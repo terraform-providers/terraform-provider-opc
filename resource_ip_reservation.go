@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 )
 
 func resourceOPCIPReservation() *schema.Resource {
@@ -31,8 +32,11 @@ func resourceOPCIPReservation() *schema.Resource {
 			"parent_pool": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  "/oracle/public/ippool",
+				Default:  string(compute.PublicReservationPool),
 				ForceNew: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					string(compute.PublicReservationPool),
+				}, true),
 			},
 			"tags": tagsForceNewSchema(),
 			"ip": {
