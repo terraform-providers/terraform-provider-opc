@@ -30,7 +30,8 @@ func resourceOPCIPReservation() *schema.Resource {
 			},
 			"parent_pool": {
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
+				Default:  "/oracle/public/ippool",
 				ForceNew: true,
 			},
 			"tags": tagsForceNewSchema(),

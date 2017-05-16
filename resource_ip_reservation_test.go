@@ -28,6 +28,26 @@ func TestAccOPCIPReservation_Basic(t *testing.T) {
 	})
 }
 
+func TestAccOPCIPreservation_OptionalParentPool(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckIPReservationDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccOPCIPReservationOptionalPool(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckIPReservationExists,
+					resource.TestCheckResourceAttr(
+						"opc_compute_ip_reservation.test", "parent_pool", "/oracle/public/ippool"),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckIPReservationExists(s *terraform.State) error {
 	client := testAccProvider.Meta().(*compute.Client).IPReservations()
 
@@ -73,3 +93,11 @@ resource "opc_compute_ip_reservation" "test" {
   permanent   = true
 }
 `
+
+func testAccOPCIPReservationOptionalPool(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_ip_reservation" "test" {
+  name        = "acc-test-ip-reservation-%d"
+  permanent   = true
+}`, rInt)
+}
