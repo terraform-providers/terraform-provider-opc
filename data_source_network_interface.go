@@ -118,7 +118,7 @@ func dataSourceNetworkInterfaceRead(d *schema.ResourceData, meta interface{}) er
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Error reading instance %q: %v", client, err)
+		return fmt.Errorf("Error reading instance %q: %v", instance_name, err)
 	}
 
 	result := compute.NetworkingInfo{}
