@@ -265,6 +265,11 @@ func resourceInstance() *schema.Resource {
 				Computed: true,
 			},
 
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+
 			"image_format": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -456,7 +461,8 @@ func updateInstanceAttributes(d *schema.ResourceData, instance *compute.Instance
 	if err := setIntList(d, "boot_order", instance.BootOrder); err != nil {
 		return err
 	}
-	d.Set("hostname", instance.Hostname)
+	d.Set("hostname", strings.Split(instance.Hostname, ".")[0])
+	d.Set("fqdn", instance.Hostname)
 	d.Set("image_list", instance.ImageList)
 	d.Set("label", instance.Label)
 
