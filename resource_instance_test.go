@@ -157,6 +157,67 @@ func TestAccOPCInstance_emptyLabel(t *testing.T) {
 	})
 }
 
+func TestAccOPCInstance_updateTags(t *testing.T) {
+	resName := "opc_compute_instance.test"
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccOPCCheckInstanceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccInstanceBasic(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccOPCCheckInstanceExists,
+					resource.TestCheckResourceAttr(resName, "name", fmt.Sprintf("acc-test-instance-%d", rInt)),
+				),
+			},
+			{
+				Config: testAccInstanceUpdateTags(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccOPCCheckInstanceExists,
+					resource.TestCheckResourceAttr(resName, "tags.#", "2"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccOPCInstance_Restart(t *testing.T) {
+	resName := "opc_compute_instance.test"
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccOPCCheckInstanceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccInstanceBootVolume(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccOPCCheckInstanceExists,
+					resource.TestCheckResourceAttr(resName, "name", fmt.Sprintf("acc-test-instance-%d", rInt)),
+				),
+			},
+			{
+				Config: testAccInstanceShutdown(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccOPCCheckInstanceExists,
+					resource.TestCheckResourceAttr(resName, "state", string(compute.InstanceShutdown)),
+				),
+			},
+			{
+				Config: testAccInstanceRestart(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccOPCCheckInstanceExists,
+					resource.TestCheckResourceAttr(resName, "state", string(compute.InstanceRunning)),
+				),
+			},
+		},
+	})
+}
+
 func testAccOPCCheckInstanceExists(s *terraform.State) error {
 	client := testAccProvider.Meta().(*compute.Client).Instances()
 
@@ -305,4 +366,121 @@ resource "opc_compute_instance" "test" {
 }
 JSON
 }`, rInt)
+}
+
+func testAccInstanceUpdateTags(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_instance" "test" {
+	name = "acc-test-instance-%d"
+	label = "TestAccOPCInstance_basic"
+	shape = "oc3"
+	image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+	tags = ["tag1", "tag2"]
+	instance_attributes = <<JSON
+{
+  "foo": "bar"
+}
+JSON
+}`, rInt)
+}
+
+func testAccInstanceBootVolume(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_image_list" "test" {
+  name = "acc-test-instance-%d"
+  description = "testing instance start-stop"
+}
+
+resource "opc_compute_image_list_entry" "test" {
+  name = "${opc_compute_image_list.test.name}"
+  machine_images = ["/oracle/public/oel_6.7_apaas_16.4.5_1610211300"]
+  version = 1
+}
+
+resource "opc_compute_storage_volume" "test" {
+  name = "acc-test-instance-%d"
+  size = "20"
+  image_list = "${opc_compute_image_list.test.name}"
+  image_list_entry = "${opc_compute_image_list_entry.test.version}"
+  bootable = true
+}
+
+resource "opc_compute_instance" "test" {
+	name = "acc-test-instance-%d"
+	label = "TestAccOPCInstance_basic"
+	shape = "oc3"
+	boot_order = [1]
+	storage {
+	  volume = "${opc_compute_storage_volume.test.name}"
+	  index = 1
+	}
+}`, rInt, rInt, rInt)
+}
+
+func testAccInstanceShutdown(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_image_list" "test" {
+  name = "acc-test-instance-%d"
+  description = "testing instance start-stop"
+}
+
+resource "opc_compute_image_list_entry" "test" {
+  name = "${opc_compute_image_list.test.name}"
+  machine_images = ["/oracle/public/oel_6.7_apaas_16.4.5_1610211300"]
+  version = 1
+}
+
+resource "opc_compute_storage_volume" "test" {
+  name = "acc-test-instance-%d"
+  size = "20"
+  image_list = "${opc_compute_image_list.test.name}"
+  image_list_entry = "${opc_compute_image_list_entry.test.version}"
+  bootable = true
+}
+
+resource "opc_compute_instance" "test" {
+	name = "acc-test-instance-%d"
+	label = "TestAccOPCInstance_basic"
+	shape = "oc3"
+	boot_order = [1]
+	desired_state = "shutdown"
+	storage {
+	  volume = "${opc_compute_storage_volume.test.name}"
+	  index = 1
+	}
+}`, rInt, rInt, rInt)
+}
+
+func testAccInstanceRestart(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_image_list" "test" {
+  name = "acc-test-instance-%d"
+  description = "testing instance start-stop"
+}
+
+resource "opc_compute_image_list_entry" "test" {
+  name = "${opc_compute_image_list.test.name}"
+  machine_images = ["/oracle/public/oel_6.7_apaas_16.4.5_1610211300"]
+  version = 1
+}
+
+resource "opc_compute_storage_volume" "test" {
+  name = "acc-test-instance-%d"
+  size = "20"
+  image_list = "${opc_compute_image_list.test.name}"
+  image_list_entry = "${opc_compute_image_list_entry.test.version}"
+  bootable = true
+}
+
+resource "opc_compute_instance" "test" {
+	name = "acc-test-instance-%d"
+	label = "TestAccOPCInstance_basic"
+	shape = "oc3"
+	boot_order = [1]
+	desired_state = "running"
+	storage {
+	  volume = "${opc_compute_storage_volume.test.name}"
+	  index = 1
+	}
+}`, rInt, rInt, rInt)
 }
