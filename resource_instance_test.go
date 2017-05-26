@@ -167,18 +167,27 @@ func TestAccOPCInstance_hostname(t *testing.T) {
 		CheckDestroy: testAccOPCCheckInstanceDestroy,
 		Steps: []resource.TestStep{
 			{
-        Config: testAccInstanceHostname(rInt),
+				Config: testAccInstanceHostname(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccOPCCheckInstanceExists,
 					resource.TestCheckResourceAttr(resName, "name", fmt.Sprintf("acc-test-instance-%d", rInt)),
 					resource.TestCheckResourceAttr(resName, "hostname", fmt.Sprintf("testhostname-%d", rInt)),
-        ),
-      },
-    },
-  })
+				),
+			},
+		},
+	})
 }
 
 func TestAccOPCInstance_updateTags(t *testing.T) {
+	resName := "opc_compute_instance.test"
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccOPCCheckInstanceDestroy,
+		Steps: []resource.TestStep{
+			{
 				Config: testAccInstanceBasic(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccOPCCheckInstanceExists,
@@ -495,6 +504,7 @@ resource "opc_compute_instance" "test" {
 	  index = 1
 	}
 }`, rInt, rInt, rInt)
+}
 
 func testAccInstanceHostname(rInt int) string {
 	return fmt.Sprintf(`
