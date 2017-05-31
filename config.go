@@ -12,17 +12,19 @@ import (
 	"github.com/hashicorp/terraform/helper/logging"
 )
 
+const DEFAULT_MAX_RETRIES = 1
+
 type Config struct {
-	User            string
-	Password        string
-	IdentityDomain  string
-	Endpoint        string
-	MaxRetryTimeout int
+	User           string
+	Password       string
+	IdentityDomain string
+	Endpoint       string
+	MaxRetries     int
 }
 
 type OPCClient struct {
-	Client          *compute.Client
-	MaxRetryTimeout int
+	Client     *compute.Client
+	MaxRetries int
 }
 
 func (c *Config) Client() (*compute.Client, error) {
@@ -37,6 +39,7 @@ func (c *Config) Client() (*compute.Client, error) {
 		Password:       &c.Password,
 		APIEndpoint:    u,
 		HTTPClient:     cleanhttp.DefaultClient(),
+		MaxRetries:     &c.MaxRetries,
 	}
 
 	if logging.IsDebugOrHigher() {
