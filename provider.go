@@ -42,6 +42,13 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("OPC_MAX_RETRIES", 1),
 				Description: "Maximum number retries to wait for a successful response when operating on resources within OPC (defaults to 1)",
 			},
+
+			"insecure": {
+				Type: schema.TypeBool,
+				Optional: true,
+				DefaultFunc: schema.EnvDefaultFunc("OPC_INSECURE", false),
+				Description: "Skip TLS Verification for self-signed certificates. Should only be used if absolutely required.",
+			},
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
