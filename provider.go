@@ -44,8 +44,8 @@ func Provider() terraform.ResourceProvider {
 			},
 
 			"insecure": {
-				Type: schema.TypeBool,
-				Optional: true,
+				Type:        schema.TypeBool,
+				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OPC_INSECURE", false),
 				Description: "Skip TLS Verification for self-signed certificates. Should only be used if absolutely required.",
 			},
