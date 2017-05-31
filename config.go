@@ -13,8 +13,6 @@ import (
 	"github.com/hashicorp/terraform/helper/logging"
 )
 
-const DEFAULT_MAX_RETRIES = 1
-
 type Config struct {
 	User           string
 	Password       string
