@@ -93,6 +93,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		IdentityDomain: d.Get("identity_domain").(string),
 		Endpoint:       d.Get("endpoint").(string),
 		MaxRetries:     d.Get("max_retries").(int),
+		Insecure:       d.Get("insecure").(bool),
 	}
 
 	return config.Client()
