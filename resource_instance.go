@@ -508,6 +508,7 @@ func updateInstanceAttributes(d *schema.ResourceData, instance *compute.Instance
 	d.Set("fingerprint", instance.Fingerprint)
 	d.Set("image_format", instance.ImageFormat)
 	d.Set("ip_address", instance.IPAddress)
+	d.Set("desired_state", instance.DesiredState)
 
 	if err := setStringList(d, "placement_requirements", instance.PlacementRequirements); err != nil {
 		return err
