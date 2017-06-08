@@ -171,7 +171,7 @@ type CreateInstanceInput struct {
 	Attributes map[string]interface{} `json:"attributes"`
 	// Boot order list
 	// Optional
-	BootOrder []int `json:"boot_order"`
+	BootOrder []int `json:"boot_order,omitempty"`
 	// The desired state of the opc instance. Can only be `running` or `shutdown`
 	// Omits if empty.
 	// Optional
@@ -204,7 +204,7 @@ type CreateInstanceInput struct {
 	Shape string `json:"shape"`
 	// A list of the Storage Attachments you want to associate with the instance.
 	// Optional
-	Storage []StorageAttachmentInput `json:"storage_attachments"`
+	Storage []StorageAttachmentInput `json:"storage_attachments,omitempty"`
 	// A list of the SSH public keys that you want to associate with the instance.
 	// Optional
 	SSHKeys []string `json:"sshkeys"`
