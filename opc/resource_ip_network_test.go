@@ -94,7 +94,7 @@ func testAccOPCCheckIPNetworkExists(state *OPCResourceState) error {
 		Name: name,
 	}
 
-	if _, err := state.Client.IPNetworks().GetIPNetwork(input); err != nil {
+	if _, err := state.ComputeClient.IPNetworks().GetIPNetwork(input); err != nil {
 		return fmt.Errorf("Error retrieving state of IP Network '%s': %v", name, err)
 	}
 
@@ -108,7 +108,7 @@ func testAccOPCCheckIPNetworkDestroyed(state *OPCResourceState) error {
 		Name: name,
 	}
 
-	if info, _ := state.Client.IPNetworks().GetIPNetwork(input); info != nil {
+	if info, _ := state.ComputeClient.IPNetworks().GetIPNetwork(input); info != nil {
 		return fmt.Errorf("IP Network '%s' still exists: %+v", name, info)
 	}
 	return nil

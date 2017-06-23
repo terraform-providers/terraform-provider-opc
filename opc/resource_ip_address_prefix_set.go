@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -46,7 +47,7 @@ func resourceOPCIPAddressPrefixSet() *schema.Resource {
 }
 
 func resourceOPCIPAddressPrefixSetCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPAddressPrefixSets()
+	client := meta.(*compute.ComputeClient).IPAddressPrefixSets()
 
 	input := compute.CreateIPAddressPrefixSetInput{
 		Name: d.Get("name").(string),
@@ -76,15 +77,15 @@ func resourceOPCIPAddressPrefixSetCreate(d *schema.ResourceData, meta interface{
 }
 
 func resourceOPCIPAddressPrefixSetRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPAddressPrefixSets()
+	computeClient := meta.(*compute.ComputeClient).IPAddressPrefixSets()
 
 	getInput := compute.GetIPAddressPrefixSetInput{
 		Name: d.Id(),
 	}
-	result, err := client.GetIPAddressPrefixSet(&getInput)
+	result, err := computeClient.GetIPAddressPrefixSet(&getInput)
 	if err != nil {
 		// IP Address Prefix Set does not exist
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -104,7 +105,7 @@ func resourceOPCIPAddressPrefixSetRead(d *schema.ResourceData, meta interface{})
 }
 
 func resourceOPCIPAddressPrefixSetUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPAddressPrefixSets()
+	client := meta.(*compute.ComputeClient).IPAddressPrefixSets()
 
 	input := compute.UpdateIPAddressPrefixSetInput{
 		Name: d.Get("name").(string),
@@ -134,7 +135,7 @@ func resourceOPCIPAddressPrefixSetUpdate(d *schema.ResourceData, meta interface{
 }
 
 func resourceOPCIPAddressPrefixSetDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPAddressPrefixSets()
+	client := meta.(*compute.ComputeClient).IPAddressPrefixSets()
 	name := d.Id()
 
 	input := compute.DeleteIPAddressPrefixSetInput{

@@ -32,7 +32,7 @@ func TestAccOPCIPAddressReservation_Basic(t *testing.T) {
 }
 
 func testAccOPCCheckIPAddressReservationExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.Client).IPAddressReservations()
+	client := testAccProvider.Meta().(*compute.ComputeClient).IPAddressReservations()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_ip_address_reservation" {
@@ -50,7 +50,7 @@ func testAccOPCCheckIPAddressReservationExists(s *terraform.State) error {
 	return nil
 }
 func testAccOPCCheckIPAddressReservationDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.Client).IPAddressReservations()
+	client := testAccProvider.Meta().(*compute.ComputeClient).IPAddressReservations()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_ip_address_reservation" {

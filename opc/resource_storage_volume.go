@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
@@ -133,7 +134,7 @@ func resourceOPCStorageVolume() *schema.Resource {
 }
 
 func resourceOPCStorageVolumeCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).StorageVolumes()
+	client := meta.(*compute.ComputeClient).StorageVolumes()
 
 	name := d.Get("name").(string)
 	description := d.Get("description").(string)
@@ -184,7 +185,7 @@ func resourceOPCStorageVolumeCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceOPCStorageVolumeUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).StorageVolumes()
+	client := meta.(*compute.ComputeClient).StorageVolumes()
 
 	name := d.Id()
 	description := d.Get("description").(string)
@@ -211,7 +212,7 @@ func resourceOPCStorageVolumeUpdate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceOPCStorageVolumeRead(d *schema.ResourceData, meta interface{}) error {
-	sv := meta.(*compute.Client).StorageVolumes()
+	sv := meta.(*compute.ComputeClient).StorageVolumes()
 
 	name := d.Id()
 	input := compute.GetStorageVolumeInput{
@@ -220,7 +221,7 @@ func resourceOPCStorageVolumeRead(d *schema.ResourceData, meta interface{}) erro
 	result, err := sv.GetStorageVolume(&input)
 	if err != nil {
 		// Volume doesn't exist
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -259,7 +260,7 @@ func resourceOPCStorageVolumeRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceOPCStorageVolumeDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).StorageVolumes()
+	client := meta.(*compute.ComputeClient).StorageVolumes()
 	name := d.Id()
 
 	input := compute.DeleteStorageVolumeInput{

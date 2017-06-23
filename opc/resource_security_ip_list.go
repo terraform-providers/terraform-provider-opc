@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -39,7 +40,7 @@ func resourceOPCSecurityIPList() *schema.Resource {
 
 func resourceOPCSecurityIPListCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	client := meta.(*compute.Client).SecurityIPLists()
+	client := meta.(*compute.ComputeClient).SecurityIPLists()
 
 	ipEntries := d.Get("ip_entries").([]interface{})
 	ipEntryStrings := []string{}
@@ -67,17 +68,17 @@ func resourceOPCSecurityIPListCreate(d *schema.ResourceData, meta interface{}) e
 
 func resourceOPCSecurityIPListRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	client := meta.(*compute.Client).SecurityIPLists()
+	computeClient := meta.(*compute.ComputeClient).SecurityIPLists()
 	name := d.Id()
 
 	log.Printf("[DEBUG] Reading state of security IP list %s", name)
 	input := compute.GetSecurityIPListInput{
 		Name: name,
 	}
-	result, err := client.GetSecurityIPList(&input)
+	result, err := computeClient.GetSecurityIPList(&input)
 	if err != nil {
 		// Security IP List does not exist
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -94,7 +95,7 @@ func resourceOPCSecurityIPListRead(d *schema.ResourceData, meta interface{}) err
 func resourceOPCSecurityIPListUpdate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
 
-	client := meta.(*compute.Client).SecurityIPLists()
+	client := meta.(*compute.ComputeClient).SecurityIPLists()
 
 	ipEntries := d.Get("ip_entries").([]interface{})
 	ipEntryStrings := []string{}
@@ -121,7 +122,7 @@ func resourceOPCSecurityIPListUpdate(d *schema.ResourceData, meta interface{}) e
 
 func resourceOPCSecurityIPListDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	client := meta.(*compute.Client).SecurityIPLists()
+	client := meta.(*compute.ComputeClient).SecurityIPLists()
 	name := d.Id()
 
 	log.Printf("[DEBUG] Deleting security IP list %s", name)

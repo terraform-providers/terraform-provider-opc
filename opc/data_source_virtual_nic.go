@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -43,7 +44,7 @@ func dataSourceVNIC() *schema.Resource {
 }
 
 func dataSourceVNICRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).VirtNICs()
+	computeClient := meta.(*compute.ComputeClient).VirtNICs()
 
 	name := d.Get("name").(string)
 
@@ -51,9 +52,9 @@ func dataSourceVNICRead(d *schema.ResourceData, meta interface{}) error {
 		Name: name,
 	}
 
-	vnic, err := client.GetVirtualNIC(input)
+	vnic, err := computeClient.GetVirtualNIC(input)
 	if err != nil {
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}

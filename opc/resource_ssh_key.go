@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -39,7 +40,7 @@ func resourceOPCSSHKey() *schema.Resource {
 }
 
 func resourceOPCSSHKeyCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SSHKeys()
+	client := meta.(*compute.ComputeClient).SSHKeys()
 
 	name := d.Get("name").(string)
 	key := d.Get("key").(string)
@@ -61,7 +62,7 @@ func resourceOPCSSHKeyCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSSHKeyUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SSHKeys()
+	client := meta.(*compute.ComputeClient).SSHKeys()
 
 	name := d.Get("name").(string)
 	key := d.Get("key").(string)
@@ -81,15 +82,15 @@ func resourceOPCSSHKeyUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SSHKeys()
+	computeClient := meta.(*compute.ComputeClient).SSHKeys()
 	name := d.Id()
 
 	input := compute.GetSSHKeyInput{
 		Name: name,
 	}
-	result, err := client.GetSSHKey(&input)
+	result, err := computeClient.GetSSHKey(&input)
 	if err != nil {
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -104,7 +105,7 @@ func resourceOPCSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSSHKeyDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SSHKeys()
+	client := meta.(*compute.ComputeClient).SSHKeys()
 	name := d.Id()
 
 	input := compute.DeleteSSHKeyInput{

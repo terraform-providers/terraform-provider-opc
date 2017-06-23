@@ -64,7 +64,7 @@ func TestAccOPCSecurityRule_Full(t *testing.T) {
 }
 
 func testAccCheckSecurityRuleExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.Client).SecurityRules()
+	client := testAccProvider.Meta().(*compute.ComputeClient).SecurityRules()
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_sec_rule" {
 			continue
@@ -82,7 +82,7 @@ func testAccCheckSecurityRuleExists(s *terraform.State) error {
 }
 
 func testAccCheckSecurityRuleDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.Client).SecurityRules()
+	client := testAccProvider.Meta().(*compute.ComputeClient).SecurityRules()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_security_rule" {

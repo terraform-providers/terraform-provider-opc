@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -54,7 +55,7 @@ func resourceOPCSecurityProtocol() *schema.Resource {
 }
 
 func resourceOPCSecurityProtocolCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SecurityProtocols()
+	client := meta.(*compute.ComputeClient).SecurityProtocols()
 	input := compute.CreateSecurityProtocolInput{
 		Name:       d.Get("name").(string),
 		IPProtocol: d.Get("ip_protocol").(string),
@@ -86,14 +87,14 @@ func resourceOPCSecurityProtocolCreate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceOPCSecurityProtocolRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SecurityProtocols()
+	computeClient := meta.(*compute.ComputeClient).SecurityProtocols()
 	getInput := compute.GetSecurityProtocolInput{
 		Name: d.Id(),
 	}
-	result, err := client.GetSecurityProtocol(&getInput)
+	result, err := computeClient.GetSecurityProtocol(&getInput)
 	if err != nil {
 		// Security Protocol does not exist
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -116,7 +117,7 @@ func resourceOPCSecurityProtocolRead(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceOPCSecurityProtocolUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SecurityProtocols()
+	client := meta.(*compute.ComputeClient).SecurityProtocols()
 	input := compute.UpdateSecurityProtocolInput{
 		Name:       d.Get("name").(string),
 		IPProtocol: d.Get("ip_protocol").(string),
@@ -147,7 +148,7 @@ func resourceOPCSecurityProtocolUpdate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceOPCSecurityProtocolDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SecurityProtocols()
+	client := meta.(*compute.ComputeClient).SecurityProtocols()
 	name := d.Id()
 
 	input := compute.DeleteSecurityProtocolInput{

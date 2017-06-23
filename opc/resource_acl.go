@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -52,7 +53,7 @@ func resourceOPCACLCreate(d *schema.ResourceData, meta interface{}) error {
 
 	log.Print("[DEBUG] Creating acl")
 
-	client := meta.(*compute.Client).ACLs()
+	client := meta.(*compute.ComputeClient).ACLs()
 	input := compute.CreateACLInput{
 		Name:    d.Get("name").(string),
 		Enabled: d.Get("enabled").(bool),
@@ -78,16 +79,16 @@ func resourceOPCACLCreate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceOPCACLRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	client := meta.(*compute.Client).ACLs()
+	computeClient := meta.(*compute.ComputeClient).ACLs()
 
 	log.Printf("[DEBUG] Reading state of ip reservation %s", d.Id())
 	getInput := compute.GetACLInput{
 		Name: d.Id(),
 	}
-	result, err := client.GetACL(&getInput)
+	result, err := computeClient.GetACL(&getInput)
 	if err != nil {
 		// ACL does not exist
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -110,7 +111,7 @@ func resourceOPCACLUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	log.Print("[DEBUG] Updating acl")
 
-	client := meta.(*compute.Client).ACLs()
+	client := meta.(*compute.ComputeClient).ACLs()
 	input := compute.UpdateACLInput{
 		Name:    d.Get("name").(string),
 		Enabled: d.Get("enabled").(bool),
@@ -136,7 +137,7 @@ func resourceOPCACLUpdate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceOPCACLDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	client := meta.(*compute.Client).ACLs()
+	client := meta.(*compute.ComputeClient).ACLs()
 	name := d.Id()
 
 	log.Printf("[DEBUG] Deleting ACL: %v", name)
