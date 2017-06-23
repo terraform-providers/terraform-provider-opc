@@ -1,4 +1,4 @@
-package compute
+package storage
 
 import (
 	"bytes"
@@ -34,18 +34,8 @@ func newAuthenticatingServer(handler func(w http.ResponseWriter, r *http.Request
 	}))
 }
 
-func getTestClient(c *opc.Config) (*ComputeClient, error) {
+func getStorageTestClient(c *opc.Config) (*Client, error) {
 	// Build up config with default values if omitted
-	if c.APIEndpoint == nil {
-		if os.Getenv("OPC_ENDPOINT") == "" {
-			panic("OPC_ENDPOINT not set in environment")
-		}
-		endpoint, err := url.Parse(os.Getenv("OPC_ENDPOINT"))
-		if err != nil {
-			return nil, err
-		}
-		c.APIEndpoint = endpoint
-	}
 
 	if c.IdentityDomain == nil {
 		domain := os.Getenv("OPC_IDENTITY_DOMAIN")
@@ -70,10 +60,10 @@ func getTestClient(c *opc.Config) (*ComputeClient, error) {
 		}
 	}
 
-	return NewComputeClient(c)
+	return NewStorageClient(c)
 }
 
-func getBlankTestClient() (*ComputeClient, *httptest.Server, error) {
+func getBlankTestClient() (*Client, *httptest.Server, error) {
 	server := newAuthenticatingServer(func(w http.ResponseWriter, r *http.Request) {
 	})
 
@@ -83,7 +73,7 @@ func getBlankTestClient() (*ComputeClient, *httptest.Server, error) {
 		return nil, nil, err
 	}
 
-	client, err := getTestClient(&opc.Config{
+	client, err := getStorageTestClient(&opc.Config{
 		IdentityDomain: opc.String(_ClientTestDomain),
 		Username:       opc.String(_ClientTestUser),
 		APIEndpoint:    endpoint,
@@ -96,7 +86,7 @@ func getBlankTestClient() (*ComputeClient, *httptest.Server, error) {
 }
 
 // Returns a stub client with default values, and a custom API Endpoint
-func getStubClient(endpoint *url.URL) (*ComputeClient, error) {
+func getStubClient(endpoint *url.URL) (*Client, error) {
 	domain := "test"
 	username := "test"
 	password := "test"
@@ -106,7 +96,7 @@ func getStubClient(endpoint *url.URL) (*ComputeClient, error) {
 		Password:       &password,
 		APIEndpoint:    endpoint,
 	}
-	return getTestClient(config)
+	return getStorageTestClient(config)
 }
 
 func unmarshalRequestBody(t *testing.T, r *http.Request, target interface{}) {

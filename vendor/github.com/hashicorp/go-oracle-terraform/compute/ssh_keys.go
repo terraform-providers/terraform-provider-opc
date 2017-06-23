@@ -7,10 +7,10 @@ type SSHKeysClient struct {
 
 // SSHKeys obtains an SSHKeysClient which can be used to access to the
 // SSH key functions of the Compute API
-func (c *Client) SSHKeys() *SSHKeysClient {
+func (c *ComputeClient) SSHKeys() *SSHKeysClient {
 	return &SSHKeysClient{
 		ResourceClient: ResourceClient{
-			Client:              c,
+			ComputeClient:       c,
 			ResourceDescription: "SSH key",
 			ContainerPath:       "/sshkey/",
 			ResourceRootPath:    "/sshkey",

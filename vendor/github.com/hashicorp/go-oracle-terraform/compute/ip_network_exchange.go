@@ -12,10 +12,10 @@ type IPNetworkExchangesClient struct {
 
 // IPNetworkExchanges() returns an IPNetworkExchangesClient that can be used to access the
 // necessary CRUD functions for IP Network Exchanges.
-func (c *Client) IPNetworkExchanges() *IPNetworkExchangesClient {
+func (c *ComputeClient) IPNetworkExchanges() *IPNetworkExchangesClient {
 	return &IPNetworkExchangesClient{
 		ResourceClient: ResourceClient{
-			Client:              c,
+			ComputeClient:       c,
 			ResourceDescription: IPNetworkExchangeDescription,
 			ContainerPath:       IPNetworkExchangeContainerPath,
 			ResourceRootPath:    IPNetworkExchangeResourcePath,

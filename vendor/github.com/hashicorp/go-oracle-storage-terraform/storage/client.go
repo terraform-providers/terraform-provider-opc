@@ -1,10 +1,8 @@
-package compute
+package storage
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -14,9 +12,11 @@ import (
 	"github.com/hashicorp/go-oracle-terraform/opc"
 )
 
-const CMP_USERNAME = "/Compute-%s/%s"
-const CMP_QUALIFIED_NAME = "%s/%s"
+const STR_ACCOUNT = "/Storage-%s"
+const STR_USERNAME = "/Storage-%s:%s"
 const DEFAULT_MAX_RETRIES = 1
+const AUTH_HEADER = "X-Auth-Token"
+const STR_QUALIFIED_NAME = "%s%s/%s"
 
 // Client represents an authenticated compute client, with compute credentials and an api client.
 type Client struct {
@@ -25,14 +25,15 @@ type Client struct {
 	password       *string
 	apiEndpoint    *url.URL
 	httpClient     *http.Client
-	authCookie     *http.Cookie
-	cookieIssued   time.Time
+	authToken      *string
+	tokenIssued    time.Time
 	maxRetries     *int
 	logger         opc.Logger
 	loglevel       opc.LogLevelType
 }
 
-func NewComputeClient(c *opc.Config) (*Client, error) {
+func NewStorageClient(c *opc.Config) (*Client, error) {
+	var err error
 	// First create a client
 	client := &Client{
 		identityDomain: c.IdentityDomain,
@@ -42,6 +43,11 @@ func NewComputeClient(c *opc.Config) (*Client, error) {
 		httpClient:     c.HTTPClient,
 		maxRetries:     c.MaxRetries,
 		loglevel:       c.LogLevel,
+	}
+
+	client.apiEndpoint, err = url.Parse(fmt.Sprintf("https://%s.storage.oraclecloud.com", *client.identityDomain))
+	if err != nil {
+		return nil, err
 	}
 
 	// Setup logger; defaults to stdout
@@ -57,7 +63,7 @@ func NewComputeClient(c *opc.Config) (*Client, error) {
 		client.loglevel = opc.LogLevel()
 	}
 
-	if err := client.getAuthenticationCookie(); err != nil {
+	if err := client.getAuthenticationToken(); err != nil {
 		return nil, err
 	}
 
@@ -74,50 +80,33 @@ func NewComputeClient(c *opc.Config) (*Client, error) {
 	return client, nil
 }
 
-func (c *Client) executeRequest(method, path string, body interface{}) (*http.Response, error) {
+func (c *Client) executeRequest(method, path string, headers interface{}) (*http.Response, error) {
 	// Parse URL Path
 	urlPath, err := url.Parse(path)
 	if err != nil {
 		return nil, err
 	}
 
-	// Marshall request body
-	var requestBody io.ReadSeeker
-	var marshaled []byte
-	if body != nil {
-		marshaled, err = json.Marshal(body)
-		if err != nil {
-			return nil, err
-		}
-		requestBody = bytes.NewReader(marshaled)
-	}
-
 	// Create request
-	req, err := http.NewRequest(method, c.formatURL(urlPath), requestBody)
+	req, err := http.NewRequest(method, c.formatURL(urlPath), nil)
 	if err != nil {
 		return nil, err
 	}
 
-	debugReqString := fmt.Sprintf("HTTP %s Req (%s)", method, path)
-	if body != nil {
-		req.Header.Set("Content-Type", "application/oracle-compute-v3+json")
-		// Don't leak creds in STDERR
-		if path != "/authenticate/" {
-			debugReqString = fmt.Sprintf("%s:\n %s", debugReqString, string(marshaled))
+	if headers != nil {
+		for k, v := range headers.(map[string]string) {
+			req.Header.Add(k, v)
 		}
 	}
 
-	// Log the request before the authentication cookie, so as not to leak credentials
-	c.debugLogString(debugReqString)
-
-	// If we have an authentication cookie, let's authenticate, refreshing cookie if need be
-	if c.authCookie != nil {
-		if time.Since(c.cookieIssued).Minutes() > 25 {
-			if err := c.getAuthenticationCookie(); err != nil {
+	// If we have an authentication toekn, let's authenticate, refreshing token if need be
+	if c.authToken != nil {
+		if time.Since(c.tokenIssued).Minutes() > 25 {
+			if err := c.getAuthenticationToken(); err != nil {
 				return nil, err
 			}
 		}
-		req.AddCookie(c.authCookie)
+		req.Header.Add(AUTH_HEADER, *c.authToken)
 	}
 
 	// Execute request with supplied client
@@ -134,7 +123,6 @@ func (c *Client) executeRequest(method, path string, body interface{}) (*http.Re
 	oracleErr := &opc.OracleError{
 		StatusCode: resp.StatusCode,
 	}
-
 	// Even though the returned body will be in json form, it's undocumented what
 	// fields are actually returned. Once we get documentation of the actual
 	// error fields that are possible to be returned we can have stricter error types.
@@ -193,23 +181,23 @@ func (c *Client) formatURL(path *url.URL) string {
 }
 
 func (c *Client) getUserName() string {
-	return fmt.Sprintf(CMP_USERNAME, *c.identityDomain, *c.userName)
+	return fmt.Sprintf(STR_USERNAME, *c.identityDomain, *c.userName)
+}
+
+func (c *Client) getAccount() string {
+	return fmt.Sprintf(STR_ACCOUNT, *c.identityDomain)
 }
 
 // From compute_client
 // GetObjectName returns the fully-qualified name of an OPC object, e.g. /identity-domain/user@email/{name}
-func (c *Client) getQualifiedName(name string) string {
+func (c *Client) getQualifiedName(version string, name string) string {
 	if name == "" {
 		return ""
 	}
-	if strings.HasPrefix(name, "/oracle") || strings.HasPrefix(name, "/Compute-") {
+	if strings.HasPrefix(name, "/Storage-") || strings.HasPrefix(name, "v1/") {
 		return name
 	}
-	return fmt.Sprintf(CMP_QUALIFIED_NAME, c.getUserName(), name)
-}
-
-func (c *Client) getObjectPath(root, name string) string {
-	return fmt.Sprintf("%s%s", root, c.getQualifiedName(name))
+	return fmt.Sprintf(STR_QUALIFIED_NAME, version, c.getAccount(), name)
 }
 
 // GetUnqualifiedName returns the unqualified name of an OPC object, e.g. the {name} part of /identity-domain/user@email/{name}
@@ -238,34 +226,6 @@ func (c *Client) unqualifyUrl(url *string) {
 	var validID = regexp.MustCompile(`(\/(Compute[^\/\s]+))(\/[^\/\s]+)(\/[^\/\s]+)`)
 	name := validID.FindString(*url)
 	*url = c.getUnqualifiedName(name)
-}
-
-func (c *Client) getQualifiedList(list []string) []string {
-	for i, name := range list {
-		list[i] = c.getQualifiedName(name)
-	}
-	return list
-}
-
-func (c *Client) getUnqualifiedList(list []string) []string {
-	for i, name := range list {
-		list[i] = c.getUnqualifiedName(name)
-	}
-	return list
-}
-
-func (c *Client) getQualifiedListName(name string) string {
-	nameParts := strings.Split(name, ":")
-	listType := nameParts[0]
-	listName := nameParts[1]
-	return fmt.Sprintf("%s:%s", listType, c.getQualifiedName(listName))
-}
-
-func (c *Client) unqualifyListName(qualifiedName string) string {
-	nameParts := strings.Split(qualifiedName, ":")
-	listType := nameParts[0]
-	listName := nameParts[1]
-	return fmt.Sprintf("%s:%s", listType, c.getUnqualifiedName(listName))
 }
 
 // Retry function

@@ -19,10 +19,10 @@ const (
 
 // IPAddressReservations returns an IPAddressReservationsClient to manage IP address reservation
 // resources
-func (c *Client) IPAddressReservations() *IPAddressReservationsClient {
+func (c *ComputeClient) IPAddressReservations() *IPAddressReservationsClient {
 	return &IPAddressReservationsClient{
 		ResourceClient: &ResourceClient{
-			Client:              c,
+			ComputeClient:       c,
 			ResourceDescription: IPAddressReservationDescription,
 			ContainerPath:       IPAddressReservationContainerPath,
 			ResourceRootPath:    IPAddressReservationResourcePath,

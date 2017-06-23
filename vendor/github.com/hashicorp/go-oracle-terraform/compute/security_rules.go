@@ -12,10 +12,10 @@ type SecurityRuleClient struct {
 
 // SecurityRules() returns an SecurityRulesClient that can be used to access the
 // necessary CRUD functions for Security Rules.
-func (c *Client) SecurityRules() *SecurityRuleClient {
+func (c *ComputeClient) SecurityRules() *SecurityRuleClient {
 	return &SecurityRuleClient{
 		ResourceClient: ResourceClient{
-			Client:              c,
+			ComputeClient:       c,
 			ResourceDescription: SecurityRuleDescription,
 			ContainerPath:       SecurityRuleContainerPath,
 			ResourceRootPath:    SecurityRuleResourcePath,

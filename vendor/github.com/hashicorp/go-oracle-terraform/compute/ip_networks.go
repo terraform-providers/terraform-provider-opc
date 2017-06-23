@@ -12,10 +12,10 @@ type IPNetworksClient struct {
 
 // IPNetworks() returns an IPNetworksClient that can be used to access the
 // necessary CRUD functions for IP Networks.
-func (c *Client) IPNetworks() *IPNetworksClient {
+func (c *ComputeClient) IPNetworks() *IPNetworksClient {
 	return &IPNetworksClient{
 		ResourceClient: ResourceClient{
-			Client:              c,
+			ComputeClient:       c,
 			ResourceDescription: IPNetworkDescription,
 			ContainerPath:       IPNetworkContainerPath,
 			ResourceRootPath:    IPNetworkResourcePath,

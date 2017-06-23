@@ -7,10 +7,10 @@ type SecurityApplicationsClient struct {
 
 // SecurityApplications obtains a SecurityApplicationsClient which can be used to access to the
 // Security Application functions of the Compute API
-func (c *Client) SecurityApplications() *SecurityApplicationsClient {
+func (c *ComputeClient) SecurityApplications() *SecurityApplicationsClient {
 	return &SecurityApplicationsClient{
 		ResourceClient: ResourceClient{
-			Client:              c,
+			ComputeClient:       c,
 			ResourceDescription: "security application",
 			ContainerPath:       "/secapplication/",
 			ResourceRootPath:    "/secapplication",

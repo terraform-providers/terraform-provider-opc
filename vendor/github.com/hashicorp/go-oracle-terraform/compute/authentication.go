@@ -12,10 +12,10 @@ type AuthenticationReq struct {
 }
 
 // Get a new auth cookie for the compute client
-func (c *Client) getAuthenticationCookie() error {
+func (c *ComputeClient) getAuthenticationCookie() error {
 	req := AuthenticationReq{
 		User:     c.getUserName(),
-		Password: *c.password,
+		Password: *c.client.Password,
 	}
 
 	rsp, err := c.executeRequest("POST", "/authenticate/", req)
@@ -27,7 +27,7 @@ func (c *Client) getAuthenticationCookie() error {
 		return fmt.Errorf("No authentication cookie found in response %#v", rsp)
 	}
 
-	c.debugLogString("Successfully authenticated to OPC")
+	c.client.DebugLogString("Successfully authenticated to OPC")
 	c.authCookie = rsp.Cookies()[0]
 	c.cookieIssued = time.Now()
 	return nil
