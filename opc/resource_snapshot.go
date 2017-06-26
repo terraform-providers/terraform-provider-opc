@@ -21,7 +21,6 @@ func resourceOPCSnapshot() *schema.Resource {
 			"name": {
 				Type:     schema.TypeString,
 				Computed: true,
-				ForceNew: true,
 			},
 			"account": {
 				Type:     schema.TypeString,
