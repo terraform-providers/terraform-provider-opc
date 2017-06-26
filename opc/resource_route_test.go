@@ -125,7 +125,7 @@ resource "opc_compute_route" "test" {
 }
 
 func testAccOPCCheckRouteExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.Client).Routes()
+	client := testAccProvider.Meta().(*compute.ComputeClient).Routes()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_route" {
@@ -144,7 +144,7 @@ func testAccOPCCheckRouteExists(s *terraform.State) error {
 }
 
 func testAccOPCCheckRouteDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.Client).Routes()
+	client := testAccProvider.Meta().(*compute.ComputeClient).Routes()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_route" {

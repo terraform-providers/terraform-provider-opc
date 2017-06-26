@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -121,7 +122,7 @@ func resourceOPCStorageVolumeSnapshot() *schema.Resource {
 }
 
 func resourceOPCStorageVolumeSnapshotCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).StorageVolumeSnapshots()
+	client := meta.(*compute.ComputeClient).StorageVolumeSnapshots()
 
 	// Get required attribute
 	input := &compute.CreateStorageVolumeSnapshotInput{
@@ -162,20 +163,26 @@ func resourceOPCStorageVolumeSnapshotCreate(d *schema.ResourceData, meta interfa
 }
 
 func resourceOPCStorageVolumeSnapshotRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).StorageVolumeSnapshots()
+	computeClient := meta.(*compute.ComputeClient).StorageVolumeSnapshots()
 
 	name := d.Id()
 	input := &compute.GetStorageVolumeSnapshotInput{
 		Name: name,
 	}
 
-	result, err := client.GetStorageVolumeSnapshot(input)
+	result, err := computeClient.GetStorageVolumeSnapshot(input)
 	if err != nil {
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
 		return fmt.Errorf("Error reading storage volume snapshot '%s': %v", name, err)
+	}
+
+	if result == nil {
+		// No Storage volume snapshot was found
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("volume_name", result.Volume)
@@ -214,7 +221,7 @@ func resourceOPCStorageVolumeSnapshotRead(d *schema.ResourceData, meta interface
 }
 
 func resourceOPCStorageVolumeSnapshotDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).StorageVolumeSnapshots()
+	client := meta.(*compute.ComputeClient).StorageVolumeSnapshots()
 
 	name := d.Id()
 

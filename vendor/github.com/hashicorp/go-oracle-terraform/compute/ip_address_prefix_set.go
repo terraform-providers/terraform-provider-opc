@@ -12,10 +12,10 @@ type IPAddressPrefixSetsClient struct {
 
 // IPAddressPrefixSets() returns an IPAddressPrefixSetsClient that can be used to access the
 // necessary CRUD functions for IP Address Prefix Sets.
-func (c *Client) IPAddressPrefixSets() *IPAddressPrefixSetsClient {
+func (c *ComputeClient) IPAddressPrefixSets() *IPAddressPrefixSetsClient {
 	return &IPAddressPrefixSetsClient{
 		ResourceClient: ResourceClient{
-			Client:              c,
+			ComputeClient:       c,
 			ResourceDescription: IPAddressPrefixSetDescription,
 			ContainerPath:       IPAddressPrefixSetContainerPath,
 			ResourceRootPath:    IPAddressPrefixSetResourcePath,

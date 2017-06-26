@@ -23,11 +23,11 @@ type Config struct {
 }
 
 type OPCClient struct {
-	Client     *compute.Client
+	Client     *compute.ComputeClient
 	MaxRetries int
 }
 
-func (c *Config) Client() (*compute.Client, error) {
+func (c *Config) Client() (*compute.ComputeClient, error) {
 	u, err := url.ParseRequestURI(c.Endpoint)
 	if err != nil {
 		return nil, fmt.Errorf("Invalid endpoint URI: %s", err)

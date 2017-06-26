@@ -1,5 +1,7 @@
 package compute
 
+import "github.com/hashicorp/go-oracle-terraform/client"
+
 const WaitForVolumeAttachmentDeleteTimeout = 30
 const WaitForVolumeAttachmentReadyTimeout = 30
 
@@ -10,10 +12,10 @@ type StorageAttachmentsClient struct {
 
 // StorageAttachments obtains a StorageAttachmentsClient which can be used to access to the
 // Storage Attachment functions of the Compute API
-func (c *Client) StorageAttachments() *StorageAttachmentsClient {
+func (c *ComputeClient) StorageAttachments() *StorageAttachmentsClient {
 	return &StorageAttachmentsClient{
 		ResourceClient: ResourceClient{
-			Client:              c,
+			ComputeClient:       c,
 			ResourceDescription: "storage volume attachment",
 			ContainerPath:       "/storage/attachment/",
 			ResourceRootPath:    "/storage/attachment",
@@ -118,7 +120,7 @@ func (c *StorageAttachmentsClient) GetStorageAttachment(input *GetStorageAttachm
 func (c *StorageAttachmentsClient) waitForStorageAttachmentToFullyAttach(name string, timeoutSeconds int) (*StorageAttachmentInfo, error) {
 	var waitResult *StorageAttachmentInfo
 
-	err := c.waitFor("storage attachment to be attached", timeoutSeconds, func() (bool, error) {
+	err := c.client.WaitFor("storage attachment to be attached", timeoutSeconds, func() (bool, error) {
 		input := &GetStorageAttachmentInput{
 			Name: name,
 		}
@@ -142,13 +144,13 @@ func (c *StorageAttachmentsClient) waitForStorageAttachmentToFullyAttach(name st
 
 // waitForStorageAttachmentToBeDeleted waits for the storage attachment with the given name to be fully deleted, or times out.
 func (c *StorageAttachmentsClient) waitForStorageAttachmentToBeDeleted(name string, timeoutSeconds int) error {
-	return c.waitFor("storage attachment to be deleted", timeoutSeconds, func() (bool, error) {
+	return c.client.WaitFor("storage attachment to be deleted", timeoutSeconds, func() (bool, error) {
 		input := &GetStorageAttachmentInput{
 			Name: name,
 		}
 		_, err := c.GetStorageAttachment(input)
 		if err != nil {
-			if WasNotFoundError(err) {
+			if client.WasNotFoundError(err) {
 				return true, nil
 			}
 			return false, err

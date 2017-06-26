@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -30,7 +31,6 @@ func resourceOPCSnapshot() *schema.Resource {
 			"creation_time": {
 				Type:     schema.TypeString,
 				Computed: true,
-				ForceNew: true,
 			},
 			"instance": {
 				Type:     schema.TypeString,
@@ -41,19 +41,17 @@ func resourceOPCSnapshot() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
-				ForceNew: true,
 			},
 			"uri": {
 				Type:     schema.TypeString,
 				Computed: true,
-				ForceNew: true,
 			},
 		},
 	}
 }
 
 func resourceOPCSnapshotCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).Snapshots()
+	client := meta.(*compute.ComputeClient).Snapshots()
 
 	instance := d.Get("instance").(string)
 
@@ -80,17 +78,17 @@ func resourceOPCSnapshotCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSnapshotRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).Snapshots()
+	computeClient := meta.(*compute.ComputeClient).Snapshots()
 
 	name := d.Id()
 
 	input := compute.GetSnapshotInput{
 		Name: name,
 	}
-	result, err := client.GetSnapshot(&input)
+	result, err := computeClient.GetSnapshot(&input)
 	if err != nil {
 		// Sec Rule does not exist
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -108,17 +106,17 @@ func resourceOPCSnapshotRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSnapshotDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).Snapshots()
-	machineImageClient := meta.(*compute.Client).MachineImages()
+	computeClient := meta.(*compute.ComputeClient).Snapshots()
+	machineImageClient := meta.(*compute.ComputeClient).MachineImages()
 	name := d.Id()
 
 	getInput := compute.GetSnapshotInput{
 		Name: name,
 	}
-	result, err := client.GetSnapshot(&getInput)
+	result, err := computeClient.GetSnapshot(&getInput)
 	if err != nil {
-		// Sec Rule does not exist
-		if compute.WasNotFoundError(err) {
+		// Snapshot does not exist
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -129,7 +127,7 @@ func resourceOPCSnapshotDelete(d *schema.ResourceData, meta interface{}) error {
 		Snapshot:     name,
 		MachineImage: result.MachineImage,
 	}
-	if err := client.DeleteSnapshot(machineImageClient, &input); err != nil {
+	if err := computeClient.DeleteSnapshot(machineImageClient, &input); err != nil {
 		return fmt.Errorf("Error deleting snapshot %s: %s", name, err)
 	}
 

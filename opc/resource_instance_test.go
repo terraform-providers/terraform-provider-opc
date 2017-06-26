@@ -240,7 +240,7 @@ func TestAccOPCInstance_Restart(t *testing.T) {
 }
 
 func testAccOPCCheckInstanceExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.Client).Instances()
+	client := testAccProvider.Meta().(*compute.ComputeClient).Instances()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_instance" {
@@ -261,7 +261,7 @@ func testAccOPCCheckInstanceExists(s *terraform.State) error {
 }
 
 func testAccOPCCheckInstanceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.Client).Instances()
+	client := testAccProvider.Meta().(*compute.ComputeClient).Instances()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_instance" {

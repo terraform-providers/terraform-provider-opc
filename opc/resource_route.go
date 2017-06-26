@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -51,7 +52,7 @@ func resourceOPCRoute() *schema.Resource {
 }
 
 func resourceOPCRouteCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).Routes()
+	client := meta.(*compute.ComputeClient).Routes()
 
 	// Get Required attributes
 	name := d.Get("name").(string)
@@ -93,35 +94,40 @@ func resourceOPCRouteCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCRouteRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).Routes()
+	computeClient := meta.(*compute.ComputeClient).Routes()
 
 	name := d.Id()
 	input := &compute.GetRouteInput{
 		Name: name,
 	}
 
-	res, err := client.GetRoute(input)
+	result, err := computeClient.GetRoute(input)
 	if err != nil {
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
 		return fmt.Errorf("Error reading route '%s': %v", name, err)
 	}
 
-	d.Set("name", res.Name)
-	d.Set("admin_distance", res.AdminDistance)
-	d.Set("ip_address_prefix", res.IPAddressPrefix)
-	d.Set("next_hop_vnic_set", res.NextHopVnicSet)
-	d.Set("description", res.Description)
-	if err := setStringList(d, "tags", res.Tags); err != nil {
+	if result == nil {
+		d.SetId("")
+		return nil
+	}
+
+	d.Set("name", result.Name)
+	d.Set("admin_distance", result.AdminDistance)
+	d.Set("ip_address_prefix", result.IPAddressPrefix)
+	d.Set("next_hop_vnic_set", result.NextHopVnicSet)
+	d.Set("description", result.Description)
+	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err
 	}
 	return nil
 }
 
 func resourceOPCRouteUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).Routes()
+	client := meta.(*compute.ComputeClient).Routes()
 
 	// Get Required attributes
 	name := d.Get("name").(string)
@@ -163,7 +169,7 @@ func resourceOPCRouteUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCRouteDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).Routes()
+	client := meta.(*compute.ComputeClient).Routes()
 
 	name := d.Id()
 	input := &compute.DeleteRouteInput{

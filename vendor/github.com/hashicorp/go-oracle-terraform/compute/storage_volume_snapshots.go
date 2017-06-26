@@ -3,6 +3,8 @@ package compute
 import (
 	"fmt"
 	"strings"
+
+	"github.com/hashicorp/go-oracle-terraform/client"
 )
 
 const (
@@ -22,10 +24,10 @@ type StorageVolumeSnapshotClient struct {
 	ResourceClient
 }
 
-func (c *Client) StorageVolumeSnapshots() *StorageVolumeSnapshotClient {
+func (c *ComputeClient) StorageVolumeSnapshots() *StorageVolumeSnapshotClient {
 	return &StorageVolumeSnapshotClient{
 		ResourceClient: ResourceClient{
-			Client:              c,
+			ComputeClient:       c,
 			ResourceDescription: StorageVolumeSnapshotDescription,
 			ContainerPath:       StorageVolumeSnapshotContainerPath,
 			ResourceRootPath:    StorageVolumeSnapshotResourcePath,
@@ -149,7 +151,7 @@ func (c *StorageVolumeSnapshotClient) GetStorageVolumeSnapshot(input *GetStorage
 	var storageSnapshot StorageVolumeSnapshotInfo
 	input.Name = c.getQualifiedName(input.Name)
 	if err := c.getResource(input.Name, &storageSnapshot); err != nil {
-		if WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			return nil, nil
 		}
 
@@ -200,7 +202,7 @@ func (c *StorageVolumeSnapshotClient) success(result *StorageVolumeSnapshotInfo)
 func (c *StorageVolumeSnapshotClient) waitForStorageSnapshotAvailable(name string, timeout int) (*StorageVolumeSnapshotInfo, error) {
 	var result *StorageVolumeSnapshotInfo
 
-	err := c.waitFor(
+	err := c.client.WaitFor(
 		fmt.Sprintf("storage volume snapshot %s to become available", c.getQualifiedName(name)),
 		timeout,
 		func() (bool, error) {
@@ -229,7 +231,7 @@ func (c *StorageVolumeSnapshotClient) waitForStorageSnapshotAvailable(name strin
 
 // Waits for a storage snapshot to be deleted
 func (c *StorageVolumeSnapshotClient) waitForStorageSnapshotDeleted(name string, timeout int) error {
-	return c.waitFor(
+	return c.client.WaitFor(
 		fmt.Sprintf("storage volume snapshot %s to be deleted", c.getQualifiedName(name)),
 		timeout,
 		func() (bool, error) {

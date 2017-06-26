@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
@@ -61,7 +62,7 @@ func resourceOPCSecurityListCreate(d *schema.ResourceData, meta interface{}) err
 	policy := d.Get("policy").(string)
 	outboundCIDRPolicy := d.Get("outbound_cidr_policy").(string)
 
-	client := meta.(*compute.Client).SecurityLists()
+	client := meta.(*compute.ComputeClient).SecurityLists()
 	input := compute.CreateSecurityListInput{
 		Name:               name,
 		Description:        description,
@@ -79,7 +80,7 @@ func resourceOPCSecurityListCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCSecurityListUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SecurityLists()
+	client := meta.(*compute.ComputeClient).SecurityLists()
 
 	name := d.Get("name").(string)
 	description := d.Get("description").(string)
@@ -101,21 +102,27 @@ func resourceOPCSecurityListUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCSecurityListRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SecurityLists()
+	computeClient := meta.(*compute.ComputeClient).SecurityLists()
 
 	name := d.Id()
 
 	input := compute.GetSecurityListInput{
 		Name: name,
 	}
-	result, err := client.GetSecurityList(&input)
+
+	result, err := computeClient.GetSecurityList(&input)
 	if err != nil {
 		// Security List does not exist
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
 		return fmt.Errorf("Error reading security list %s: %s", name, err)
+	}
+
+	if result == nil {
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("name", result.Name)
@@ -127,7 +134,7 @@ func resourceOPCSecurityListRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceOPCSecurityListDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SecurityLists()
+	client := meta.(*compute.ComputeClient).SecurityLists()
 
 	name := d.Id()
 	input := compute.DeleteSecurityListInput{

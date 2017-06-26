@@ -53,7 +53,7 @@ func resourceOPCImageListEntry() *schema.Resource {
 }
 
 func resourceOPCImageListEntryCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).ImageListEntries()
+	client := meta.(*compute.ComputeClient).ImageListEntries()
 
 	name := d.Get("name").(string)
 	machineImages := expandOPCImageListEntryMachineImages(d)
@@ -86,38 +86,44 @@ func resourceOPCImageListEntryCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceOPCImageListEntryRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).ImageListEntries()
+	client := meta.(*compute.ComputeClient).ImageListEntries()
 
 	name, version, err := parseOPCImageListEntryID(d.Id())
 	if err != nil {
 		return err
 	}
 
-	getInput := compute.GetImageListEntryInput{
+	input := compute.GetImageListEntryInput{
 		Name:    *name,
 		Version: *version,
 	}
-	getResult, err := client.GetImageListEntry(&getInput)
+
+	result, err := client.GetImageListEntry(&input)
 	if err != nil {
 		return err
 	}
 
-	attrs, err := structure.FlattenJsonToString(getResult.Attributes)
+	if result == nil {
+		d.SetId("")
+		return nil
+	}
+
+	attrs, err := structure.FlattenJsonToString(result.Attributes)
 	if err != nil {
 		return err
 	}
 
 	d.Set("name", name)
-	d.Set("machine_images", getResult.MachineImages)
-	d.Set("version", getResult.Version)
+	d.Set("machine_images", result.MachineImages)
+	d.Set("version", result.Version)
 	d.Set("attributes", attrs)
-	d.Set("uri", getResult.Uri)
+	d.Set("uri", result.Uri)
 
 	return nil
 }
 
 func resourceOPCImageListEntryDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).ImageListEntries()
+	client := meta.(*compute.ComputeClient).ImageListEntries()
 
 	name, version, err := parseOPCImageListEntryID(d.Id())
 	if err != nil {

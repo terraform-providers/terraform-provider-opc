@@ -7,10 +7,10 @@ type MachineImagesClient struct {
 
 // MachineImages obtains an MachineImagesClient which can be used to access to the
 // MachineImage functions of the Compute API
-func (c *Client) MachineImages() *MachineImagesClient {
+func (c *ComputeClient) MachineImages() *MachineImagesClient {
 	return &MachineImagesClient{
 		ResourceClient: ResourceClient{
-			Client:              c,
+			ComputeClient:       c,
 			ResourceDescription: "MachineImage",
 			ContainerPath:       "/machineimage/",
 			ResourceRootPath:    "/machineimage",

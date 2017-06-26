@@ -34,7 +34,7 @@ func newAuthenticatingServer(handler func(w http.ResponseWriter, r *http.Request
 	}))
 }
 
-func getTestClient(c *opc.Config) (*Client, error) {
+func getTestClient(c *opc.Config) (*ComputeClient, error) {
 	// Build up config with default values if omitted
 	if c.APIEndpoint == nil {
 		if os.Getenv("OPC_ENDPOINT") == "" {
@@ -73,7 +73,7 @@ func getTestClient(c *opc.Config) (*Client, error) {
 	return NewComputeClient(c)
 }
 
-func getBlankTestClient() (*Client, *httptest.Server, error) {
+func getBlankTestClient() (*ComputeClient, *httptest.Server, error) {
 	server := newAuthenticatingServer(func(w http.ResponseWriter, r *http.Request) {
 	})
 
@@ -96,7 +96,7 @@ func getBlankTestClient() (*Client, *httptest.Server, error) {
 }
 
 // Returns a stub client with default values, and a custom API Endpoint
-func getStubClient(endpoint *url.URL) (*Client, error) {
+func getStubClient(endpoint *url.URL) (*ComputeClient, error) {
 	domain := "test"
 	username := "test"
 	password := "test"

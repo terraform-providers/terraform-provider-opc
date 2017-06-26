@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/hashicorp/go-oracle-terraform/client"
 )
 
 const WaitForInstanceReadyTimeout = 600
@@ -16,10 +18,10 @@ type InstancesClient struct {
 
 // Instances obtains an InstancesClient which can be used to access to the
 // Instance functions of the Compute API
-func (c *Client) Instances() *InstancesClient {
+func (c *ComputeClient) Instances() *InstancesClient {
 	return &InstancesClient{
 		ResourceClient: ResourceClient{
-			Client:              c,
+			ComputeClient:       c,
 			ResourceDescription: "instance",
 			ContainerPath:       "/launchplan/",
 			ResourceRootPath:    "/instance",
@@ -464,7 +466,7 @@ func (c *InstancesClient) DeleteInstance(input *DeleteInstanceInput) error {
 func (c *InstancesClient) WaitForInstanceRunning(input *GetInstanceInput, timeoutSeconds int) (*InstanceInfo, error) {
 	var info *InstanceInfo
 	var getErr error
-	err := c.waitFor("instance to be ready", timeoutSeconds, func() (bool, error) {
+	err := c.client.WaitFor("instance to be ready", timeoutSeconds, func() (bool, error) {
 		info, getErr = c.GetInstance(input)
 		if getErr != nil {
 			return false, getErr
@@ -473,22 +475,22 @@ func (c *InstancesClient) WaitForInstanceRunning(input *GetInstanceInput, timeou
 		case InstanceError:
 			return false, fmt.Errorf("Error initializing instance: %s", info.ErrorReason)
 		case InstanceRunning: // Target State
-			c.debugLogString("Instance Running")
+			c.client.DebugLogString("Instance Running")
 			return true, nil
 		case InstanceQueued:
-			c.debugLogString("Instance Queuing")
+			c.client.DebugLogString("Instance Queuing")
 			return false, nil
 		case InstanceInitializing:
-			c.debugLogString("Instance Initializing")
+			c.client.DebugLogString("Instance Initializing")
 			return false, nil
 		case InstancePreparing:
-			c.debugLogString("Instance Preparing")
+			c.client.DebugLogString("Instance Preparing")
 			return false, nil
 		case InstanceStarting:
-			c.debugLogString("Instance Starting")
+			c.client.DebugLogString("Instance Starting")
 			return false, nil
 		default:
-			c.debugLogString(fmt.Sprintf("Unknown instance state: %s, waiting", s))
+			c.client.DebugLogString(fmt.Sprintf("Unknown instance state: %s, waiting", s))
 			return false, nil
 		}
 	})
@@ -499,7 +501,7 @@ func (c *InstancesClient) WaitForInstanceRunning(input *GetInstanceInput, timeou
 func (c *InstancesClient) WaitForInstanceShutdown(input *GetInstanceInput, timeoutSeconds int) (*InstanceInfo, error) {
 	var info *InstanceInfo
 	var getErr error
-	err := c.waitFor("instance to be shutdown", timeoutSeconds, func() (bool, error) {
+	err := c.client.WaitFor("instance to be shutdown", timeoutSeconds, func() (bool, error) {
 		info, getErr = c.GetInstance(input)
 		if getErr != nil {
 			return false, getErr
@@ -508,25 +510,25 @@ func (c *InstancesClient) WaitForInstanceShutdown(input *GetInstanceInput, timeo
 		case InstanceError:
 			return false, fmt.Errorf("Error initializing instance: %s", info.ErrorReason)
 		case InstanceRunning:
-			c.debugLogString("Instance Running")
+			c.client.DebugLogString("Instance Running")
 			return false, nil
 		case InstanceQueued:
-			c.debugLogString("Instance Queuing")
+			c.client.DebugLogString("Instance Queuing")
 			return false, nil
 		case InstanceInitializing:
-			c.debugLogString("Instance Initializing")
+			c.client.DebugLogString("Instance Initializing")
 			return false, nil
 		case InstancePreparing:
-			c.debugLogString("Instance Preparing")
+			c.client.DebugLogString("Instance Preparing")
 			return false, nil
 		case InstanceStarting:
-			c.debugLogString("Instance Starting")
+			c.client.DebugLogString("Instance Starting")
 			return false, nil
 		case InstanceShutdown: // Target State
-			c.debugLogString("Instance Shutdown")
+			c.client.DebugLogString("Instance Shutdown")
 			return true, nil
 		default:
-			c.debugLogString(fmt.Sprintf("Unknown instance state: %s, waiting", s))
+			c.client.DebugLogString(fmt.Sprintf("Unknown instance state: %s, waiting", s))
 			return false, nil
 		}
 	})
@@ -535,10 +537,10 @@ func (c *InstancesClient) WaitForInstanceShutdown(input *GetInstanceInput, timeo
 
 // WaitForInstanceDeleted waits for an instance to be fully deleted.
 func (c *InstancesClient) WaitForInstanceDeleted(input *DeleteInstanceInput, timeoutSeconds int) error {
-	return c.waitFor("instance to be deleted", timeoutSeconds, func() (bool, error) {
+	return c.client.WaitFor("instance to be deleted", timeoutSeconds, func() (bool, error) {
 		var info InstanceInfo
 		if err := c.getResource(input.String(), &info); err != nil {
-			if WasNotFoundError(err) {
+			if client.WasNotFoundError(err) {
 				// Instance could not be found, thus deleted
 				return true, nil
 			}
@@ -549,10 +551,10 @@ func (c *InstancesClient) WaitForInstanceDeleted(input *DeleteInstanceInput, tim
 		case InstanceError:
 			return false, fmt.Errorf("Error stopping instance: %s", info.ErrorReason)
 		case InstanceStopping:
-			c.debugLogString("Instance stopping")
+			c.client.DebugLogString("Instance stopping")
 			return false, nil
 		default:
-			c.debugLogString(fmt.Sprintf("Unknown instance state: %s, waiting", s))
+			c.client.DebugLogString(fmt.Sprintf("Unknown instance state: %s, waiting", s))
 			return false, nil
 		}
 	})

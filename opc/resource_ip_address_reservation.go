@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
@@ -51,7 +52,7 @@ func resourceOPCIPAddressReservation() *schema.Resource {
 }
 
 func resourceOPCIPAddressReservationCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPAddressReservations()
+	client := meta.(*compute.ComputeClient).IPAddressReservations()
 
 	input := compute.CreateIPAddressReservationInput{
 		Name:          d.Get("name").(string),
@@ -74,19 +75,25 @@ func resourceOPCIPAddressReservationCreate(d *schema.ResourceData, meta interfac
 }
 
 func resourceOPCIPAddressReservationRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPAddressReservations()
+	computeClient := meta.(*compute.ComputeClient).IPAddressReservations()
 
-	getInput := compute.GetIPAddressReservationInput{
+	input := compute.GetIPAddressReservationInput{
 		Name: d.Id(),
 	}
-	result, err := client.GetIPAddressReservation(&getInput)
+
+	result, err := computeClient.GetIPAddressReservation(&input)
 	if err != nil {
 		// IP Address Reservation does not exist
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
 		return fmt.Errorf("Error reading ip address reservation %s: %s", d.Id(), err)
+	}
+
+	if result == nil {
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("name", result.Name)
@@ -102,7 +109,7 @@ func resourceOPCIPAddressReservationRead(d *schema.ResourceData, meta interface{
 }
 
 func resourceOPCIPAddressReservationUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPAddressReservations()
+	client := meta.(*compute.ComputeClient).IPAddressReservations()
 
 	input := compute.UpdateIPAddressReservationInput{
 		Name:          d.Get("name").(string),
@@ -125,7 +132,7 @@ func resourceOPCIPAddressReservationUpdate(d *schema.ResourceData, meta interfac
 }
 
 func resourceOPCIPAddressReservationDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPAddressReservations()
+	client := meta.(*compute.ComputeClient).IPAddressReservations()
 	name := d.Id()
 
 	input := compute.DeleteIPAddressReservationInput{

@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
@@ -81,7 +82,7 @@ func resourceOPCSecurityApplicationCreate(d *schema.ResourceData, meta interface
 	icmpcode := d.Get("icmpcode").(string)
 	description := d.Get("description").(string)
 
-	client := meta.(*compute.Client).SecurityApplications()
+	client := meta.(*compute.ComputeClient).SecurityApplications()
 	input := compute.CreateSecurityApplicationInput{
 		Name:        name,
 		Description: description,
@@ -101,19 +102,25 @@ func resourceOPCSecurityApplicationCreate(d *schema.ResourceData, meta interface
 }
 
 func resourceOPCSecurityApplicationRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SecurityApplications()
+	computeClient := meta.(*compute.ComputeClient).SecurityApplications()
 	name := d.Id()
 
 	input := compute.GetSecurityApplicationInput{
 		Name: name,
 	}
-	result, err := client.GetSecurityApplication(&input)
+
+	result, err := computeClient.GetSecurityApplication(&input)
 	if err != nil {
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
 		return fmt.Errorf("Error reading security application %s: %s", name, err)
+	}
+
+	if result == nil {
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("name", result.Name)
@@ -127,7 +134,7 @@ func resourceOPCSecurityApplicationRead(d *schema.ResourceData, meta interface{}
 }
 
 func resourceOPCSecurityApplicationDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SecurityApplications()
+	client := meta.(*compute.ComputeClient).SecurityApplications()
 	name := d.Id()
 
 	input := compute.DeleteSecurityApplicationInput{

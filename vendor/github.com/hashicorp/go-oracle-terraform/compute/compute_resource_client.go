@@ -11,7 +11,7 @@ import (
 
 // ResourceClient is an AuthenticatedClient with some additional information about the resources to be addressed.
 type ResourceClient struct {
-	*Client
+	*ComputeClient
 	ResourceDescription string
 	ContainerPath       string
 	ResourceRootPath    string
@@ -69,7 +69,7 @@ func (c *ResourceClient) deleteResource(name string) error {
 func (c *ResourceClient) unmarshalResponseBody(resp *http.Response, iface interface{}) error {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(resp.Body)
-	c.debugLogString(fmt.Sprintf("HTTP Resp (%d): %s", resp.StatusCode, buf.String()))
+	c.client.DebugLogString(fmt.Sprintf("HTTP Resp (%d): %s", resp.StatusCode, buf.String()))
 	// JSON decode response into interface
 	var tmp interface{}
 	dcd := json.NewDecoder(buf)

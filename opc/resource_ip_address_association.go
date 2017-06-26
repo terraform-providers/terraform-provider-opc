@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -45,7 +46,7 @@ func resourceOPCIPAddressAssociation() *schema.Resource {
 }
 
 func resourceOPCIPAddressAssociationCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPAddressAssociations()
+	client := meta.(*compute.ComputeClient).IPAddressAssociations()
 
 	input := compute.CreateIPAddressAssociationInput{
 		Name: d.Get("name").(string),
@@ -78,16 +79,16 @@ func resourceOPCIPAddressAssociationCreate(d *schema.ResourceData, meta interfac
 }
 
 func resourceOPCIPAddressAssociationRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPAddressAssociations()
+	computeClient := meta.(*compute.ComputeClient).IPAddressAssociations()
 	name := d.Id()
 
 	getInput := compute.GetIPAddressAssociationInput{
 		Name: name,
 	}
-	result, err := client.GetIPAddressAssociation(&getInput)
+	result, err := computeClient.GetIPAddressAssociation(&getInput)
 	if err != nil {
 		// IP Address Association does not exist
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -110,7 +111,7 @@ func resourceOPCIPAddressAssociationRead(d *schema.ResourceData, meta interface{
 }
 
 func resourceOPCIPAddressAssociationUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPAddressAssociations()
+	client := meta.(*compute.ComputeClient).IPAddressAssociations()
 
 	input := compute.UpdateIPAddressAssociationInput{
 		Name: d.Get("name").(string),
@@ -143,7 +144,7 @@ func resourceOPCIPAddressAssociationUpdate(d *schema.ResourceData, meta interfac
 }
 
 func resourceOPCIPAddressAssociationDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPAddressAssociations()
+	client := meta.(*compute.ComputeClient).IPAddressAssociations()
 	name := d.Id()
 
 	input := compute.DeleteIPAddressAssociationInput{

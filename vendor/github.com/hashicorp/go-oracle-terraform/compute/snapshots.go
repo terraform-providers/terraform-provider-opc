@@ -13,10 +13,10 @@ type SnapshotsClient struct {
 
 // Snapshots obtains an SnapshotsClient which can be used to access to the
 // Snapshot functions of the Compute API
-func (c *Client) Snapshots() *SnapshotsClient {
+func (c *ComputeClient) Snapshots() *SnapshotsClient {
 	return &SnapshotsClient{
 		ResourceClient: ResourceClient{
-			Client:              c,
+			ComputeClient:       c,
 			ResourceDescription: "Snapshot",
 			ContainerPath:       "/snapshot/",
 			ResourceRootPath:    "/snapshot",
@@ -166,7 +166,7 @@ func (c *SnapshotsClient) DeleteSnapshot(machineImagesClient *MachineImagesClien
 func (c *SnapshotsClient) WaitForSnapshotComplete(input *GetSnapshotInput, timeoutSeconds int) (*Snapshot, error) {
 	var info *Snapshot
 	var getErr error
-	err := c.waitFor("snapshot to be complete", timeoutSeconds, func() (bool, error) {
+	err := c.client.WaitFor("snapshot to be complete", timeoutSeconds, func() (bool, error) {
 		info, getErr = c.GetSnapshot(input)
 		if getErr != nil {
 			return false, getErr
@@ -175,19 +175,19 @@ func (c *SnapshotsClient) WaitForSnapshotComplete(input *GetSnapshotInput, timeo
 		case SnapshotError:
 			return false, fmt.Errorf("Error initializing snapshot: %s", info.ErrorReason)
 		case SnapshotComplete:
-			c.debugLogString("Snapshot Complete")
+			c.client.DebugLogString("Snapshot Complete")
 			return true, nil
 		case SnapshotQueued:
-			c.debugLogString("Snapshot Queuing")
+			c.client.DebugLogString("Snapshot Queuing")
 			return false, nil
 		case SnapshotActive:
-			c.debugLogString("Snapshot Active")
+			c.client.DebugLogString("Snapshot Active")
 			if info.Delay == SnapshotDelayShutdown {
 				return true, nil
 			}
 			return false, nil
 		default:
-			c.debugLogString(fmt.Sprintf("Unknown snapshot state: %s, waiting", s))
+			c.client.DebugLogString(fmt.Sprintf("Unknown snapshot state: %s, waiting", s))
 			return false, nil
 		}
 	})

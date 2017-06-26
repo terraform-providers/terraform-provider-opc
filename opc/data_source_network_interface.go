@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -99,7 +100,7 @@ func dataSourceNetworkInterface() *schema.Resource {
 }
 
 func dataSourceNetworkInterfaceRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).Instances()
+	computeClient := meta.(*compute.ComputeClient).Instances()
 
 	// Get required attributes
 	instance_name := d.Get("instance_name").(string)
@@ -112,9 +113,9 @@ func dataSourceNetworkInterfaceRead(d *schema.ResourceData, meta interface{}) er
 		ID:   instance_id,
 	}
 
-	instance, err := client.GetInstance(input)
+	instance, err := computeClient.GetInstance(input)
 	if err != nil {
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}

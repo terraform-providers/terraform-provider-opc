@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -73,7 +74,7 @@ func resourceOPCSecurityRule() *schema.Resource {
 }
 
 func resourceOPCSecurityRuleCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SecurityRules()
+	client := meta.(*compute.ComputeClient).SecurityRules()
 	input := compute.CreateSecurityRuleInput{
 		Name:          d.Get("name").(string),
 		FlowDirection: d.Get("flow_direction").(string),
@@ -126,19 +127,25 @@ func resourceOPCSecurityRuleCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCSecurityRuleRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SecurityRules()
+	computeClient := meta.(*compute.ComputeClient).SecurityRules()
 
-	getInput := compute.GetSecurityRuleInput{
+	input := compute.GetSecurityRuleInput{
 		Name: d.Id(),
 	}
-	result, err := client.GetSecurityRule(&getInput)
+
+	result, err := computeClient.GetSecurityRule(&input)
 	if err != nil {
 		// SecurityRule does not exist
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
 		return fmt.Errorf("Error reading security rule %s: %s", d.Id(), err)
+	}
+
+	if result == nil {
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("name", result.Name)
@@ -166,7 +173,7 @@ func resourceOPCSecurityRuleRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceOPCSecurityRuleUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SecurityRules()
+	client := meta.(*compute.ComputeClient).SecurityRules()
 	input := compute.UpdateSecurityRuleInput{
 		Name:          d.Get("name").(string),
 		FlowDirection: d.Get("flow_direction").(string),
@@ -218,7 +225,7 @@ func resourceOPCSecurityRuleUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCSecurityRuleDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SecurityRules()
+	client := meta.(*compute.ComputeClient).SecurityRules()
 	name := d.Id()
 
 	input := compute.DeleteSecurityRuleInput{

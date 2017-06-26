@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -40,7 +41,7 @@ func resourceOPCSecurityAssociation() *schema.Resource {
 }
 
 func resourceOPCSecurityAssociationCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SecurityAssociations()
+	client := meta.(*compute.ComputeClient).SecurityAssociations()
 
 	name := d.Get("name").(string)
 	vcable := d.Get("vcable").(string)
@@ -62,21 +63,27 @@ func resourceOPCSecurityAssociationCreate(d *schema.ResourceData, meta interface
 }
 
 func resourceOPCSecurityAssociationRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SecurityAssociations()
+	computeClient := meta.(*compute.ComputeClient).SecurityAssociations()
 
 	name := d.Id()
 
 	input := compute.GetSecurityAssociationInput{
 		Name: name,
 	}
-	result, err := client.GetSecurityAssociation(&input)
+
+	result, err := computeClient.GetSecurityAssociation(&input)
 	if err != nil {
 		// Security Association does not exist
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
 		return fmt.Errorf("Error reading security association %s: %s", name, err)
+	}
+
+	if result == nil {
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("name", result.Name)
@@ -87,7 +94,7 @@ func resourceOPCSecurityAssociationRead(d *schema.ResourceData, meta interface{}
 }
 
 func resourceOPCSecurityAssociationDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SecurityAssociations()
+	client := meta.(*compute.ComputeClient).SecurityAssociations()
 
 	name := d.Id()
 

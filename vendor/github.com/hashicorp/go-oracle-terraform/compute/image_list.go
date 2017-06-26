@@ -13,10 +13,10 @@ type ImageListClient struct {
 
 // ImageList obtains an ImageListClient which can be used to access to the
 // Image List functions of the Compute API
-func (c *Client) ImageList() *ImageListClient {
+func (c *ComputeClient) ImageList() *ImageListClient {
 	return &ImageListClient{
 		ResourceClient: ResourceClient{
-			Client:              c,
+			ComputeClient:       c,
 			ResourceDescription: ImageListDescription,
 			ContainerPath:       ImageListContainerPath,
 			ResourceRootPath:    ImageListResourcePath,

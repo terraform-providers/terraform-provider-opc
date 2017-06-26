@@ -49,7 +49,7 @@ func TestAccOPCIPreservation_OptionalParentPool(t *testing.T) {
 }
 
 func testAccCheckIPReservationExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.Client).IPReservations()
+	client := testAccProvider.Meta().(*compute.ComputeClient).IPReservations()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_ip_reservation" {
@@ -68,7 +68,7 @@ func testAccCheckIPReservationExists(s *terraform.State) error {
 }
 
 func testAccCheckIPReservationDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.Client).IPReservations()
+	client := testAccProvider.Meta().(*compute.ComputeClient).IPReservations()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_ip_reservation" {

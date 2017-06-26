@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -47,7 +48,7 @@ func resourceOPCVNICSet() *schema.Resource {
 }
 
 func resourceOPCVNICSetCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).VirtNICSets()
+	client := meta.(*compute.ComputeClient).VirtNICSets()
 
 	name := d.Get("name").(string)
 	desc, descOk := d.GetOk("description")
@@ -86,38 +87,43 @@ func resourceOPCVNICSetCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCVNICSetRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).VirtNICSets()
+	computeClient := meta.(*compute.ComputeClient).VirtNICSets()
 
 	name := d.Id()
 	input := &compute.GetVirtualNICSetInput{
 		Name: name,
 	}
 
-	res, err := client.GetVirtualNICSet(input)
+	result, err := computeClient.GetVirtualNICSet(input)
 	if err != nil {
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
 		return fmt.Errorf("Error reading Virtual NIC Set '%s': %s", name, err)
 	}
 
-	d.Set("name", res.Name)
-	d.Set("description", res.Description)
-	if err := setStringList(d, "applied_acls", res.AppliedACLs); err != nil {
+	if result == nil {
+		d.SetId("")
+		return nil
+	}
+
+	d.Set("name", result.Name)
+	d.Set("description", result.Description)
+	if err := setStringList(d, "applied_acls", result.AppliedACLs); err != nil {
 		return err
 	}
-	if err := setStringList(d, "virtual_nics", res.VirtualNICs); err != nil {
+	if err := setStringList(d, "virtual_nics", result.VirtualNICs); err != nil {
 		return err
 	}
-	if err := setStringList(d, "tags", res.Tags); err != nil {
+	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err
 	}
 	return nil
 }
 
 func resourceOPCVNICSetUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).VirtNICSets()
+	client := meta.(*compute.ComputeClient).VirtNICSets()
 
 	name := d.Id()
 	desc, descOk := d.GetOk("description")
@@ -155,7 +161,7 @@ func resourceOPCVNICSetUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCVNICSetDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).VirtNICSets()
+	client := meta.(*compute.ComputeClient).VirtNICSets()
 
 	name := d.Id()
 	input := &compute.DeleteVirtualNICSetInput{

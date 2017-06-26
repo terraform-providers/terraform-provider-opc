@@ -12,10 +12,10 @@ type IPAddressAssociationsClient struct {
 
 // IPAddressAssociations() returns an IPAddressAssociationsClient that can be used to access the
 // necessary CRUD functions for IP Address Associations.
-func (c *Client) IPAddressAssociations() *IPAddressAssociationsClient {
+func (c *ComputeClient) IPAddressAssociations() *IPAddressAssociationsClient {
 	return &IPAddressAssociationsClient{
 		ResourceClient: ResourceClient{
-			Client:              c,
+			ComputeClient:       c,
 			ResourceDescription: IPAddressAssociationDescription,
 			ContainerPath:       IPAddressAssociationContainerPath,
 			ResourceRootPath:    IPAddressAssociationResourcePath,

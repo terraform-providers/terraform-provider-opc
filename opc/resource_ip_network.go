@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -56,7 +57,7 @@ func resourceOPCIPNetwork() *schema.Resource {
 }
 
 func resourceOPCIPNetworkCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPNetworks()
+	client := meta.(*compute.ComputeClient).IPNetworks()
 
 	// Get required attributes
 	name := d.Get("name").(string)
@@ -95,36 +96,41 @@ func resourceOPCIPNetworkCreate(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceOPCIPNetworkRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPNetworks()
+	computeClient := meta.(*compute.ComputeClient).IPNetworks()
 
 	name := d.Id()
 	input := &compute.GetIPNetworkInput{
 		Name: name,
 	}
 
-	res, err := client.GetIPNetwork(input)
+	result, err := computeClient.GetIPNetwork(input)
 	if err != nil {
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
 		return fmt.Errorf("Error reading IP Network '%s': %v", name, err)
 	}
 
-	d.Set("name", res.Name)
-	d.Set("ip_address_prefix", res.IPAddressPrefix)
-	d.Set("ip_network_exchanged", res.IPNetworkExchange)
-	d.Set("description", res.Description)
-	d.Set("public_napt_enabled", res.PublicNaptEnabled)
-	d.Set("uri", res.Uri)
-	if err := setStringList(d, "tags", res.Tags); err != nil {
+	if result == nil {
+		d.SetId("")
+		return nil
+	}
+
+	d.Set("name", result.Name)
+	d.Set("ip_address_prefix", result.IPAddressPrefix)
+	d.Set("ip_network_exchanged", result.IPNetworkExchange)
+	d.Set("description", result.Description)
+	d.Set("public_napt_enabled", result.PublicNaptEnabled)
+	d.Set("uri", result.Uri)
+	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err
 	}
 	return nil
 }
 
 func resourceOPCIPNetworkUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPNetworks()
+	client := meta.(*compute.ComputeClient).IPNetworks()
 
 	// Get required attributes
 	name := d.Get("name").(string)
@@ -165,7 +171,7 @@ func resourceOPCIPNetworkUpdate(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceOPCIPNetworkDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPNetworks()
+	client := meta.(*compute.ComputeClient).IPNetworks()
 
 	name := d.Id()
 	input := &compute.DeleteIPNetworkInput{

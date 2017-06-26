@@ -12,10 +12,10 @@ type SecurityProtocolsClient struct {
 
 // SecurityProtocols() returns an SecurityProtocolsClient that can be used to access the
 // necessary CRUD functions for Security Protocols.
-func (c *Client) SecurityProtocols() *SecurityProtocolsClient {
+func (c *ComputeClient) SecurityProtocols() *SecurityProtocolsClient {
 	return &SecurityProtocolsClient{
 		ResourceClient: ResourceClient{
-			Client:              c,
+			ComputeClient:       c,
 			ResourceDescription: SecurityProtocolDescription,
 			ContainerPath:       SecurityProtocolContainerPath,
 			ResourceRootPath:    SecurityProtocolResourcePath,

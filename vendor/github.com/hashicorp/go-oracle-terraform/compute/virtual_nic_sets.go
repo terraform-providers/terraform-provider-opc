@@ -4,10 +4,10 @@ type VirtNICSetsClient struct {
 	ResourceClient
 }
 
-func (c *Client) VirtNICSets() *VirtNICSetsClient {
+func (c *ComputeClient) VirtNICSets() *VirtNICSetsClient {
 	return &VirtNICSetsClient{
 		ResourceClient: ResourceClient{
-			Client:              c,
+			ComputeClient:       c,
 			ResourceDescription: "Virtual NIC Set",
 			ContainerPath:       "/network/v1/vnicset/",
 			ResourceRootPath:    "/network/v1/vnicset",

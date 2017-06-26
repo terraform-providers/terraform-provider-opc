@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
@@ -362,7 +363,7 @@ func resourceInstance() *schema.Resource {
 }
 
 func resourceInstanceCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).Instances()
+	client := meta.(*compute.ComputeClient).Instances()
 
 	// Get Required Attributes
 	input := &compute.CreateInstanceInput{
@@ -434,7 +435,7 @@ func resourceInstanceCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceInstanceRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).Instances()
+	computeClient := meta.(*compute.ComputeClient).Instances()
 
 	name := d.Get("name").(string)
 
@@ -444,15 +445,21 @@ func resourceInstanceRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	log.Printf("[DEBUG] Reading state of instance %s", name)
-	result, err := client.GetInstance(input)
+	result, err := computeClient.GetInstance(input)
 	if err != nil {
 		// Instance doesn't exist
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			log.Printf("[DEBUG] Instance %s not found", name)
 			d.SetId("")
 			return nil
 		}
 		return fmt.Errorf("Error reading instance %s: %s", name, err)
+	}
+
+	if result == nil {
+		log.Printf("[DEBUG] Instance %s not found", name)
+		d.SetId("")
+		return nil
 	}
 
 	log.Printf("[DEBUG] Instance '%s' found", name)
@@ -542,7 +549,7 @@ func updateInstanceAttributes(d *schema.ResourceData, instance *compute.Instance
 }
 
 func resourceInstanceUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).Instances()
+	client := meta.(*compute.ComputeClient).Instances()
 
 	name := d.Get("name").(string)
 
@@ -572,7 +579,7 @@ func resourceInstanceUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceInstanceDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).Instances()
+	client := meta.(*compute.ComputeClient).Instances()
 
 	name := d.Get("name").(string)
 
