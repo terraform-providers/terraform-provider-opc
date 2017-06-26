@@ -65,6 +65,7 @@ func resourceOPCIPAssociationRead(d *schema.ResourceData, meta interface{}) erro
 	input := compute.GetIPAssociationInput{
 		Name: name,
 	}
+
 	result, err := computeClient.GetIPAssociation(&input)
 	if err != nil {
 		// IP Association does not exist
@@ -73,6 +74,11 @@ func resourceOPCIPAssociationRead(d *schema.ResourceData, meta interface{}) erro
 			return nil
 		}
 		return fmt.Errorf("Error reading ip association '%s': %s", name, err)
+	}
+
+	if result == nil {
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("name", result.Name)

@@ -93,25 +93,31 @@ func resourceOPCImageListEntryRead(d *schema.ResourceData, meta interface{}) err
 		return err
 	}
 
-	getInput := compute.GetImageListEntryInput{
+	input := compute.GetImageListEntryInput{
 		Name:    *name,
 		Version: *version,
 	}
-	getResult, err := client.GetImageListEntry(&getInput)
+
+	result, err := client.GetImageListEntry(&input)
 	if err != nil {
 		return err
 	}
 
-	attrs, err := structure.FlattenJsonToString(getResult.Attributes)
+	if result == nil {
+		d.SetId("")
+		return nil
+	}
+
+	attrs, err := structure.FlattenJsonToString(result.Attributes)
 	if err != nil {
 		return err
 	}
 
 	d.Set("name", name)
-	d.Set("machine_images", getResult.MachineImages)
-	d.Set("version", getResult.Version)
+	d.Set("machine_images", result.MachineImages)
+	d.Set("version", result.Version)
 	d.Set("attributes", attrs)
-	d.Set("uri", getResult.Uri)
+	d.Set("uri", result.Uri)
 
 	return nil
 }

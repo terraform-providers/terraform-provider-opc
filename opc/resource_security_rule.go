@@ -129,10 +129,11 @@ func resourceOPCSecurityRuleCreate(d *schema.ResourceData, meta interface{}) err
 func resourceOPCSecurityRuleRead(d *schema.ResourceData, meta interface{}) error {
 	computeClient := meta.(*compute.ComputeClient).SecurityRules()
 
-	getInput := compute.GetSecurityRuleInput{
+	input := compute.GetSecurityRuleInput{
 		Name: d.Id(),
 	}
-	result, err := computeClient.GetSecurityRule(&getInput)
+
+	result, err := computeClient.GetSecurityRule(&input)
 	if err != nil {
 		// SecurityRule does not exist
 		if client.WasNotFoundError(err) {
@@ -140,6 +141,11 @@ func resourceOPCSecurityRuleRead(d *schema.ResourceData, meta interface{}) error
 			return nil
 		}
 		return fmt.Errorf("Error reading security rule %s: %s", d.Id(), err)
+	}
+
+	if result == nil {
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("name", result.Name)

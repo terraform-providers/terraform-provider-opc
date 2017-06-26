@@ -456,6 +456,12 @@ func resourceInstanceRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error reading instance %s: %s", name, err)
 	}
 
+	if result == nil {
+		log.Printf("[DEBUG] Instance %s not found", name)
+		d.SetId("")
+		return nil
+	}
+
 	log.Printf("[DEBUG] Instance '%s' found", name)
 
 	// Update attributes

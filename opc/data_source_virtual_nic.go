@@ -61,6 +61,11 @@ func dataSourceVNICRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error reading vnic %s: %s", name, err)
 	}
 
+	if vnic == nil {
+		d.SetId("")
+		return nil
+	}
+
 	d.SetId(name)
 	d.Set("description", vnic.Description)
 	d.Set("mac_address", vnic.MACAddress)

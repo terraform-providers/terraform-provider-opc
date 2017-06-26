@@ -103,7 +103,7 @@ func resourceOPCIPNetworkRead(d *schema.ResourceData, meta interface{}) error {
 		Name: name,
 	}
 
-	res, err := computeClient.GetIPNetwork(input)
+	result, err := computeClient.GetIPNetwork(input)
 	if err != nil {
 		if client.WasNotFoundError(err) {
 			d.SetId("")
@@ -112,13 +112,18 @@ func resourceOPCIPNetworkRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error reading IP Network '%s': %v", name, err)
 	}
 
-	d.Set("name", res.Name)
-	d.Set("ip_address_prefix", res.IPAddressPrefix)
-	d.Set("ip_network_exchanged", res.IPNetworkExchange)
-	d.Set("description", res.Description)
-	d.Set("public_napt_enabled", res.PublicNaptEnabled)
-	d.Set("uri", res.Uri)
-	if err := setStringList(d, "tags", res.Tags); err != nil {
+	if result == nil {
+		d.SetId("")
+		return nil
+	}
+
+	d.Set("name", result.Name)
+	d.Set("ip_address_prefix", result.IPAddressPrefix)
+	d.Set("ip_network_exchanged", result.IPNetworkExchange)
+	d.Set("description", result.Description)
+	d.Set("public_napt_enabled", result.PublicNaptEnabled)
+	d.Set("uri", result.Uri)
+	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err
 	}
 	return nil

@@ -85,6 +85,7 @@ func resourceOPCACLRead(d *schema.ResourceData, meta interface{}) error {
 	getInput := compute.GetACLInput{
 		Name: d.Id(),
 	}
+
 	result, err := computeClient.GetACL(&getInput)
 	if err != nil {
 		// ACL does not exist
@@ -93,6 +94,11 @@ func resourceOPCACLRead(d *schema.ResourceData, meta interface{}) error {
 			return nil
 		}
 		return fmt.Errorf("Error reading acl %s: %s", d.Id(), err)
+	}
+
+	if result == nil {
+		d.SetId("")
+		return nil
 	}
 
 	log.Printf("[DEBUG] Read state of acl %s: %#v", d.Id(), result)

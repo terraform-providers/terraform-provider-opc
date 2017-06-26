@@ -108,6 +108,7 @@ func resourceOPCSecurityApplicationRead(d *schema.ResourceData, meta interface{}
 	input := compute.GetSecurityApplicationInput{
 		Name: name,
 	}
+
 	result, err := computeClient.GetSecurityApplication(&input)
 	if err != nil {
 		if client.WasNotFoundError(err) {
@@ -115,6 +116,11 @@ func resourceOPCSecurityApplicationRead(d *schema.ResourceData, meta interface{}
 			return nil
 		}
 		return fmt.Errorf("Error reading security application %s: %s", name, err)
+	}
+
+	if result == nil {
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("name", result.Name)

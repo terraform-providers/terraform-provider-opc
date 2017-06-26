@@ -88,10 +88,12 @@ func resourceOPCSecurityProtocolCreate(d *schema.ResourceData, meta interface{})
 
 func resourceOPCSecurityProtocolRead(d *schema.ResourceData, meta interface{}) error {
 	computeClient := meta.(*compute.ComputeClient).SecurityProtocols()
-	getInput := compute.GetSecurityProtocolInput{
+
+	input := compute.GetSecurityProtocolInput{
 		Name: d.Id(),
 	}
-	result, err := computeClient.GetSecurityProtocol(&getInput)
+
+	result, err := computeClient.GetSecurityProtocol(&input)
 	if err != nil {
 		// Security Protocol does not exist
 		if client.WasNotFoundError(err) {
@@ -99,6 +101,11 @@ func resourceOPCSecurityProtocolRead(d *schema.ResourceData, meta interface{}) e
 			return nil
 		}
 		return fmt.Errorf("Error reading security protocol %s: %s", d.Id(), err)
+	}
+
+	if result == nil {
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("name", result.Name)

@@ -67,10 +67,11 @@ func resourceOPCIPNetworkExchangeRead(d *schema.ResourceData, meta interface{}) 
 	computeClient := meta.(*compute.ComputeClient).IPNetworkExchanges()
 
 	log.Printf("[DEBUG] Reading state of IP Network Exchange %s", d.Id())
-	getInput := compute.GetIPNetworkExchangeInput{
+	input := compute.GetIPNetworkExchangeInput{
 		Name: d.Id(),
 	}
-	result, err := computeClient.GetIPNetworkExchange(&getInput)
+
+	result, err := computeClient.GetIPNetworkExchange(&input)
 	if err != nil {
 		// IP NetworkExchange does not exist
 		if client.WasNotFoundError(err) {
@@ -78,6 +79,11 @@ func resourceOPCIPNetworkExchangeRead(d *schema.ResourceData, meta interface{}) 
 			return nil
 		}
 		return fmt.Errorf("Error reading ip network exchange %s: %s", d.Id(), err)
+	}
+
+	if result == nil {
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("name", result.Name)

@@ -97,6 +97,7 @@ func resourceOPCSecRuleRead(d *schema.ResourceData, meta interface{}) error {
 	input := compute.GetSecRuleInput{
 		Name: name,
 	}
+
 	result, err := computeClient.GetSecRule(&input)
 	if err != nil {
 		// Sec Rule does not exist
@@ -105,6 +106,11 @@ func resourceOPCSecRuleRead(d *schema.ResourceData, meta interface{}) error {
 			return nil
 		}
 		return fmt.Errorf("Error reading sec list %s: %s", name, err)
+	}
+
+	if result == nil {
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("name", result.Name)
