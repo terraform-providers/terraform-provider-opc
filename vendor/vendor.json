@@ -262,6 +262,12 @@
 			"versionExact": "v0.1.1"
 		},
 		{
+			"checksumSHA1": "DzK7lYwHt5Isq5Zf73cnQqBO2LI=",
+			"path": "github.com/hashicorp/go-oracle-terraform/helper",
+			"revision": "772eb00a5b53cebd922a023a29999821a21f4903",
+			"revisionTime": "2017-06-06T18:57:20Z"
+		},
+		{
 			"checksumSHA1": "JbuYtbJkx3r1BLuCMymkri0Q1BI=",
 			"path": "github.com/hashicorp/go-oracle-terraform/opc",
 			"revision": "181f071554a111de0fde9799162796cbadefeaa8",
