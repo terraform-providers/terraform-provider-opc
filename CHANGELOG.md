@@ -1,4 +1,8 @@
 ## 0.1.2 (Unreleased)
+
+BUG FIXES:
+ * storage_volume_snapshot: Fix crash on import [GH-10]
+
 ## 0.1.1 (June 21, 2017)
 
 NOTES:
