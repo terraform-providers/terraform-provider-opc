@@ -94,7 +94,7 @@ func resourceOPCVNICSetRead(d *schema.ResourceData, meta interface{}) error {
 		Name: name,
 	}
 
-	res, err := computeClient.GetVirtualNICSet(input)
+	result, err := computeClient.GetVirtualNICSet(input)
 	if err != nil {
 		if client.WasNotFoundError(err) {
 			d.SetId("")
@@ -103,15 +103,20 @@ func resourceOPCVNICSetRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error reading Virtual NIC Set '%s': %s", name, err)
 	}
 
-	d.Set("name", res.Name)
-	d.Set("description", res.Description)
-	if err := setStringList(d, "applied_acls", res.AppliedACLs); err != nil {
+	if result == nil {
+		d.SetId("")
+		return nil
+	}
+
+	d.Set("name", result.Name)
+	d.Set("description", result.Description)
+	if err := setStringList(d, "applied_acls", result.AppliedACLs); err != nil {
 		return err
 	}
-	if err := setStringList(d, "virtual_nics", res.VirtualNICs); err != nil {
+	if err := setStringList(d, "virtual_nics", result.VirtualNICs); err != nil {
 		return err
 	}
-	if err := setStringList(d, "tags", res.Tags); err != nil {
+	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err
 	}
 	return nil

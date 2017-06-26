@@ -75,6 +75,7 @@ func resourceOPCSecurityIPListRead(d *schema.ResourceData, meta interface{}) err
 	input := compute.GetSecurityIPListInput{
 		Name: name,
 	}
+
 	result, err := computeClient.GetSecurityIPList(&input)
 	if err != nil {
 		// Security IP List does not exist
@@ -83,6 +84,11 @@ func resourceOPCSecurityIPListRead(d *schema.ResourceData, meta interface{}) err
 			return nil
 		}
 		return fmt.Errorf("Error reading security IP list %s: %s", name, err)
+	}
+
+	if result == nil {
+		d.SetId("")
+		return nil
 	}
 
 	log.Printf("[DEBUG] Read state of security IP list %s: %#v", name, result)

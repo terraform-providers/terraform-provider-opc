@@ -51,6 +51,7 @@ func resourceOPCSSHKeyCreate(d *schema.ResourceData, meta interface{}) error {
 		Key:     key,
 		Enabled: enabled,
 	}
+
 	info, err := client.CreateSSHKey(&input)
 	if err != nil {
 		return fmt.Errorf("Error creating ssh key %s: %s", name, err)
@@ -73,6 +74,7 @@ func resourceOPCSSHKeyUpdate(d *schema.ResourceData, meta interface{}) error {
 		Key:     key,
 		Enabled: enabled,
 	}
+
 	_, err := client.UpdateSSHKey(&input)
 	if err != nil {
 		return fmt.Errorf("Error updating ssh key %s: %s", name, err)
@@ -88,6 +90,7 @@ func resourceOPCSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
 	input := compute.GetSSHKeyInput{
 		Name: name,
 	}
+
 	result, err := computeClient.GetSSHKey(&input)
 	if err != nil {
 		if client.WasNotFoundError(err) {
@@ -95,6 +98,11 @@ func resourceOPCSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
 			return nil
 		}
 		return fmt.Errorf("Error reading ssh key %s: %s", name, err)
+	}
+
+	if result == nil {
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("name", result.Name)

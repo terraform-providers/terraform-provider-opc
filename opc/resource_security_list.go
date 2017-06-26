@@ -109,6 +109,7 @@ func resourceOPCSecurityListRead(d *schema.ResourceData, meta interface{}) error
 	input := compute.GetSecurityListInput{
 		Name: name,
 	}
+
 	result, err := computeClient.GetSecurityList(&input)
 	if err != nil {
 		// Security List does not exist
@@ -117,6 +118,11 @@ func resourceOPCSecurityListRead(d *schema.ResourceData, meta interface{}) error
 			return nil
 		}
 		return fmt.Errorf("Error reading security list %s: %s", name, err)
+	}
+
+	if result == nil {
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("name", result.Name)

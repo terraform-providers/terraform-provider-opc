@@ -70,6 +70,7 @@ func resourceOPCSecurityAssociationRead(d *schema.ResourceData, meta interface{}
 	input := compute.GetSecurityAssociationInput{
 		Name: name,
 	}
+
 	result, err := computeClient.GetSecurityAssociation(&input)
 	if err != nil {
 		// Security Association does not exist
@@ -78,6 +79,11 @@ func resourceOPCSecurityAssociationRead(d *schema.ResourceData, meta interface{}
 			return nil
 		}
 		return fmt.Errorf("Error reading security association %s: %s", name, err)
+	}
+
+	if result == nil {
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("name", result.Name)

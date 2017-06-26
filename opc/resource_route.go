@@ -101,7 +101,7 @@ func resourceOPCRouteRead(d *schema.ResourceData, meta interface{}) error {
 		Name: name,
 	}
 
-	res, err := computeClient.GetRoute(input)
+	result, err := computeClient.GetRoute(input)
 	if err != nil {
 		if client.WasNotFoundError(err) {
 			d.SetId("")
@@ -110,12 +110,17 @@ func resourceOPCRouteRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error reading route '%s': %v", name, err)
 	}
 
-	d.Set("name", res.Name)
-	d.Set("admin_distance", res.AdminDistance)
-	d.Set("ip_address_prefix", res.IPAddressPrefix)
-	d.Set("next_hop_vnic_set", res.NextHopVnicSet)
-	d.Set("description", res.Description)
-	if err := setStringList(d, "tags", res.Tags); err != nil {
+	if result == nil {
+		d.SetId("")
+		return nil
+	}
+
+	d.Set("name", result.Name)
+	d.Set("admin_distance", result.AdminDistance)
+	d.Set("ip_address_prefix", result.IPAddressPrefix)
+	d.Set("next_hop_vnic_set", result.NextHopVnicSet)
+	d.Set("description", result.Description)
+	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err
 	}
 	return nil

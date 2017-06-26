@@ -77,17 +77,23 @@ func resourceOPCImageListUpdate(d *schema.ResourceData, meta interface{}) error 
 func resourceOPCImageListRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*compute.ComputeClient).ImageList()
 
-	getInput := &compute.GetImageListInput{
+	input := &compute.GetImageListInput{
 		Name: d.Id(),
 	}
-	getResult, err := client.GetImageList(getInput)
+
+	result, err := client.GetImageList(input)
 	if err != nil {
 		return err
 	}
 
-	d.Set("name", getResult.Name)
-	d.Set("description", getResult.Description)
-	d.Set("default", getResult.Default)
+	if result == nil {
+		d.SetId("")
+		return nil
+	}
+
+	d.Set("name", result.Name)
+	d.Set("description", result.Description)
+	d.Set("default", result.Default)
 
 	return nil
 }

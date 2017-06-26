@@ -81,10 +81,11 @@ func resourceOPCIPReservationRead(d *schema.ResourceData, meta interface{}) erro
 	computeClient := meta.(*compute.ComputeClient).IPReservations()
 
 	log.Printf("[DEBUG] Reading state of ip reservation %s", d.Id())
-	getInput := compute.GetIPReservationInput{
+	input := compute.GetIPReservationInput{
 		Name: d.Id(),
 	}
-	result, err := computeClient.GetIPReservation(&getInput)
+
+	result, err := computeClient.GetIPReservation(&input)
 	if err != nil {
 		// IP Reservation does not exist
 		if client.WasNotFoundError(err) {
@@ -92,6 +93,11 @@ func resourceOPCIPReservationRead(d *schema.ResourceData, meta interface{}) erro
 			return nil
 		}
 		return fmt.Errorf("Error reading ip reservation %s: %s", d.Id(), err)
+	}
+
+	if result == nil {
+		d.SetId("")
+		return nil
 	}
 
 	log.Printf("[DEBUG] Read state of ip reservation %s: %#v", d.Id(), result)

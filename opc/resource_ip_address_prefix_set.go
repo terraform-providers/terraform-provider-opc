@@ -79,10 +79,11 @@ func resourceOPCIPAddressPrefixSetCreate(d *schema.ResourceData, meta interface{
 func resourceOPCIPAddressPrefixSetRead(d *schema.ResourceData, meta interface{}) error {
 	computeClient := meta.(*compute.ComputeClient).IPAddressPrefixSets()
 
-	getInput := compute.GetIPAddressPrefixSetInput{
+	input := compute.GetIPAddressPrefixSetInput{
 		Name: d.Id(),
 	}
-	result, err := computeClient.GetIPAddressPrefixSet(&getInput)
+
+	result, err := computeClient.GetIPAddressPrefixSet(&input)
 	if err != nil {
 		// IP Address Prefix Set does not exist
 		if client.WasNotFoundError(err) {
@@ -90,6 +91,11 @@ func resourceOPCIPAddressPrefixSetRead(d *schema.ResourceData, meta interface{})
 			return nil
 		}
 		return fmt.Errorf("Error reading IP Address Prefix Set %s: %s", d.Id(), err)
+	}
+
+	if result == nil {
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("name", result.Name)

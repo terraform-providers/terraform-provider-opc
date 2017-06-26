@@ -218,6 +218,7 @@ func resourceOPCStorageVolumeRead(d *schema.ResourceData, meta interface{}) erro
 	input := compute.GetStorageVolumeInput{
 		Name: name,
 	}
+
 	result, err := sv.GetStorageVolume(&input)
 	if err != nil {
 		// Volume doesn't exist
