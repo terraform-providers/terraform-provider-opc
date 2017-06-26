@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/hashicorp/go-oracle-terraform/client"
 )
 
 const WaitForVolumeReadyTimeout = 600
@@ -16,10 +18,10 @@ type StorageVolumeClient struct {
 
 // StorageVolumes obtains a StorageVolumeClient which can be used to access to the
 // Storage Volume functions of the Compute API
-func (c *Client) StorageVolumes() *StorageVolumeClient {
+func (c *ComputeClient) StorageVolumes() *StorageVolumeClient {
 	return &StorageVolumeClient{
 		ResourceClient: ResourceClient{
-			Client:              c,
+			ComputeClient:       c,
 			ResourceDescription: "storage volume",
 			ContainerPath:       "/storage/volume/",
 			ResourceRootPath:    "/storage/volume",
@@ -204,7 +206,7 @@ func (c *StorageVolumeClient) success(result *StorageVolumeInfo) (*StorageVolume
 func (c *StorageVolumeClient) GetStorageVolume(input *GetStorageVolumeInput) (*StorageVolumeInfo, error) {
 	var storageVolume StorageVolumeInfo
 	if err := c.getResource(input.Name, &storageVolume); err != nil {
-		if WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			return nil, nil
 		}
 
@@ -276,7 +278,7 @@ func (c *StorageVolumeClient) UpdateStorageVolume(input *UpdateStorageVolumeInpu
 func (c *StorageVolumeClient) waitForStorageVolumeToBecomeAvailable(name string, timeoutInSeconds int) (*StorageVolumeInfo, error) {
 	var waitResult *StorageVolumeInfo
 
-	err := c.waitFor(
+	err := c.client.WaitFor(
 		fmt.Sprintf("storage volume %s to become available", c.getQualifiedName(name)),
 		timeoutInSeconds,
 		func() (bool, error) {
@@ -304,7 +306,7 @@ func (c *StorageVolumeClient) waitForStorageVolumeToBecomeAvailable(name string,
 
 // waitForStorageVolumeToBeDeleted waits until the specified storage volume has been deleted.
 func (c *StorageVolumeClient) waitForStorageVolumeToBeDeleted(name string, timeoutInSeconds int) error {
-	return c.waitFor(
+	return c.client.WaitFor(
 		fmt.Sprintf("storage volume %s to be deleted", c.getQualifiedName(name)),
 		timeoutInSeconds,
 		func() (bool, error) {

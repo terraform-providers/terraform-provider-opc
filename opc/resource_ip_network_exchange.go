@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -38,7 +39,7 @@ func resourceOPCIPNetworkExchange() *schema.Resource {
 }
 
 func resourceOPCIPNetworkExchangeCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPNetworkExchanges()
+	client := meta.(*compute.ComputeClient).IPNetworkExchanges()
 	input := compute.CreateIPNetworkExchangeInput{
 		Name: d.Get("name").(string),
 	}
@@ -63,16 +64,16 @@ func resourceOPCIPNetworkExchangeCreate(d *schema.ResourceData, meta interface{}
 }
 
 func resourceOPCIPNetworkExchangeRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPNetworkExchanges()
+	computeClient := meta.(*compute.ComputeClient).IPNetworkExchanges()
 
 	log.Printf("[DEBUG] Reading state of IP Network Exchange %s", d.Id())
 	getInput := compute.GetIPNetworkExchangeInput{
 		Name: d.Id(),
 	}
-	result, err := client.GetIPNetworkExchange(&getInput)
+	result, err := computeClient.GetIPNetworkExchange(&getInput)
 	if err != nil {
 		// IP NetworkExchange does not exist
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -91,7 +92,7 @@ func resourceOPCIPNetworkExchangeRead(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceOPCIPNetworkExchangeDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPNetworkExchanges()
+	client := meta.(*compute.ComputeClient).IPNetworkExchanges()
 	name := d.Id()
 
 	log.Printf("[DEBUG] Deleting IP Network Exchange '%s'", name)

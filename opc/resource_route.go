@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -51,7 +52,7 @@ func resourceOPCRoute() *schema.Resource {
 }
 
 func resourceOPCRouteCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).Routes()
+	client := meta.(*compute.ComputeClient).Routes()
 
 	// Get Required attributes
 	name := d.Get("name").(string)
@@ -93,16 +94,16 @@ func resourceOPCRouteCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCRouteRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).Routes()
+	computeClient := meta.(*compute.ComputeClient).Routes()
 
 	name := d.Id()
 	input := &compute.GetRouteInput{
 		Name: name,
 	}
 
-	res, err := client.GetRoute(input)
+	res, err := computeClient.GetRoute(input)
 	if err != nil {
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -121,7 +122,7 @@ func resourceOPCRouteRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCRouteUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).Routes()
+	client := meta.(*compute.ComputeClient).Routes()
 
 	// Get Required attributes
 	name := d.Get("name").(string)
@@ -163,7 +164,7 @@ func resourceOPCRouteUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCRouteDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).Routes()
+	client := meta.(*compute.ComputeClient).Routes()
 
 	name := d.Id()
 	input := &compute.DeleteRouteInput{

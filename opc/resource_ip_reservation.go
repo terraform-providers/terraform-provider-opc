@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
@@ -64,7 +65,7 @@ func resourceOPCIPReservationCreate(d *schema.ResourceData, meta interface{}) er
 	log.Printf("[DEBUG] Creating ip reservation from parent_pool %s with tags=%s",
 		reservation.ParentPool, reservation.Tags)
 
-	client := meta.(*compute.Client).IPReservations()
+	client := meta.(*compute.ComputeClient).IPReservations()
 	info, err := client.CreateIPReservation(&reservation)
 	if err != nil {
 		return fmt.Errorf("Error creating ip reservation from parent_pool %s with tags=%s: %s",
@@ -77,16 +78,16 @@ func resourceOPCIPReservationCreate(d *schema.ResourceData, meta interface{}) er
 
 func resourceOPCIPReservationRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	client := meta.(*compute.Client).IPReservations()
+	computeClient := meta.(*compute.ComputeClient).IPReservations()
 
 	log.Printf("[DEBUG] Reading state of ip reservation %s", d.Id())
 	getInput := compute.GetIPReservationInput{
 		Name: d.Id(),
 	}
-	result, err := client.GetIPReservation(&getInput)
+	result, err := computeClient.GetIPReservation(&getInput)
 	if err != nil {
 		// IP Reservation does not exist
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -108,7 +109,7 @@ func resourceOPCIPReservationRead(d *schema.ResourceData, meta interface{}) erro
 
 func resourceOPCIPReservationDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	client := meta.(*compute.Client).IPReservations()
+	client := meta.(*compute.ComputeClient).IPReservations()
 
 	log.Printf("[DEBUG] Deleting ip reservation %s", d.Id())
 

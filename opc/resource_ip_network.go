@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -56,7 +57,7 @@ func resourceOPCIPNetwork() *schema.Resource {
 }
 
 func resourceOPCIPNetworkCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPNetworks()
+	client := meta.(*compute.ComputeClient).IPNetworks()
 
 	// Get required attributes
 	name := d.Get("name").(string)
@@ -95,16 +96,16 @@ func resourceOPCIPNetworkCreate(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceOPCIPNetworkRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPNetworks()
+	computeClient := meta.(*compute.ComputeClient).IPNetworks()
 
 	name := d.Id()
 	input := &compute.GetIPNetworkInput{
 		Name: name,
 	}
 
-	res, err := client.GetIPNetwork(input)
+	res, err := computeClient.GetIPNetwork(input)
 	if err != nil {
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -124,7 +125,7 @@ func resourceOPCIPNetworkRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCIPNetworkUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPNetworks()
+	client := meta.(*compute.ComputeClient).IPNetworks()
 
 	// Get required attributes
 	name := d.Get("name").(string)
@@ -165,7 +166,7 @@ func resourceOPCIPNetworkUpdate(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceOPCIPNetworkDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPNetworks()
+	client := meta.(*compute.ComputeClient).IPNetworks()
 
 	name := d.Id()
 	input := &compute.DeleteIPNetworkInput{

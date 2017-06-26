@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -42,7 +43,7 @@ func resourceOPCIPAssociationCreate(d *schema.ResourceData, meta interface{}) er
 	vCable := d.Get("vcable").(string)
 	parentPool := d.Get("parent_pool").(string)
 
-	client := meta.(*compute.Client).IPAssociations()
+	client := meta.(*compute.ComputeClient).IPAssociations()
 	input := compute.CreateIPAssociationInput{
 		ParentPool: parentPool,
 		VCable:     vCable,
@@ -58,16 +59,16 @@ func resourceOPCIPAssociationCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceOPCIPAssociationRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPAssociations()
+	computeClient := meta.(*compute.ComputeClient).IPAssociations()
 
 	name := d.Id()
 	input := compute.GetIPAssociationInput{
 		Name: name,
 	}
-	result, err := client.GetIPAssociation(&input)
+	result, err := computeClient.GetIPAssociation(&input)
 	if err != nil {
 		// IP Association does not exist
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -82,7 +83,7 @@ func resourceOPCIPAssociationRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceOPCIPAssociationDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).IPAssociations()
+	client := meta.(*compute.ComputeClient).IPAssociations()
 
 	name := d.Id()
 	input := compute.DeleteIPAssociationInput{

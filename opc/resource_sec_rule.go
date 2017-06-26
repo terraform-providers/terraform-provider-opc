@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 
+	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -56,7 +57,7 @@ func resourceOPCSecRule() *schema.Resource {
 }
 
 func resourceOPCSecRuleCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SecRules()
+	client := meta.(*compute.ComputeClient).SecRules()
 
 	name := d.Get("name").(string)
 	sourceList := d.Get("source_list").(string)
@@ -89,17 +90,17 @@ func resourceOPCSecRuleCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSecRuleRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SecRules()
+	computeClient := meta.(*compute.ComputeClient).SecRules()
 
 	name := d.Id()
 
 	input := compute.GetSecRuleInput{
 		Name: name,
 	}
-	result, err := client.GetSecRule(&input)
+	result, err := computeClient.GetSecRule(&input)
 	if err != nil {
 		// Sec Rule does not exist
-		if compute.WasNotFoundError(err) {
+		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -118,7 +119,7 @@ func resourceOPCSecRuleRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSecRuleUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SecRules()
+	client := meta.(*compute.ComputeClient).SecRules()
 
 	name := d.Get("name").(string)
 	sourceList := d.Get("source_list").(string)
@@ -149,7 +150,7 @@ func resourceOPCSecRuleUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSecRuleDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.Client).SecRules()
+	client := meta.(*compute.ComputeClient).SecRules()
 	name := d.Id()
 
 	input := compute.DeleteSecRuleInput{

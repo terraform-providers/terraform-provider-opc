@@ -13,10 +13,10 @@ const (
 
 // ACLs obtains a ACLsClient which can be used to access to the
 // ACLs functions of the Compute API
-func (c *Client) ACLs() *ACLsClient {
+func (c *ComputeClient) ACLs() *ACLsClient {
 	return &ACLsClient{
 		ResourceClient: ResourceClient{
-			Client:              c,
+			ComputeClient:       c,
 			ResourceDescription: ACLDescription,
 			ContainerPath:       ACLContainerPath,
 			ResourceRootPath:    ACLResourcePath,

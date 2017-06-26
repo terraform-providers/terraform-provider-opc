@@ -10,10 +10,10 @@ type RoutesClient struct {
 	ResourceClient
 }
 
-func (c *Client) Routes() *RoutesClient {
+func (c *ComputeClient) Routes() *RoutesClient {
 	return &RoutesClient{
 		ResourceClient: ResourceClient{
-			Client:              c,
+			ComputeClient:       c,
 			ResourceDescription: RoutesDescription,
 			ContainerPath:       RoutesContainerPath,
 			ResourceRootPath:    RoutesResourcePath,

@@ -13,10 +13,10 @@ const (
 
 // IPReservations obtains an IPReservationsClient which can be used to access to the
 // IP Reservations functions of the Compute API
-func (c *Client) IPReservations() *IPReservationsClient {
+func (c *ComputeClient) IPReservations() *IPReservationsClient {
 	return &IPReservationsClient{
 		ResourceClient: &ResourceClient{
-			Client:              c,
+			ComputeClient:       c,
 			ResourceDescription: IPReservationDesc,
 			ContainerPath:       IPReservationContainerPath,
 			ResourceRootPath:    IPReservataionResourcePath,

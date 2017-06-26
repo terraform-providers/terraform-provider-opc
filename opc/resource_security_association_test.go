@@ -49,7 +49,7 @@ func TestAccOPCSecurityAssociation_Complete(t *testing.T) {
 }
 
 func testAccOPCCheckSecurityAssociationExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.Client).SecurityAssociations()
+	client := testAccProvider.Meta().(*compute.ComputeClient).SecurityAssociations()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_security_association" {
@@ -68,7 +68,7 @@ func testAccOPCCheckSecurityAssociationExists(s *terraform.State) error {
 }
 
 func testAccOPCCheckSecurityAssociationDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.Client).SecurityAssociations()
+	client := testAccProvider.Meta().(*compute.ComputeClient).SecurityAssociations()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_security_association" {

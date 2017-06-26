@@ -90,7 +90,7 @@ func TestAccOPCSSHKey_disable(t *testing.T) {
 }
 
 func testAccOPCCheckSSHKeyExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.Client).SSHKeys()
+	client := testAccProvider.Meta().(*compute.ComputeClient).SSHKeys()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_ssh_key" {
@@ -109,7 +109,7 @@ func testAccOPCCheckSSHKeyExists(s *terraform.State) error {
 }
 
 func testAccOPCCheckSSHKeyDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.Client).SSHKeys()
+	client := testAccProvider.Meta().(*compute.ComputeClient).SSHKeys()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_ssh_key" {

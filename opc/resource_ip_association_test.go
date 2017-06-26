@@ -30,7 +30,7 @@ func TestAccOPCIPAssociation_Basic(t *testing.T) {
 }
 
 func testAccOPCCheckIPAssociationExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.Client).IPAssociations()
+	client := testAccProvider.Meta().(*compute.ComputeClient).IPAssociations()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_ip_association" {
@@ -49,7 +49,7 @@ func testAccOPCCheckIPAssociationExists(s *terraform.State) error {
 }
 
 func testAccOPCCheckIPAssociationDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.Client).IPAssociations()
+	client := testAccProvider.Meta().(*compute.ComputeClient).IPAssociations()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_ip_association" {

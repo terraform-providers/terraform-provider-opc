@@ -1,4 +1,4 @@
-package compute
+package client
 
 import (
 	"bytes"
@@ -9,14 +9,14 @@ import (
 )
 
 // Log a string if debug logs are on
-func (c *Client) debugLogString(str string) {
+func (c *Client) DebugLogString(str string) {
 	if c.loglevel != opc.LogDebug {
 		return
 	}
 	c.logger.Log(str)
 }
 
-func (c *Client) debugLogReq(req *http.Request) {
+func (c *Client) DebugLogReq(req *http.Request) {
 	// Don't need to log this if not debugging
 	if c.loglevel != opc.LogDebug {
 		return
