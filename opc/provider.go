@@ -49,6 +49,13 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("OPC_INSECURE", false),
 				Description: "Skip TLS Verification for self-signed certificates. Should only be used if absolutely required.",
 			},
+
+			"storage": {
+				Type: schema.TypeBool,
+				Optional: true,
+				DefaultFunc: schema.EnvDefaultFunc("OPC_STORAGE", false),
+				Description: "Determines whether Terraform will authenticate with the storage api."
+			},
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
@@ -81,6 +88,7 @@ func Provider() terraform.ResourceProvider {
 			"opc_compute_ip_address_prefix_set":   resourceOPCIPAddressPrefixSet(),
 			"opc_compute_ip_address_association":  resourceOPCIPAddressAssociation(),
 			"opc_compute_snapshot":                resourceOPCSnapshot(),
+			"opc_storage_container":               resourceOPCStorageContainer(),
 		},
 
 		ConfigureFunc: providerConfigure,
@@ -95,6 +103,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		Endpoint:       d.Get("endpoint").(string),
 		MaxRetries:     d.Get("max_retries").(int),
 		Insecure:       d.Get("insecure").(bool),
+		Storage:        d.Get("storage").(bool),
 	}
 
 	return config.Client()

@@ -40,7 +40,7 @@ func resourceOPCSSHKey() *schema.Resource {
 }
 
 func resourceOPCSSHKeyCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.ComputeClient).SSHKeys()
+	client := meta.(*OPCClient).computeClient.SSHKeys()
 
 	name := d.Get("name").(string)
 	key := d.Get("key").(string)
@@ -63,7 +63,7 @@ func resourceOPCSSHKeyCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSSHKeyUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.ComputeClient).SSHKeys()
+	client := meta.(*OPCClient).computeClient.SSHKeys()
 
 	name := d.Get("name").(string)
 	key := d.Get("key").(string)
@@ -84,7 +84,7 @@ func resourceOPCSSHKeyUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*compute.ComputeClient).SSHKeys()
+	computeClient := meta.(*OPCClient).computeClient.SSHKeys()
 	name := d.Id()
 
 	input := compute.GetSSHKeyInput{
@@ -113,7 +113,7 @@ func resourceOPCSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSSHKeyDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.ComputeClient).SSHKeys()
+	client := meta.(*OPCClient).computeClient.SSHKeys()
 	name := d.Id()
 
 	input := compute.DeleteSSHKeyInput{

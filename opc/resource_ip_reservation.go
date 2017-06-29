@@ -65,7 +65,7 @@ func resourceOPCIPReservationCreate(d *schema.ResourceData, meta interface{}) er
 	log.Printf("[DEBUG] Creating ip reservation from parent_pool %s with tags=%s",
 		reservation.ParentPool, reservation.Tags)
 
-	client := meta.(*compute.ComputeClient).IPReservations()
+	client := meta.(*OPCClient).computeClient.IPReservations()
 	info, err := client.CreateIPReservation(&reservation)
 	if err != nil {
 		return fmt.Errorf("Error creating ip reservation from parent_pool %s with tags=%s: %s",
@@ -78,7 +78,7 @@ func resourceOPCIPReservationCreate(d *schema.ResourceData, meta interface{}) er
 
 func resourceOPCIPReservationRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	computeClient := meta.(*compute.ComputeClient).IPReservations()
+	computeClient := meta.(*OPCClient).computeClient.IPReservations()
 
 	log.Printf("[DEBUG] Reading state of ip reservation %s", d.Id())
 	input := compute.GetIPReservationInput{
@@ -115,7 +115,7 @@ func resourceOPCIPReservationRead(d *schema.ResourceData, meta interface{}) erro
 
 func resourceOPCIPReservationDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	client := meta.(*compute.ComputeClient).IPReservations()
+	client := meta.(*OPCClient).computeClient.IPReservations()
 
 	log.Printf("[DEBUG] Deleting ip reservation %s", d.Id())
 

@@ -53,7 +53,7 @@ func opcResourceCheck(resourceName string, f func(checker *OPCResourceState) err
 		}
 
 		state := &OPCResourceState{
-			ComputeClient: testAccProvider.Meta().(*compute.ComputeClient),
+			ComputeClient: testAccProvider.Meta().(*OPCClient).computeClient,
 			InstanceState: rs.Primary,
 		}
 

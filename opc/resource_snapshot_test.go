@@ -49,7 +49,7 @@ func TestAccOPCSnapshot_MachineImage(t *testing.T) {
 }
 
 func testAccCheckSnapshotExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.ComputeClient).Snapshots()
+	client := testAccProvider.Meta().(*OPCClient).computeClient.Snapshots()
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_snapshot" {
 			continue
@@ -67,7 +67,7 @@ func testAccCheckSnapshotExists(s *terraform.State) error {
 }
 
 func testAccCheckSnapshotDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.ComputeClient).Snapshots()
+	client := testAccProvider.Meta().(*OPCClient).computeClient.Snapshots()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_snapshot" {

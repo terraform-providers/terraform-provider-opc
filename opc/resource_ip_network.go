@@ -57,7 +57,7 @@ func resourceOPCIPNetwork() *schema.Resource {
 }
 
 func resourceOPCIPNetworkCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.ComputeClient).IPNetworks()
+	client := meta.(*OPCClient).computeClient.IPNetworks()
 
 	// Get required attributes
 	name := d.Get("name").(string)
@@ -96,7 +96,7 @@ func resourceOPCIPNetworkCreate(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceOPCIPNetworkRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*compute.ComputeClient).IPNetworks()
+	computeClient := meta.(*OPCClient).computeClient.IPNetworks()
 
 	name := d.Id()
 	input := &compute.GetIPNetworkInput{
@@ -130,7 +130,7 @@ func resourceOPCIPNetworkRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCIPNetworkUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.ComputeClient).IPNetworks()
+	client := meta.(*OPCClient).computeClient.IPNetworks()
 
 	// Get required attributes
 	name := d.Get("name").(string)
@@ -171,7 +171,7 @@ func resourceOPCIPNetworkUpdate(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceOPCIPNetworkDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.ComputeClient).IPNetworks()
+	client := meta.(*OPCClient).computeClient.IPNetworks()
 
 	name := d.Id()
 	input := &compute.DeleteIPNetworkInput{

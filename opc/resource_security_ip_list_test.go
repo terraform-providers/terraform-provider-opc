@@ -64,7 +64,7 @@ func TestAccOPCSecurityIPList_Updated(t *testing.T) {
 }
 
 func testAccCheckSecurityIPListExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.ComputeClient).SecurityIPLists()
+	client := testAccProvider.Meta().(*OPCClient).computeClient.SecurityIPLists()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_security_ip_list" {
@@ -83,7 +83,7 @@ func testAccCheckSecurityIPListExists(s *terraform.State) error {
 }
 
 func testAccCheckSecurityIPListDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.ComputeClient).SecurityIPLists()
+	client := testAccProvider.Meta().(*OPCClient).computeClient.SecurityIPLists()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_security_ip_list" {

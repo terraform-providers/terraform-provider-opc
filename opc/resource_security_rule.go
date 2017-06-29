@@ -74,7 +74,7 @@ func resourceOPCSecurityRule() *schema.Resource {
 }
 
 func resourceOPCSecurityRuleCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.ComputeClient).SecurityRules()
+	client := meta.(*OPCClient).computeClient.SecurityRules()
 	input := compute.CreateSecurityRuleInput{
 		Name:          d.Get("name").(string),
 		FlowDirection: d.Get("flow_direction").(string),
@@ -127,7 +127,7 @@ func resourceOPCSecurityRuleCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCSecurityRuleRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*compute.ComputeClient).SecurityRules()
+	computeClient := meta.(*OPCClient).computeClient.SecurityRules()
 
 	input := compute.GetSecurityRuleInput{
 		Name: d.Id(),
@@ -173,7 +173,7 @@ func resourceOPCSecurityRuleRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceOPCSecurityRuleUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.ComputeClient).SecurityRules()
+	client := meta.(*OPCClient).computeClient.SecurityRules()
 	input := compute.UpdateSecurityRuleInput{
 		Name:          d.Get("name").(string),
 		FlowDirection: d.Get("flow_direction").(string),
@@ -225,7 +225,7 @@ func resourceOPCSecurityRuleUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCSecurityRuleDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.ComputeClient).SecurityRules()
+	client := meta.(*OPCClient).computeClient.SecurityRules()
 	name := d.Id()
 
 	input := compute.DeleteSecurityRuleInput{

@@ -53,7 +53,7 @@ func TestAccOPCVNICSet_Basic(t *testing.T) {
 }
 
 func testAccOPCCheckVNICSetExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.ComputeClient).VirtNICSets()
+	client := testAccProvider.Meta().(*OPCClient).computeClient.VirtNICSets()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_vnic_set" {
@@ -72,7 +72,7 @@ func testAccOPCCheckVNICSetExists(s *terraform.State) error {
 }
 
 func testAccOPCCheckVNICSetDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.ComputeClient).VirtNICSets()
+	client := testAccProvider.Meta().(*OPCClient).computeClient.VirtNICSets()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_vnic_set" {
