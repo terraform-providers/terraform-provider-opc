@@ -144,16 +144,6 @@ func resourceOPCStorageVolumeCreate(d *schema.ResourceData, meta interface{}) er
 	imageList := d.Get("image_list").(string)
 	imageListEntry := d.Get("image_list_entry").(int)
 
-	if bootable == true {
-		if imageList == "" {
-			return fmt.Errorf("Error: A Bootable Volume must have an Image List!")
-		}
-
-		if imageListEntry == -1 {
-			return fmt.Errorf("Error: A Bootable Volume must have an Image List Entry!")
-		}
-	}
-
 	input := compute.CreateStorageVolumeInput{
 		Name:           name,
 		Description:    description,
