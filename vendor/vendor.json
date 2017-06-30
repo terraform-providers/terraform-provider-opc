@@ -250,34 +250,34 @@
 		{
 			"checksumSHA1": "iG8sgf8Nq6SnoMY3wjK68eZ4f3g=",
 			"path": "github.com/hashicorp/go-oracle-terraform/client",
-			"revision": "0202f6181647249c67e853099a4db7325e5ea845",
-			"revisionTime": "2017-06-30T17:56:13Z",
-			"version": "=v0.1.2",
-			"versionExact": "v0.1.2"
+			"revision": "9911508fbab5bd3985b91c2ce005f64f9b3856f9",
+			"revisionTime": "2017-06-30T19:09:16Z",
+			"version": "=v0.1.3",
+			"versionExact": "v0.1.3"
 		},
 		{
-			"checksumSHA1": "oUrm8IVnH4iVu5q3FBPO5vLneMw=",
+			"checksumSHA1": "xYQ4S63Kj7Os7hElCapxWSMoeN0=",
 			"path": "github.com/hashicorp/go-oracle-terraform/compute",
-			"revision": "0202f6181647249c67e853099a4db7325e5ea845",
-			"revisionTime": "2017-06-30T17:56:13Z",
-			"version": "=v0.1.2",
-			"versionExact": "v0.1.2"
+			"revision": "9911508fbab5bd3985b91c2ce005f64f9b3856f9",
+			"revisionTime": "2017-06-30T19:09:16Z",
+			"version": "=v0.1.3",
+			"versionExact": "v0.1.3"
 		},
 		{
 			"checksumSHA1": "DzK7lYwHt5Isq5Zf73cnQqBO2LI=",
 			"path": "github.com/hashicorp/go-oracle-terraform/helper",
-			"revision": "0202f6181647249c67e853099a4db7325e5ea845",
-			"revisionTime": "2017-06-30T17:56:13Z",
-			"version": "=v0.1.2",
-			"versionExact": "v0.1.2"
+			"revision": "9911508fbab5bd3985b91c2ce005f64f9b3856f9",
+			"revisionTime": "2017-06-30T19:09:16Z",
+			"version": "=v0.1.3",
+			"versionExact": "v0.1.3"
 		},
 		{
 			"checksumSHA1": "JbuYtbJkx3r1BLuCMymkri0Q1BI=",
 			"path": "github.com/hashicorp/go-oracle-terraform/opc",
-			"revision": "0202f6181647249c67e853099a4db7325e5ea845",
-			"revisionTime": "2017-06-30T17:56:13Z",
-			"version": "=v0.1.2",
-			"versionExact": "v0.1.2"
+			"revision": "9911508fbab5bd3985b91c2ce005f64f9b3856f9",
+			"revisionTime": "2017-06-30T19:09:16Z",
+			"version": "=v0.1.3",
+			"versionExact": "v0.1.3"
 		},
 		{
 			"checksumSHA1": "b0nQutPMJHeUmz4SjpreotAo6Yk=",

@@ -8,8 +8,8 @@ import (
 	"github.com/hashicorp/go-oracle-terraform/client"
 )
 
-const WaitForInstanceReadyTimeout = 600
-const WaitForInstanceDeleteTimeout = 600
+const WaitForInstanceReadyTimeout = 3600
+const WaitForInstanceDeleteTimeout = 3600
 
 // InstancesClient is a client for the Instance functions of the Compute API.
 type InstancesClient struct {
@@ -324,8 +324,11 @@ func (c *InstancesClient) CreateInstance(input *CreateInstanceInput) (*InstanceI
 		instanceError error
 	)
 	for i := 0; i < *c.ComputeClient.client.MaxRetries; i++ {
+		c.client.DebugLogString(fmt.Sprintf("(Iteration: %d of %d) Creating instance with name %s\n Plan: %+v", i, *c.ComputeClient.client.MaxRetries, input.Name, plan))
+
 		instanceInfo, instanceError = c.startInstance(input.Name, plan)
 		if instanceError == nil {
+			c.client.DebugLogString(fmt.Sprintf("(Iteration: %d of %d) Finished creating instance with name %s\n Info: %+v", i, *c.ComputeClient.client.MaxRetries, input.Name, instanceInfo))
 			return instanceInfo, nil
 		}
 	}
@@ -499,6 +502,7 @@ func (c *InstancesClient) WaitForInstanceRunning(input *GetInstanceInput, timeou
 		if getErr != nil {
 			return false, getErr
 		}
+		c.client.DebugLogString(fmt.Sprintf("Instance name is %v, Instance info is %+v", info.Name, info))
 		switch s := info.State; s {
 		case InstanceError:
 			return false, fmt.Errorf("Error initializing instance: %s", info.ErrorReason)
