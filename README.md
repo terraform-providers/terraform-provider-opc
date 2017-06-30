@@ -16,7 +16,7 @@ Requirements
 Building The Provider
 ---------------------
 
-Clone repository to: `$GOPATH/src/github.com/terraform-provider/terraform-provider-opc`
+Clone repository to: `$GOPATH/src/github.com/terraform-providers/terraform-provider-opc`
 
 ```sh
 $ mkdir -p $GOPATH/src/github.com/terraform-providers; cd $GOPATH/src/github.com/terraform-providers
