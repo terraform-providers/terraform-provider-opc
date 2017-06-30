@@ -56,6 +56,7 @@ func (c *ComputeClient) executeRequest(method, path string, body interface{}) (*
 	// If we have an authentication cookie, let's authenticate, refreshing cookie if need be
 	if c.authCookie != nil {
 		if time.Since(c.cookieIssued).Minutes() > 25 {
+			c.authCookie = nil
 			if err := c.getAuthenticationCookie(); err != nil {
 				return nil, err
 			}
