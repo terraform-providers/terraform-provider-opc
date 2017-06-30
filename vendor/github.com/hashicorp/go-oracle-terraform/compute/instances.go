@@ -319,7 +319,22 @@ func (c *InstancesClient) CreateInstance(input *CreateInstanceInput) (*InstanceI
 
 	plan := LaunchPlanInput{Instances: []CreateInstanceInput{*input}}
 
+	var (
+		instanceInfo  *InstanceInfo
+		instanceError error
+	)
+	for i := 0; i < *c.ComputeClient.client.MaxRetries; i++ {
+		instanceInfo, instanceError = c.startInstance(input.Name, plan)
+		if instanceError == nil {
+			return instanceInfo, nil
+		}
+	}
+	return nil, instanceError
+}
+
+func (c *InstancesClient) startInstance(name string, plan LaunchPlanInput) (*InstanceInfo, error) {
 	var responseBody LaunchPlanResponse
+
 	if err := c.createResource(&plan, &responseBody); err != nil {
 		return nil, err
 	}
@@ -330,13 +345,26 @@ func (c *InstancesClient) CreateInstance(input *CreateInstanceInput) (*InstanceI
 
 	// Call wait for instance ready now, as creating the instance is an eventually consistent operation
 	getInput := &GetInstanceInput{
-		Name: input.Name,
+		Name: name,
 		ID:   responseBody.Instances[0].ID,
 	}
 
 	// Wait for instance to be ready and return the result
 	// Don't have to unqualify any objects, as the GetInstance method will handle that
-	return c.WaitForInstanceRunning(getInput, WaitForInstanceReadyTimeout)
+	instanceInfo, instanceError := c.WaitForInstanceRunning(getInput, WaitForInstanceReadyTimeout)
+	// If the instance enters an error state we need to delete the instance and retry
+	if instanceError != nil {
+		deleteInput := &DeleteInstanceInput{
+			Name: name,
+			ID:   responseBody.Instances[0].ID,
+		}
+		err := c.DeleteInstance(deleteInput)
+		if err != nil {
+			return nil, fmt.Errorf("Error deleting instance %s: %s", name, err)
+		}
+		return nil, instanceError
+	}
+	return instanceInfo, nil
 }
 
 // Both of these fields are required. If they're not provided, things go wrong in
