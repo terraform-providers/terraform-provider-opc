@@ -21,7 +21,7 @@ type Config struct {
 	Endpoint       string
 	MaxRetries     int
 	Insecure       bool
-	Storage 			 bool
+	Storage        bool
 }
 
 type OPCClient struct {
@@ -69,7 +69,7 @@ func (c *Config) Client() (*OPCClient, error) {
 		computeClient: computeClient,
 	}
 
-	if &c.Storage {
+	if c.Storage {
 		storageClient, err := storage.NewStorageClient(&config)
 		if err != nil {
 			return nil, err

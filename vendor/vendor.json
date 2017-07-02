@@ -280,6 +280,14 @@
 			"versionExact": "v0.1.4"
 		},
 		{
+			"checksumSHA1": "3Ptc/yHLX2MpV7AcU1F9EnRztjA=",
+			"path": "github.com/hashicorp/go-oracle-terraform/storage",
+			"revision": "f956284fe5df3df52e751daee8eac043127645f3",
+			"revisionTime": "2017-06-30T21:21:31Z",
+			"version": "=v0.1.4",
+			"versionExact": "v0.1.4"
+		},
+		{
 			"checksumSHA1": "b0nQutPMJHeUmz4SjpreotAo6Yk=",
 			"path": "github.com/hashicorp/go-plugin",
 			"revision": "f72692aebca2008343a9deb06ddb4b17f7051c15",

@@ -51,10 +51,10 @@ func Provider() terraform.ResourceProvider {
 			},
 
 			"storage": {
-				Type: schema.TypeBool,
-				Optional: true,
+				Type:        schema.TypeBool,
+				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OPC_STORAGE", false),
-				Description: "Determines whether Terraform will authenticate with the storage api."
+				Description: "Determines whether Terraform will authenticate with the storage api.",
 			},
 		},
 
