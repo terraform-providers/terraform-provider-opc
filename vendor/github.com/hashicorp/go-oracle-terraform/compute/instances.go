@@ -8,8 +8,8 @@ import (
 	"github.com/hashicorp/go-oracle-terraform/client"
 )
 
-const WaitForInstanceReadyTimeout = 600
-const WaitForInstanceDeleteTimeout = 600
+const WaitForInstanceReadyTimeout = 3600
+const WaitForInstanceDeleteTimeout = 3600
 
 // InstancesClient is a client for the Instance functions of the Compute API.
 type InstancesClient struct {
@@ -319,7 +319,25 @@ func (c *InstancesClient) CreateInstance(input *CreateInstanceInput) (*InstanceI
 
 	plan := LaunchPlanInput{Instances: []CreateInstanceInput{*input}}
 
+	var (
+		instanceInfo  *InstanceInfo
+		instanceError error
+	)
+	for i := 0; i < *c.ComputeClient.client.MaxRetries; i++ {
+		c.client.DebugLogString(fmt.Sprintf("(Iteration: %d of %d) Creating instance with name %s\n Plan: %+v", i, *c.ComputeClient.client.MaxRetries, input.Name, plan))
+
+		instanceInfo, instanceError = c.startInstance(input.Name, plan)
+		if instanceError == nil {
+			c.client.DebugLogString(fmt.Sprintf("(Iteration: %d of %d) Finished creating instance with name %s\n Info: %+v", i, *c.ComputeClient.client.MaxRetries, input.Name, instanceInfo))
+			return instanceInfo, nil
+		}
+	}
+	return nil, instanceError
+}
+
+func (c *InstancesClient) startInstance(name string, plan LaunchPlanInput) (*InstanceInfo, error) {
 	var responseBody LaunchPlanResponse
+
 	if err := c.createResource(&plan, &responseBody); err != nil {
 		return nil, err
 	}
@@ -330,13 +348,26 @@ func (c *InstancesClient) CreateInstance(input *CreateInstanceInput) (*InstanceI
 
 	// Call wait for instance ready now, as creating the instance is an eventually consistent operation
 	getInput := &GetInstanceInput{
-		Name: input.Name,
+		Name: name,
 		ID:   responseBody.Instances[0].ID,
 	}
 
 	// Wait for instance to be ready and return the result
 	// Don't have to unqualify any objects, as the GetInstance method will handle that
-	return c.WaitForInstanceRunning(getInput, WaitForInstanceReadyTimeout)
+	instanceInfo, instanceError := c.WaitForInstanceRunning(getInput, WaitForInstanceReadyTimeout)
+	// If the instance enters an error state we need to delete the instance and retry
+	if instanceError != nil {
+		deleteInput := &DeleteInstanceInput{
+			Name: name,
+			ID:   responseBody.Instances[0].ID,
+		}
+		err := c.DeleteInstance(deleteInput)
+		if err != nil {
+			return nil, fmt.Errorf("Error deleting instance %s: %s", name, err)
+		}
+		return nil, instanceError
+	}
+	return instanceInfo, nil
 }
 
 // Both of these fields are required. If they're not provided, things go wrong in
@@ -471,6 +502,7 @@ func (c *InstancesClient) WaitForInstanceRunning(input *GetInstanceInput, timeou
 		if getErr != nil {
 			return false, getErr
 		}
+		c.client.DebugLogString(fmt.Sprintf("Instance name is %v, Instance info is %+v", info.Name, info))
 		switch s := info.State; s {
 		case InstanceError:
 			return false, fmt.Errorf("Error initializing instance: %s", info.ErrorReason)

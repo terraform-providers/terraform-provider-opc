@@ -19,11 +19,9 @@ type Client struct {
 	IdentityDomain *string
 	UserName       *string
 	Password       *string
-	apiEndpoint    *url.URL
+	APIEndpoint    *url.URL
 	httpClient     *http.Client
-	authCookie     *http.Cookie
-	cookieIssued   time.Time
-	maxRetries     *int
+	MaxRetries     *int
 	logger         opc.Logger
 	loglevel       opc.LogLevelType
 }
@@ -34,9 +32,9 @@ func NewClient(c *opc.Config) (*Client, error) {
 		IdentityDomain: c.IdentityDomain,
 		UserName:       c.Username,
 		Password:       c.Password,
-		apiEndpoint:    c.APIEndpoint,
+		APIEndpoint:    c.APIEndpoint,
 		httpClient:     c.HTTPClient,
-		maxRetries:     c.MaxRetries,
+		MaxRetries:     c.MaxRetries,
 		loglevel:       c.LogLevel,
 	}
 
@@ -55,7 +53,7 @@ func NewClient(c *opc.Config) (*Client, error) {
 
 	// Default max retries if unset
 	if c.MaxRetries == nil {
-		client.maxRetries = opc.Int(DEFAULT_MAX_RETRIES)
+		client.MaxRetries = opc.Int(DEFAULT_MAX_RETRIES)
 	}
 
 	// Protect against any nil http client
@@ -132,10 +130,10 @@ func (c *Client) ExecuteRequest(req *http.Request) (*http.Response, error) {
 func (c *Client) retryRequest(req *http.Request) (*http.Response, error) {
 	// Double check maxRetries is not nil
 	var retries int
-	if c.maxRetries == nil {
+	if c.MaxRetries == nil {
 		retries = DEFAULT_MAX_RETRIES
 	} else {
-		retries = *c.maxRetries
+		retries = *c.MaxRetries
 	}
 
 	var statusCode int
@@ -169,7 +167,7 @@ func (c *Client) retryRequest(req *http.Request) (*http.Response, error) {
 }
 
 func (c *Client) formatURL(path *url.URL) string {
-	return c.apiEndpoint.ResolveReference(path).String()
+	return c.APIEndpoint.ResolveReference(path).String()
 }
 
 // Retry function
