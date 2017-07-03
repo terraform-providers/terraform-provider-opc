@@ -56,8 +56,11 @@ The following arguments are supported:
 * `size` (Required) The size of this storage volume in GB. The allowed range is from 1 GB to 2 TB (2048 GB).
 * `storage_type` - (Optional) - The Type of Storage to provision. Possible values are `/oracle/public/storage/latency` or `/oracle/public/storage/default`. Defaults to `/oracle/public/storage/default`.
 * `bootable` - (Optional) Is the Volume Bootable? Defaults to `false`.
-* `image_list` - (Optional) Defines an image list. Required if `bootable` is set to `true`, optional if set to `false`.
-* `image_list_entry` - (Optional) Defines an image list entry. Required if `bootable` is set to `true`, optional if set to `false`.
+* `image_list` - (Optional) Defines an image list.
+* `image_list_entry` - (Optional) Defines an image list entry.
+* `snapshot` - (Optional) The name of the parent snapshot from which the storage volume is restored or cloned.
+* `snapshot_id` - (Optional) The Id of the parent snapshot from which the storage volume is restored or cloned.
+* `snapshot_account` - (Optional) The Account of the parent snapshot from which the storage volume is restored.
 * `tags` - (Optional) Comma-separated strings that tag the storage volume.
 
 ## Attributes Reference

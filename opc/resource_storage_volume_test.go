@@ -116,6 +116,26 @@ func TestAccOPCStorageVolume_Bootable(t *testing.T) {
 	})
 }
 
+func TestAccOPCStorageVolume_BootableEndToEnd(t *testing.T) {
+	volumeResourceName := "opc_compute_storage_volume.restored"
+	ri := acctest.RandInt()
+	config := testAccStorageVolumeBootableEndToEnd(ri)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: opcResourceCheck(volumeResourceName, testAccCheckStorageVolumeDestroyed),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					opcResourceCheck(volumeResourceName, testAccCheckStorageVolumeExists),
+				),
+			},
+		},
+	})
+}
+
 func TestAccOPCStorageVolume_ImageListEntry(t *testing.T) {
 	volumeResourceName := "opc_compute_storage_volume.test"
 	ri := acctest.RandInt()
@@ -267,6 +287,85 @@ resource "opc_compute_storage_volume" "test" {
   image_list_entry = "${opc_compute_image_list_entry.test.version}"
 }
 `
+
+func testAccStorageVolumeBootableEndToEnd(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_image_list" "original" {
+  name        = "test-acc-imagelist-%d"
+  description = "Provider Acceptance Tests Original Image List"
+}
+
+resource "opc_compute_image_list_entry" "original" {
+  name           = "${opc_compute_image_list.original.name}"
+  machine_images = ["/oracle/public/oel_6.7_apaas_16.4.5_1610211300"]
+  version        = 1
+}
+
+resource "opc_compute_storage_volume" "original" {
+  name             = "test-acc-original-sv-%d"
+  description      = "Provider Acceptance Tests Original Storage Volume"
+  size             = 100
+  bootable         = true
+  image_list       = "${opc_compute_image_list.original.name}"
+  image_list_entry = "${opc_compute_image_list_entry.original.version}"
+}
+
+resource "opc_compute_instance" "original" {
+  name       = "test-acc-original-instance-%d"
+  label      = "Original Instance"
+  shape      = "oc3"
+  image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+
+  storage {
+    volume = "${opc_compute_storage_volume.original.name}"
+    index  = 1
+  }
+
+  networking_info {
+    index          = 0
+    nat            = ["ippool:/oracle/public/ippool"]
+    shared_network = true
+  }
+}
+
+# Take a snapshot
+resource "opc_compute_storage_volume_snapshot" "test" {
+  name                   = "test-acc-snapshot-%d"
+  description            = "Provider Acceptance Tests Snapshot"
+  tags                   = ["example"]
+  collocated             = true
+  volume_name            = "${opc_compute_storage_volume.original.name}"
+  parent_volume_bootable = true
+}
+
+# Restore the image onto the Volume
+resource "opc_compute_storage_volume" "restored" {
+  name        = "test-acc-volume-%d"
+  description = "storage volume from snapshot"
+  size        = 100
+  bootable    = true
+  snapshot_id = "${opc_compute_storage_volume_snapshot.test.snapshot_id}"
+}
+
+# Ensure it's bootable
+resource "opc_compute_instance" "restored" {
+  name       = "test-acc-restored-%d"
+  label      = "Provider Acceptance Test Restored Instance"
+  shape      = "oc3"
+  image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+
+  storage {
+    volume = "${opc_compute_storage_volume.restored.name}"
+    index  = 1
+  }
+
+  networking_info {
+    index          = 0
+    nat            = ["ippool:/oracle/public/ippool"]
+    shared_network = true
+  }
+}`, rInt, rInt, rInt, rInt, rInt, rInt)
+}
 
 const testAccStorageVolumeImageListEntry = `
 resource "opc_compute_image_list" "test" {
