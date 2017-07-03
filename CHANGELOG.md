@@ -1,7 +1,8 @@
 ## 0.1.2 (Unreleased)
 
 BUG FIXES:
- * storage_volume_snapshot: Fix crash on import [GH-10]
+ * `opc_storage_volume_snapshot`: Fix crash on import [GH-10]
+ * `opc_compute_storage_volume`: bootable volumes can be added without an image list/image list entry [GH-19]
 
 ## 0.1.1 (June 21, 2017)
 
