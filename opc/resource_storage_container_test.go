@@ -49,6 +49,7 @@ func TestAccOPCStorageContainer_Updated(t *testing.T) {
 					testAccCheckStorageContainerExists,
 					resource.TestCheckResourceAttr(containerResourceName, "max_age", "50"),
 					resource.TestCheckResourceAttr(containerResourceName, "primary_key", "test-key"),
+					resource.TestCheckResourceAttr(containerResourceName, "allowed_origins.#", "1"),
 					resource.TestCheckResourceAttr(containerResourceName, "allowed_origins.0", "origin-1"),
 				),
 			},
@@ -59,7 +60,8 @@ func TestAccOPCStorageContainer_Updated(t *testing.T) {
 					resource.TestCheckResourceAttr(containerResourceName, "max_age", "60"),
 					resource.TestCheckResourceAttr(containerResourceName, "primary_key", "test-key-updated"),
 					resource.TestCheckResourceAttr(containerResourceName, "secondary_key", "test-key"),
-					resource.TestCheckResourceAttr(containerResourceName, "allowed_origins.0", "origin-2"),
+					resource.TestCheckResourceAttr(containerResourceName, "allowed_origins.#", "2"),
+					resource.TestCheckResourceAttr(containerResourceName, "allowed_origins.1", "origin-2"),
 				),
 			},
 		},
@@ -119,6 +121,6 @@ resource "opc_storage_container" "test" {
   max_age = 60
   primary_key = "test-key-updated"
   secondary_key = "test-key"
-	allowed_origins = ["origin-2"]
+	allowed_origins = ["origin-1", "origin-2"]
 }
 `
