@@ -1,7 +1,7 @@
 ## 0.1.2 (Unreleased)
 FEATURES:
 
-  * `opc_storage_container`: Adds Oracle Storage Container to Terraform.
+  * `opc_storage_container`: Adds Oracle Storage Container to Terraform. [GH-23]
   
 BUG FIXES:
  * `opc_storage_volume_snapshot`: Fix crash on import [GH-10]
