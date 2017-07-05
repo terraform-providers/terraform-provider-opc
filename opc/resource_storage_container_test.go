@@ -108,19 +108,19 @@ func testAccCheckStorageContainerDestroy(s *terraform.State) error {
 
 const testAccOPCStorageContainerBasic = `
 resource "opc_storage_container" "test" {
-	name = "acc-storage-container-%d"
+  name = "acc-storage-container-%d"
   max_age = 50
   primary_key = "test-key"
-	allowed_origins = ["origin-1"]
+  allowed_origins = ["origin-1"]
 }
 `
 
 const testAccOPCStorageContainerUpdated = `
 resource "opc_storage_container" "test" {
-	name = "acc-storage-container-%d"
+  name = "acc-storage-container-%d"
   max_age = 60
   primary_key = "test-key-updated"
   secondary_key = "test-key"
-	allowed_origins = ["origin-1", "origin-2"]
+  allowed_origins = ["origin-1", "origin-2"]
 }
 `
