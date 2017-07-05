@@ -49,6 +49,13 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("OPC_INSECURE", false),
 				Description: "Skip TLS Verification for self-signed certificates. Should only be used if absolutely required.",
 			},
+
+			"storage_endpoint": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("OPC_STORAGE_ENDPOINT", nil),
+				Description: "The HTTP endpoint for Oracle Storage operations.",
+			},
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
@@ -81,6 +88,7 @@ func Provider() terraform.ResourceProvider {
 			"opc_compute_ip_address_prefix_set":   resourceOPCIPAddressPrefixSet(),
 			"opc_compute_ip_address_association":  resourceOPCIPAddressAssociation(),
 			"opc_compute_snapshot":                resourceOPCSnapshot(),
+			"opc_storage_container":               resourceOPCStorageContainer(),
 		},
 
 		ConfigureFunc: providerConfigure,
@@ -89,12 +97,13 @@ func Provider() terraform.ResourceProvider {
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
-		User:           d.Get("user").(string),
-		Password:       d.Get("password").(string),
-		IdentityDomain: d.Get("identity_domain").(string),
-		Endpoint:       d.Get("endpoint").(string),
-		MaxRetries:     d.Get("max_retries").(int),
-		Insecure:       d.Get("insecure").(bool),
+		User:            d.Get("user").(string),
+		Password:        d.Get("password").(string),
+		IdentityDomain:  d.Get("identity_domain").(string),
+		Endpoint:        d.Get("endpoint").(string),
+		MaxRetries:      d.Get("max_retries").(int),
+		Insecure:        d.Get("insecure").(bool),
+		StorageEndpoint: d.Get("storage_endpoint").(string),
 	}
 
 	return config.Client()

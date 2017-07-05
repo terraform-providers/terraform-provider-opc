@@ -45,7 +45,7 @@ func TestAccOPCSecurityList_complete(t *testing.T) {
 }
 
 func testAccCheckSecurityListExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.ComputeClient).SecurityLists()
+	client := testAccProvider.Meta().(*OPCClient).computeClient.SecurityLists()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_security_list" {
@@ -64,7 +64,7 @@ func testAccCheckSecurityListExists(s *terraform.State) error {
 }
 
 func testAccCheckSecurityListDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.ComputeClient).SecurityLists()
+	client := testAccProvider.Meta().(*OPCClient).computeClient.SecurityLists()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_security_list" {

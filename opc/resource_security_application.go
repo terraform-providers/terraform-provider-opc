@@ -82,7 +82,7 @@ func resourceOPCSecurityApplicationCreate(d *schema.ResourceData, meta interface
 	icmpcode := d.Get("icmpcode").(string)
 	description := d.Get("description").(string)
 
-	client := meta.(*compute.ComputeClient).SecurityApplications()
+	client := meta.(*OPCClient).computeClient.SecurityApplications()
 	input := compute.CreateSecurityApplicationInput{
 		Name:        name,
 		Description: description,
@@ -102,7 +102,7 @@ func resourceOPCSecurityApplicationCreate(d *schema.ResourceData, meta interface
 }
 
 func resourceOPCSecurityApplicationRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*compute.ComputeClient).SecurityApplications()
+	computeClient := meta.(*OPCClient).computeClient.SecurityApplications()
 	name := d.Id()
 
 	input := compute.GetSecurityApplicationInput{
@@ -134,7 +134,7 @@ func resourceOPCSecurityApplicationRead(d *schema.ResourceData, meta interface{}
 }
 
 func resourceOPCSecurityApplicationDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.ComputeClient).SecurityApplications()
+	client := meta.(*OPCClient).computeClient.SecurityApplications()
 	name := d.Id()
 
 	input := compute.DeleteSecurityApplicationInput{

@@ -53,7 +53,7 @@ func resourceOPCImageListEntry() *schema.Resource {
 }
 
 func resourceOPCImageListEntryCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.ComputeClient).ImageListEntries()
+	client := meta.(*OPCClient).computeClient.ImageListEntries()
 
 	name := d.Get("name").(string)
 	machineImages := expandOPCImageListEntryMachineImages(d)
@@ -86,7 +86,7 @@ func resourceOPCImageListEntryCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceOPCImageListEntryRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.ComputeClient).ImageListEntries()
+	client := meta.(*OPCClient).computeClient.ImageListEntries()
 
 	name, version, err := parseOPCImageListEntryID(d.Id())
 	if err != nil {
@@ -123,7 +123,7 @@ func resourceOPCImageListEntryRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCImageListEntryDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.ComputeClient).ImageListEntries()
+	client := meta.(*OPCClient).computeClient.ImageListEntries()
 
 	name, version, err := parseOPCImageListEntryID(d.Id())
 	if err != nil {

@@ -39,7 +39,7 @@ func resourceOPCIPNetworkExchange() *schema.Resource {
 }
 
 func resourceOPCIPNetworkExchangeCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.ComputeClient).IPNetworkExchanges()
+	client := meta.(*OPCClient).computeClient.IPNetworkExchanges()
 	input := compute.CreateIPNetworkExchangeInput{
 		Name: d.Get("name").(string),
 	}
@@ -64,7 +64,7 @@ func resourceOPCIPNetworkExchangeCreate(d *schema.ResourceData, meta interface{}
 }
 
 func resourceOPCIPNetworkExchangeRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*compute.ComputeClient).IPNetworkExchanges()
+	computeClient := meta.(*OPCClient).computeClient.IPNetworkExchanges()
 
 	log.Printf("[DEBUG] Reading state of IP Network Exchange %s", d.Id())
 	input := compute.GetIPNetworkExchangeInput{
@@ -98,7 +98,7 @@ func resourceOPCIPNetworkExchangeRead(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceOPCIPNetworkExchangeDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.ComputeClient).IPNetworkExchanges()
+	client := meta.(*OPCClient).computeClient.IPNetworkExchanges()
 	name := d.Id()
 
 	log.Printf("[DEBUG] Deleting IP Network Exchange '%s'", name)

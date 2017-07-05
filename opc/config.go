@@ -10,24 +10,26 @@ import (
 	"github.com/hashicorp/go-cleanhttp"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/go-oracle-terraform/opc"
+	"github.com/hashicorp/go-oracle-terraform/storage"
 	"github.com/hashicorp/terraform/helper/logging"
 )
 
 type Config struct {
-	User           string
-	Password       string
-	IdentityDomain string
-	Endpoint       string
-	MaxRetries     int
-	Insecure       bool
+	User            string
+	Password        string
+	IdentityDomain  string
+	Endpoint        string
+	MaxRetries      int
+	Insecure        bool
+	StorageEndpoint string
 }
 
 type OPCClient struct {
-	Client     *compute.ComputeClient
-	MaxRetries int
+	computeClient *compute.ComputeClient
+	storageClient *storage.StorageClient
 }
 
-func (c *Config) Client() (*compute.ComputeClient, error) {
+func (c *Config) Client() (*OPCClient, error) {
 	u, err := url.ParseRequestURI(c.Endpoint)
 	if err != nil {
 		return nil, fmt.Errorf("Invalid endpoint URI: %s", err)
@@ -58,7 +60,29 @@ func (c *Config) Client() (*compute.ComputeClient, error) {
 
 	config.HTTPClient = httpClient
 
-	return compute.NewComputeClient(&config)
+	computeClient, err := compute.NewComputeClient(&config)
+	if err != nil {
+		return nil, err
+	}
+
+	opcClient := &OPCClient{
+		computeClient: computeClient,
+	}
+
+	if c.StorageEndpoint != "" {
+		storageEndpoint, err := url.ParseRequestURI(c.StorageEndpoint)
+		if err != nil {
+			return nil, fmt.Errorf("Invalid storage endpoint URI: %s", err)
+		}
+		config.APIEndpoint = storageEndpoint
+		storageClient, err := storage.NewStorageClient(&config)
+		if err != nil {
+			return nil, err
+		}
+		opcClient.storageClient = storageClient
+	}
+
+	return opcClient, nil
 }
 
 type opcLogger struct{}

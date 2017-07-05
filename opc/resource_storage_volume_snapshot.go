@@ -122,7 +122,7 @@ func resourceOPCStorageVolumeSnapshot() *schema.Resource {
 }
 
 func resourceOPCStorageVolumeSnapshotCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.ComputeClient).StorageVolumeSnapshots()
+	client := meta.(*OPCClient).computeClient.StorageVolumeSnapshots()
 
 	// Get required attribute
 	input := &compute.CreateStorageVolumeSnapshotInput{
@@ -163,7 +163,7 @@ func resourceOPCStorageVolumeSnapshotCreate(d *schema.ResourceData, meta interfa
 }
 
 func resourceOPCStorageVolumeSnapshotRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*compute.ComputeClient).StorageVolumeSnapshots()
+	computeClient := meta.(*OPCClient).computeClient.StorageVolumeSnapshots()
 
 	name := d.Id()
 	input := &compute.GetStorageVolumeSnapshotInput{
@@ -221,7 +221,7 @@ func resourceOPCStorageVolumeSnapshotRead(d *schema.ResourceData, meta interface
 }
 
 func resourceOPCStorageVolumeSnapshotDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.ComputeClient).StorageVolumeSnapshots()
+	client := meta.(*OPCClient).computeClient.StorageVolumeSnapshots()
 
 	name := d.Id()
 

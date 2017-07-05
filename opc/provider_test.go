@@ -32,7 +32,7 @@ func TestProvider_impl(t *testing.T) {
 }
 
 func testAccPreCheck(t *testing.T) {
-	required := []string{"OPC_USERNAME", "OPC_PASSWORD", "OPC_IDENTITY_DOMAIN", "OPC_ENDPOINT"}
+	required := []string{"OPC_USERNAME", "OPC_PASSWORD", "OPC_IDENTITY_DOMAIN", "OPC_ENDPOINT", "OPC_STORAGE_ENDPOINT"}
 	for _, prop := range required {
 		if os.Getenv(prop) == "" {
 			t.Fatalf("%s must be set for acceptance test", prop)
@@ -53,7 +53,7 @@ func opcResourceCheck(resourceName string, f func(checker *OPCResourceState) err
 		}
 
 		state := &OPCResourceState{
-			ComputeClient: testAccProvider.Meta().(*compute.ComputeClient),
+			ComputeClient: testAccProvider.Meta().(*OPCClient).computeClient,
 			InstanceState: rs.Primary,
 		}
 

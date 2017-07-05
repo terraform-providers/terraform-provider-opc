@@ -55,7 +55,7 @@ func resourceOPCSecurityProtocol() *schema.Resource {
 }
 
 func resourceOPCSecurityProtocolCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.ComputeClient).SecurityProtocols()
+	client := meta.(*OPCClient).computeClient.SecurityProtocols()
 	input := compute.CreateSecurityProtocolInput{
 		Name:       d.Get("name").(string),
 		IPProtocol: d.Get("ip_protocol").(string),
@@ -87,7 +87,7 @@ func resourceOPCSecurityProtocolCreate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceOPCSecurityProtocolRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*compute.ComputeClient).SecurityProtocols()
+	computeClient := meta.(*OPCClient).computeClient.SecurityProtocols()
 
 	input := compute.GetSecurityProtocolInput{
 		Name: d.Id(),
@@ -124,7 +124,7 @@ func resourceOPCSecurityProtocolRead(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceOPCSecurityProtocolUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.ComputeClient).SecurityProtocols()
+	client := meta.(*OPCClient).computeClient.SecurityProtocols()
 	input := compute.UpdateSecurityProtocolInput{
 		Name:       d.Get("name").(string),
 		IPProtocol: d.Get("ip_protocol").(string),
@@ -155,7 +155,7 @@ func resourceOPCSecurityProtocolUpdate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceOPCSecurityProtocolDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*compute.ComputeClient).SecurityProtocols()
+	client := meta.(*OPCClient).computeClient.SecurityProtocols()
 	name := d.Id()
 
 	input := compute.DeleteSecurityProtocolInput{

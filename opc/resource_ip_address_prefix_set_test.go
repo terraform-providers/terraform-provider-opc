@@ -42,7 +42,7 @@ func TestAccOPCIPAddressPrefixSet_Basic(t *testing.T) {
 }
 
 func testAccCheckIPAddressPrefixSetExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.ComputeClient).IPAddressPrefixSets()
+	client := testAccProvider.Meta().(*OPCClient).computeClient.IPAddressPrefixSets()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_ip_address_prefix_set" {
@@ -61,7 +61,7 @@ func testAccCheckIPAddressPrefixSetExists(s *terraform.State) error {
 }
 
 func testAccCheckIPAddressPrefixSetDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*compute.ComputeClient).IPAddressPrefixSets()
+	client := testAccProvider.Meta().(*OPCClient).computeClient.IPAddressPrefixSets()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_ip_address_prefix_set" {
