@@ -59,6 +59,9 @@ func resourceOPCStorageContainer() *schema.Resource {
 
 func resourceOPCStorageContainerCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*OPCClient).storageClient
+	if client == nil {
+		return fmt.Errorf("Storage Client is not initialized. Make sure to use `storage_endpoint` variable or `OPC_STORAGE_ENDPOINT env variable`")
+	}
 
 	input := storage.CreateContainerInput{
 		Name: d.Get("name").(string),
@@ -94,6 +97,9 @@ func resourceOPCStorageContainerCreate(d *schema.ResourceData, meta interface{})
 
 func resourceOPCStorageContainerRead(d *schema.ResourceData, meta interface{}) error {
 	storageClient := meta.(*OPCClient).storageClient
+	if storageClient == nil {
+		return fmt.Errorf("Storage Client is not initialized. Make sure to use `storage_endpoint` variable or `OPC_STORAGE_ENDPOINT env variable`")
+	}
 
 	name := d.Id()
 	input := storage.GetContainerInput{
@@ -134,6 +140,9 @@ func resourceOPCStorageContainerRead(d *schema.ResourceData, meta interface{}) e
 
 func resourceOPCStorageContainerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*OPCClient).storageClient
+	if client == nil {
+		return fmt.Errorf("Storage Client is not initialized. Make sure to use `storage_endpoint` variable or `OPC_STORAGE_ENDPOINT env variable`")
+	}
 
 	name := d.Id()
 	input := storage.DeleteContainerInput{
@@ -148,6 +157,9 @@ func resourceOPCStorageContainerDelete(d *schema.ResourceData, meta interface{})
 
 func resourceOPCStorageContainerUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*OPCClient).storageClient
+	if client == nil {
+		return fmt.Errorf("Storage Client is not initialized. Make sure to use `storage_endpoint` variable or `OPC_STORAGE_ENDPOINT env variable`")
+	}
 
 	input := storage.UpdateContainerInput{
 		Name: d.Get("name").(string),

@@ -3,14 +3,14 @@ layout: "opc"
 page_title: "Oracle: opc_storage_container"
 sidebar_current: "docs-opc-resource-storage-container"
 description: |-
-  Creates and manages a Container in the OPC Storage Domain. `storage` must be set to true in the
-  provider to manage these resources.
+  Creates and manages a Container in the OPC Storage Domain. `storage_endpoint` must be set in the
+  provider or environment to manage these resources.
 ---
 
 # opc\_storage\_container
 
-Creates and manages a Container in the OPC Storage Domain. `storage` must be set to true in the
-provider to manage these resources.
+Creates and manages a Container in the OPC Storage Domain. `storage_endpoint` must be set in the
+provider or environment to manage these resources.
 
 ## Example Usage
 

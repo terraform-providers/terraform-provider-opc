@@ -50,11 +50,11 @@ func Provider() terraform.ResourceProvider {
 				Description: "Skip TLS Verification for self-signed certificates. Should only be used if absolutely required.",
 			},
 
-			"storage": {
-				Type:        schema.TypeBool,
+			"storage_endpoint": {
+				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("OPC_STORAGE", false),
-				Description: "Determines whether Terraform will authenticate with the storage api.",
+				DefaultFunc: schema.EnvDefaultFunc("OPC_STORAGE_ENDPOINT", nil),
+				Description: "The HTTP endpoint for Oracle Storage operations.",
 			},
 		},
 
@@ -97,13 +97,13 @@ func Provider() terraform.ResourceProvider {
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
-		User:           d.Get("user").(string),
-		Password:       d.Get("password").(string),
-		IdentityDomain: d.Get("identity_domain").(string),
-		Endpoint:       d.Get("endpoint").(string),
-		MaxRetries:     d.Get("max_retries").(int),
-		Insecure:       d.Get("insecure").(bool),
-		Storage:        d.Get("storage").(bool),
+		User:            d.Get("user").(string),
+		Password:        d.Get("password").(string),
+		IdentityDomain:  d.Get("identity_domain").(string),
+		Endpoint:        d.Get("endpoint").(string),
+		MaxRetries:      d.Get("max_retries").(int),
+		Insecure:        d.Get("insecure").(bool),
+		StorageEndpoint: d.Get("storage_endpoint").(string),
 	}
 
 	return config.Client()

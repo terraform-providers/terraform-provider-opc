@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"time"
 
@@ -45,6 +46,14 @@ func getStorageTestClient(c *opc.Config) (*StorageClient, error) {
 	if c.Password == nil {
 		password := os.Getenv("OPC_PASSWORD")
 		c.Password = &password
+	}
+
+	if c.APIEndpoint == nil {
+		apiEndpoint, err := url.Parse(os.Getenv("OPC_STORAGE_ENDPOINT"))
+		if err != nil {
+			return nil, err
+		}
+		c.APIEndpoint = apiEndpoint
 	}
 
 	if c.HTTPClient == nil {

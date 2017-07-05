@@ -3,7 +3,6 @@ package storage
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
@@ -29,12 +28,6 @@ func NewStorageClient(c *opc.Config) (*StorageClient, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	endpoint, err := url.Parse(fmt.Sprintf("https://%s.storage.oraclecloud.com", *client.IdentityDomain))
-	if err != nil {
-		return nil, err
-	}
-	client.APIEndpoint = endpoint
 	storageClient.client = client
 
 	if err := storageClient.getAuthenticationToken(); err != nil {

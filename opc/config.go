@@ -15,13 +15,13 @@ import (
 )
 
 type Config struct {
-	User           string
-	Password       string
-	IdentityDomain string
-	Endpoint       string
-	MaxRetries     int
-	Insecure       bool
-	Storage        bool
+	User            string
+	Password        string
+	IdentityDomain  string
+	Endpoint        string
+	MaxRetries      int
+	Insecure        bool
+	StorageEndpoint string
 }
 
 type OPCClient struct {
@@ -69,7 +69,12 @@ func (c *Config) Client() (*OPCClient, error) {
 		computeClient: computeClient,
 	}
 
-	if c.Storage {
+	if c.StorageEndpoint != "" {
+		storageEndpoint, err := url.ParseRequestURI(c.StorageEndpoint)
+		if err != nil {
+			return nil, fmt.Errorf("Invalid storage endpoint URI: %s", err)
+		}
+		config.APIEndpoint = storageEndpoint
 		storageClient, err := storage.NewStorageClient(&config)
 		if err != nil {
 			return nil, err
