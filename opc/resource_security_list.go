@@ -40,6 +40,7 @@ func resourceOPCSecurityList() *schema.Resource {
 					string(compute.SecurityListPolicyPermit),
 					string(compute.SecurityListPolicyReject),
 				}, true),
+				DiffSuppressFunc: suppressCaseDifferences,
 			},
 
 			"outbound_cidr_policy": {
@@ -51,6 +52,7 @@ func resourceOPCSecurityList() *schema.Resource {
 					string(compute.SecurityListPolicyPermit),
 					string(compute.SecurityListPolicyReject),
 				}, true),
+				DiffSuppressFunc: suppressCaseDifferences,
 			},
 		},
 	}

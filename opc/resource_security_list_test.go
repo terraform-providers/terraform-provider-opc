@@ -11,8 +11,8 @@ import (
 )
 
 func TestAccOPCSecurityList_basic(t *testing.T) {
-	ri := acctest.RandInt()
-	config := fmt.Sprintf(testAccOPCSecurityListBasic, ri)
+	rInt := acctest.RandInt()
+	rName := "opc_compute_security_list.test"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -20,16 +20,20 @@ func TestAccOPCSecurityList_basic(t *testing.T) {
 		CheckDestroy: testAccCheckSecurityListDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: config,
-				Check:  testAccCheckSecurityListExists,
+				Config: testAccOPCSecurityListBasic(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSecurityListExists,
+					resource.TestCheckResourceAttr(rName, "policy", "PERMIT"),
+					resource.TestCheckResourceAttr(rName, "outbound_cidr_policy", "DENY"),
+				),
 			},
 		},
 	})
 }
 
 func TestAccOPCSecurityList_complete(t *testing.T) {
-	ri := acctest.RandInt()
-	config := fmt.Sprintf(testAccOPCSecurityListComplete, ri)
+	rInt := acctest.RandInt()
+	rName := "opc_compute_security_list.test"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -37,8 +41,35 @@ func TestAccOPCSecurityList_complete(t *testing.T) {
 		CheckDestroy: testAccCheckSecurityListDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: config,
-				Check:  testAccCheckSecurityListExists,
+				Config: testAccOPCSecurityListComplete(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSecurityListExists,
+					resource.TestCheckResourceAttr(rName, "policy", "PERMIT"),
+					resource.TestCheckResourceAttr(rName, "outbound_cidr_policy", "DENY"),
+					resource.TestCheckResourceAttr(rName, "description", "Acceptance Test Security List Complete"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccOPCSecurityList_lowercasePolicies(t *testing.T) {
+	rInt := acctest.RandInt()
+	rName := "opc_compute_security_list.test"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSecurityListDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccOPCSecurityListLowercasePolicies(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSecurityListExists,
+					resource.TestCheckResourceAttr(rName, "policy", "PERMIT"),
+					resource.TestCheckResourceAttr(rName, "outbound_cidr_policy", "DENY"),
+					resource.TestCheckResourceAttr(rName, "description", "Acceptance Test Security List Lowercase"),
+				),
 			},
 		},
 	})
@@ -82,19 +113,31 @@ func testAccCheckSecurityListDestroy(s *terraform.State) error {
 	return nil
 }
 
-const testAccOPCSecurityListBasic = `
+func testAccOPCSecurityListBasic(rInt int) string {
+	return fmt.Sprintf(`
 resource "opc_compute_security_list" "test" {
-  name                 = "acc-test-sec-list-%d"
-  policy               = "PERMIT"
-  outbound_cidr_policy = "DENY"
+	name                 = "acc-test-sec-list-%d"
+	policy               = "PERMIT"
+	outbound_cidr_policy = "DENY"
+}`, rInt)
 }
-`
 
-const testAccOPCSecurityListComplete = `
+func testAccOPCSecurityListComplete(rInt int) string {
+	return fmt.Sprintf(`
 resource "opc_compute_security_list" "test" {
-  name                 = "acc-test-sec-list-%d"
-  description          = "Acceptance Test Security List Complete"
-  policy               = "PERMIT"
-  outbound_cidr_policy = "DENY"
+ name                 = "acc-test-sec-list-%d"
+ description          = "Acceptance Test Security List Complete"
+ policy               = "PERMIT"
+ outbound_cidr_policy = "DENY"
+}`, rInt)
 }
-`
+
+func testAccOPCSecurityListLowercasePolicies(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_security_list" "test" {
+ name                 = "acc-test-sec-list-%d"
+ description          = "Acceptance Test Security List Lowercase"
+ policy               = "permit"
+ outbound_cidr_policy = "deny"
+}`, rInt)
+}
