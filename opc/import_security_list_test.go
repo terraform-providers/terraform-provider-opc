@@ -1,7 +1,6 @@
 package opc
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/acctest"
@@ -9,10 +8,8 @@ import (
 )
 
 func TestAccOPCSecurityList_importBasic(t *testing.T) {
-	resourceName := "opc_compute_security_list.test"
-
-	ri := acctest.RandInt()
-	config := fmt.Sprintf(testAccOPCSecurityListBasic, ri)
+	rInt := acctest.RandInt()
+	rName := "opc_compute_security_list.test"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -22,10 +19,10 @@ func TestAccOPCSecurityList_importBasic(t *testing.T) {
 		CheckDestroy: testAccCheckSecurityListDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: config,
+				Config: testAccOPCSecurityListBasic(rInt),
 			},
 			{
-				ResourceName:      resourceName,
+				ResourceName:      rName,
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
@@ -34,10 +31,8 @@ func TestAccOPCSecurityList_importBasic(t *testing.T) {
 }
 
 func TestAccOPCSecurityList_importComplete(t *testing.T) {
-	resourceName := "opc_compute_security_list.test"
-
-	ri := acctest.RandInt()
-	config := fmt.Sprintf(testAccOPCSecurityListComplete, ri)
+	rInt := acctest.RandInt()
+	rName := "opc_compute_security_list.test"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -47,10 +42,10 @@ func TestAccOPCSecurityList_importComplete(t *testing.T) {
 		CheckDestroy: testAccCheckSecurityListDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: config,
+				Config: testAccOPCSecurityListComplete(rInt),
 			},
 			{
-				ResourceName:      resourceName,
+				ResourceName:      rName,
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
