@@ -12,7 +12,7 @@ import (
 
 func TestAccOPCSecurityList_basic(t *testing.T) {
 	rInt := acctest.RandInt()
-	rName := fmt.Sprintf("acc-test-sec-list-%d.test", rInt)
+	rName := "opc_compute_security_list.test"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -33,7 +33,7 @@ func TestAccOPCSecurityList_basic(t *testing.T) {
 
 func TestAccOPCSecurityList_complete(t *testing.T) {
 	rInt := acctest.RandInt()
-	rName := fmt.Sprintf("acc-test-sec-list-%d.test", rInt)
+	rName := "opc_compute_security_list.test"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -55,6 +55,7 @@ func TestAccOPCSecurityList_complete(t *testing.T) {
 
 func TestAccOPCSecurityList_lowercasePolicies(t *testing.T) {
 	rInt := acctest.RandInt()
+	rName := "opc_compute_security_list.test"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -63,7 +64,12 @@ func TestAccOPCSecurityList_lowercasePolicies(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testAccOPCSecurityListLowercasePolicies(rInt),
-				Check:  testAccCheckSecurityListExists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSecurityListExists,
+					resource.TestCheckResourceAttr(rName, "policy", "PERMIT"),
+					resource.TestCheckResourceAttr(rName, "outbound_cidr_policy", "DENY"),
+					resource.TestCheckResourceAttr(rName, "description", "Acceptance Test Security List Lowercase"),
+				),
 			},
 		},
 	})
@@ -130,7 +136,7 @@ func testAccOPCSecurityListLowercasePolicies(rInt int) string {
 	return fmt.Sprintf(`
 resource "opc_compute_security_list" "test" {
  name                 = "acc-test-sec-list-%d"
- description          = "Acceptance Test Security List Complete"
+ description          = "Acceptance Test Security List Lowercase"
  policy               = "permit"
  outbound_cidr_policy = "deny"
 }`, rInt)
