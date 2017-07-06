@@ -501,26 +501,10 @@
 			"versionExact": "v0.9.11"
 		},
 		{
-			"checksumSHA1": "yFWmdS6yEJZpRJzUqd/mULqCYGk=",
-			"path": "github.com/hashicorp/terraform/moduledeps",
-			"revision": "b7166905faa3297d5b7dfc8c4d1440aaf68c598c",
-			"revisionTime": "2017-07-06T16:43:01Z",
-			"version": "v0.9.11",
-			"versionExact": "v0.9.11"
-		},
-		{
 			"checksumSHA1": "6AA7ZAzswfl7SOzleP6e6he0lq4=",
 			"path": "github.com/hashicorp/terraform/plugin",
 			"revision": "efca455c35d0d218a9bfee835a8ec3ef8d4d1c8c",
 			"revisionTime": "2017-07-03T20:27:28Z",
-			"version": "v0.9.11",
-			"versionExact": "v0.9.11"
-		},
-		{
-			"checksumSHA1": "Dn6y05ev+T19ayqk0n+DDVhYQpk=",
-			"path": "github.com/hashicorp/terraform/plugin/discovery",
-			"revision": "b7166905faa3297d5b7dfc8c4d1440aaf68c598c",
-			"revisionTime": "2017-07-06T16:43:01Z",
 			"version": "v0.9.11",
 			"versionExact": "v0.9.11"
 		},
