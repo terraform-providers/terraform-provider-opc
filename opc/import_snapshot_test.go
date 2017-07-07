@@ -1,7 +1,6 @@
 package opc
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/acctest"
@@ -11,8 +10,7 @@ import (
 func TestAccOPCSnapshot_importBasic(t *testing.T) {
 	resourceName := "opc_compute_snapshot.test"
 
-	ri := acctest.RandInt()
-	config := fmt.Sprintf(testAccOPCSnapshotBasic, ri)
+	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -22,7 +20,7 @@ func TestAccOPCSnapshot_importBasic(t *testing.T) {
 		CheckDestroy: testAccCheckSnapshotDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: config,
+				Config: testAccOPCSnapshotBasic(rInt),
 			},
 			{
 				ResourceName:      resourceName,
