@@ -10,9 +10,10 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
+const _TestAccSnapshotImage = "/oracle/public/OL_5.11_UEKR2_x86_64"
+
 func TestAccOPCSnapshot_Basic(t *testing.T) {
-	ri := acctest.RandInt()
-	config := fmt.Sprintf(testAccOPCSnapshotBasic, ri)
+	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -20,7 +21,7 @@ func TestAccOPCSnapshot_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckSnapshotDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: config,
+				Config: testAccOPCSnapshotBasic(rInt),
 				Check:  testAccCheckSnapshotExists,
 			},
 		},
@@ -28,8 +29,7 @@ func TestAccOPCSnapshot_Basic(t *testing.T) {
 }
 
 func TestAccOPCSnapshot_MachineImage(t *testing.T) {
-	ri := acctest.RandInt()
-	config := fmt.Sprintf(testAccOPCSnapshotMachineImage, ri, ri)
+	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -37,11 +37,11 @@ func TestAccOPCSnapshot_MachineImage(t *testing.T) {
 		CheckDestroy: testAccCheckSnapshotDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: config,
+				Config: testAccOPCSnapshotMachineImage(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSnapshotExists,
 					resource.TestCheckResourceAttr(
-						"opc_compute_snapshot.test", "machine_image", fmt.Sprintf("acc-test-snapshot-%d", ri)),
+						"opc_compute_snapshot.test", "machine_image", fmt.Sprintf("acc-test-snapshot-%d", rInt)),
 				),
 			},
 		},
@@ -85,29 +85,31 @@ func testAccCheckSnapshotDestroy(s *terraform.State) error {
 	return nil
 }
 
-var testAccOPCSnapshotBasic = `
+func testAccOPCSnapshotBasic(rInt int) string {
+	return fmt.Sprintf(`
 resource "opc_compute_instance" "test" {
 	name = "acc-test-snapshot-%d"
   label = "TestAccOPCSnapshot_basic"
 	shape = "oc3"
-	image_list = "/oracle/public/JEOS_OL_6.6_10GB_RD-1.2.217-20151201-194209"
+	image_list = "%s"
 }
 
 resource "opc_compute_snapshot" "test" {
   instance = "${opc_compute_instance.test.name}/${opc_compute_instance.test.id}"
+}`, rInt, _TestAccSnapshotImage)
 }
-`
 
-var testAccOPCSnapshotMachineImage = `
+func testAccOPCSnapshotMachineImage(rInt int) string {
+	return fmt.Sprintf(`
 resource "opc_compute_instance" "test" {
 	name = "acc-test-snapshot-%d"
   label = "TestAccOPCSnapshot_basic"
 	shape = "oc3"
-	image_list = "/oracle/public/JEOS_OL_6.6_10GB_RD-1.2.217-20151201-194209"
+	image_list = "%s"
 }
 
 resource "opc_compute_snapshot" "test" {
   instance = "${opc_compute_instance.test.name}/${opc_compute_instance.test.id}"
   machine_image = "acc-test-snapshot-%d"
+}`, rInt, _TestAccSnapshotImage, rInt)
 }
-`
