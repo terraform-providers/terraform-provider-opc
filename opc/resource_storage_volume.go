@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
@@ -18,6 +19,12 @@ func resourceOPCStorageVolume() *schema.Resource {
 		Delete: resourceOPCStorageVolumeDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
+		},
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(30 * time.Minute),
+			Update: schema.DefaultTimeout(30 * time.Minute),
+			Delete: schema.DefaultTimeout(30 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -153,6 +160,7 @@ func resourceOPCStorageVolumeCreate(d *schema.ResourceData, meta interface{}) er
 		ImageList:      imageList,
 		ImageListEntry: imageListEntry,
 		Tags:           getStringList(d, "tags"),
+		Timeout:        d.Timeout(schema.TimeoutCreate),
 	}
 
 	if v, ok := d.GetOk("snapshot"); ok {
@@ -192,6 +200,7 @@ func resourceOPCStorageVolumeUpdate(d *schema.ResourceData, meta interface{}) er
 		ImageList:      imageList,
 		ImageListEntry: imageListEntry,
 		Tags:           getStringList(d, "tags"),
+		Timeout:        d.Timeout(schema.TimeoutUpdate),
 	}
 	_, err := client.UpdateStorageVolume(&input)
 	if err != nil {
@@ -255,7 +264,8 @@ func resourceOPCStorageVolumeDelete(d *schema.ResourceData, meta interface{}) er
 	name := d.Id()
 
 	input := compute.DeleteStorageVolumeInput{
-		Name: name,
+		Name:    name,
+		Timeout: d.Timeout(schema.TimeoutDelete),
 	}
 	err := client.DeleteStorageVolume(&input)
 	if err != nil {

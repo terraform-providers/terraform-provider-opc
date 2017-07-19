@@ -171,8 +171,10 @@ func (c *Client) formatURL(path *url.URL) string {
 }
 
 // Retry function
-func (c *Client) WaitFor(description string, timeoutSeconds int, test func() (bool, error)) error {
+func (c *Client) WaitFor(description string, timeout time.Duration, test func() (bool, error)) error {
 	tick := time.Tick(1 * time.Second)
+
+	timeoutSeconds := int(timeout.Seconds())
 
 	for i := 0; i < timeoutSeconds; i++ {
 		select {

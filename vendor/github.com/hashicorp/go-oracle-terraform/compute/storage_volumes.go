@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/hashicorp/go-oracle-terraform/client"
 )
 
-const WaitForVolumeReadyTimeout = 600
-const WaitForVolumeDeleteTimeout = 600
+const WaitForVolumeReadyTimeout = time.Duration(600 * time.Second)
+const WaitForVolumeDeleteTimeout = time.Duration(600 * time.Second)
 
 // StorageVolumeClient is a client for the Storage Volume functions of the Compute API.
 type StorageVolumeClient struct {
@@ -146,6 +147,9 @@ type CreateStorageVolumeInput struct {
 
 	// Comma-separated strings that tag the storage volume.
 	Tags []string `json:"tags,omitempty"`
+
+	// Timeout to wait for storage volume creation.
+	Timeout time.Duration `json:"-"`
 }
 
 // CreateStorageVolume uses the given CreateStorageVolumeInput to create a new Storage Volume.
@@ -164,13 +168,21 @@ func (c *StorageVolumeClient) CreateStorageVolume(input *CreateStorageVolumeInpu
 		return nil, err
 	}
 
-	return c.waitForStorageVolumeToBecomeAvailable(input.Name, WaitForVolumeReadyTimeout)
+	// Should never be nil, as we set this in the provider; but protect against it anyways.
+	if input.Timeout == 0 {
+		input.Timeout = WaitForVolumeReadyTimeout
+	}
+
+	return c.waitForStorageVolumeToBecomeAvailable(input.Name, input.Timeout)
 }
 
 // DeleteStorageVolumeInput represents the body of an API request to delete a Storage Volume.
 type DeleteStorageVolumeInput struct {
 	// The three-part name of the object (/Compute-identity_domain/user/object).
 	Name string `json:"name"`
+
+	// Timeout to wait for storage volume deletion
+	Timeout time.Duration `json:"-"`
 }
 
 // DeleteStorageVolume deletes the specified storage volume.
@@ -179,7 +191,12 @@ func (c *StorageVolumeClient) DeleteStorageVolume(input *DeleteStorageVolumeInpu
 		return err
 	}
 
-	return c.waitForStorageVolumeToBeDeleted(input.Name, WaitForVolumeDeleteTimeout)
+	// Should never be nil, but protect against it anyways
+	if input.Timeout == 0 {
+		input.Timeout = WaitForVolumeDeleteTimeout
+	}
+
+	return c.waitForStorageVolumeToBeDeleted(input.Name, input.Timeout)
 }
 
 // GetStorageVolumeInput represents the body of an API request to obtain a Storage Volume.
@@ -247,6 +264,9 @@ type UpdateStorageVolumeInput struct {
 
 	// Comma-separated strings that tag the storage volume.
 	Tags []string `json:"tags,omitempty"`
+
+	// Time to wait for storage volume ready
+	Timeout time.Duration `json:"-"`
 }
 
 // UpdateStorageVolume updates the specified storage volume, optionally modifying size, description and tags.
@@ -266,21 +286,25 @@ func (c *StorageVolumeClient) UpdateStorageVolume(input *UpdateStorageVolumeInpu
 		return nil, err
 	}
 
-	instanceInfo, err := c.waitForStorageVolumeToBecomeAvailable(input.Name, WaitForVolumeReadyTimeout)
+	if input.Timeout == 0 {
+		input.Timeout = WaitForVolumeReadyTimeout
+	}
+
+	volumeInfo, err := c.waitForStorageVolumeToBecomeAvailable(input.Name, input.Timeout)
 	if err != nil {
 		return nil, err
 	}
 
-	return instanceInfo, nil
+	return volumeInfo, nil
 }
 
 // waitForStorageVolumeToBecomeAvailable waits until a new Storage Volume is available (i.e. has finished initialising or updating).
-func (c *StorageVolumeClient) waitForStorageVolumeToBecomeAvailable(name string, timeoutInSeconds int) (*StorageVolumeInfo, error) {
+func (c *StorageVolumeClient) waitForStorageVolumeToBecomeAvailable(name string, timeout time.Duration) (*StorageVolumeInfo, error) {
 	var waitResult *StorageVolumeInfo
 
 	err := c.client.WaitFor(
 		fmt.Sprintf("storage volume %s to become available", c.getQualifiedName(name)),
-		timeoutInSeconds,
+		timeout,
 		func() (bool, error) {
 			getRequest := &GetStorageVolumeInput{
 				Name: name,
@@ -305,10 +329,10 @@ func (c *StorageVolumeClient) waitForStorageVolumeToBecomeAvailable(name string,
 }
 
 // waitForStorageVolumeToBeDeleted waits until the specified storage volume has been deleted.
-func (c *StorageVolumeClient) waitForStorageVolumeToBeDeleted(name string, timeoutInSeconds int) error {
+func (c *StorageVolumeClient) waitForStorageVolumeToBeDeleted(name string, timeout time.Duration) error {
 	return c.client.WaitFor(
 		fmt.Sprintf("storage volume %s to be deleted", c.getQualifiedName(name)),
-		timeoutInSeconds,
+		timeout,
 		func() (bool, error) {
 			getRequest := &GetStorageVolumeInput{
 				Name: name,

@@ -83,3 +83,14 @@ Storage Volume's can be imported using the `resource name`, e.g.
 ```shell
 $ terraform import opc_compute_storage_volume.volume1 example
 ```
+
+<a id="timeouts"></a>
+## Timeouts
+
+`opc_compute_storage_volume` provides the following
+[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+
+- `create` - (Default `30 minutes`) Used for Creating Storage Volumes.
+- `update` - (Default `30 minutes`) Used for Modifying Storage Volumes.
+- `delete` - (Default `30 minutes`) Used for Deleting Storage Volumes.
+
