@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
@@ -16,6 +17,11 @@ func resourceOPCStorageVolumeSnapshot() *schema.Resource {
 		Delete: resourceOPCStorageVolumeSnapshotDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
+		},
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(30 * time.Minute),
+			Delete: schema.DefaultTimeout(30 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -126,7 +132,8 @@ func resourceOPCStorageVolumeSnapshotCreate(d *schema.ResourceData, meta interfa
 
 	// Get required attribute
 	input := &compute.CreateStorageVolumeSnapshotInput{
-		Volume: d.Get("volume_name").(string),
+		Volume:  d.Get("volume_name").(string),
+		Timeout: d.Timeout(schema.TimeoutCreate),
 	}
 
 	if v, ok := d.GetOk("description"); ok {
@@ -226,7 +233,8 @@ func resourceOPCStorageVolumeSnapshotDelete(d *schema.ResourceData, meta interfa
 	name := d.Id()
 
 	input := &compute.DeleteStorageVolumeSnapshotInput{
-		Name: name,
+		Name:    name,
+		Timeout: d.Timeout(schema.TimeoutDelete),
 	}
 
 	if err := client.DeleteStorageVolumeSnapshot(input); err != nil {

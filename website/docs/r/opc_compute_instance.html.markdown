@@ -197,3 +197,13 @@ The instance can be imported as such:
 ```shell
 $ terraform import opc_compute_instance.instance1 instance_name/instance_id
 ```
+
+<a id="timeouts"></a>
+## Timeouts
+
+`opc_compute_instance` provides the following
+[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+
+- `create` - (Default `20 minutes`) Used for Creating Instances.
+- `update` - (Default `20 minutes`) Used for updating Instances.
+- `delete` - (Default `20 minutes`) Used for Deleting Instances.

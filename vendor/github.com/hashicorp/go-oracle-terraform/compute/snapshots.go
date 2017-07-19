@@ -2,9 +2,10 @@ package compute
 
 import (
 	"fmt"
+	"time"
 )
 
-const WaitForSnapshotCompleteTimeout = 600
+const WaitForSnapshotCompleteTimeout = time.Duration(600 * time.Second)
 
 // SnapshotsClient is a client for the Snapshot functions of the Compute API.
 type SnapshotsClient struct {
@@ -87,16 +88,18 @@ type CreateSnapshotInput struct {
 	// If you don't specify a name for this object, then the name is generated automatically.
 	// Optional
 	MachineImage string `json:"machineimage,omitempty"`
+	// Time to wait for snapshot to be completed
+	Timeout time.Duration `json:"-"`
 }
 
 // CreateSnapshot creates a new Snapshot
-func (c *SnapshotsClient) CreateSnapshot(createInput *CreateSnapshotInput) (*Snapshot, error) {
-	createInput.Account = c.getQualifiedACMEName(createInput.Account)
-	createInput.Instance = c.getQualifiedName(createInput.Instance)
-	createInput.MachineImage = c.getQualifiedName(createInput.MachineImage)
+func (c *SnapshotsClient) CreateSnapshot(input *CreateSnapshotInput) (*Snapshot, error) {
+	input.Account = c.getQualifiedACMEName(input.Account)
+	input.Instance = c.getQualifiedName(input.Instance)
+	input.MachineImage = c.getQualifiedName(input.MachineImage)
 
 	var snapshotInfo Snapshot
-	if err := c.createResource(&createInput, &snapshotInfo); err != nil {
+	if err := c.createResource(&input, &snapshotInfo); err != nil {
 		return nil, err
 	}
 
@@ -105,8 +108,12 @@ func (c *SnapshotsClient) CreateSnapshot(createInput *CreateSnapshotInput) (*Sna
 		Name: snapshotInfo.Name,
 	}
 
+	if input.Timeout == 0 {
+		input.Timeout = WaitForSnapshotCompleteTimeout
+	}
+
 	// Wait for snapshot to be complete and return the result
-	return c.WaitForSnapshotComplete(getInput, WaitForSnapshotCompleteTimeout)
+	return c.WaitForSnapshotComplete(getInput, input.Timeout)
 }
 
 // GetSnapshotInput describes the snapshot to get
@@ -135,25 +142,32 @@ type DeleteSnapshotInput struct {
 	// The name of the machine image
 	// Required
 	MachineImage string
+	// Time to wait for snapshot to be deleted
+	Timeout time.Duration
 }
 
 // DeleteSnapshot deletes the Snapshot with the given name.
 // A machine image gets created with the associated snapshot and needs to be deleted as well.
-func (c *SnapshotsClient) DeleteSnapshot(machineImagesClient *MachineImagesClient, deleteInput *DeleteSnapshotInput) error {
+func (c *SnapshotsClient) DeleteSnapshot(machineImagesClient *MachineImagesClient, input *DeleteSnapshotInput) error {
 	// Wait for snapshot complete in case delay is active and the corresponding instance needs to be deleted first
 	getInput := &GetSnapshotInput{
-		Name: deleteInput.Snapshot,
+		Name: input.Snapshot,
 	}
-	if _, err := c.WaitForSnapshotComplete(getInput, WaitForSnapshotCompleteTimeout); err != nil {
+
+	if input.Timeout == 0 {
+		input.Timeout = WaitForSnapshotCompleteTimeout
+	}
+
+	if _, err := c.WaitForSnapshotComplete(getInput, input.Timeout); err != nil {
 		return fmt.Errorf("Could not delete snapshot: %s", err)
 	}
 
-	if err := c.deleteResource(deleteInput.Snapshot); err != nil {
+	if err := c.deleteResource(input.Snapshot); err != nil {
 		return fmt.Errorf("Could not delete snapshot: %s", err)
 	}
 
 	deleteMachineImageRequest := &DeleteMachineImageInput{
-		Name: deleteInput.MachineImage,
+		Name: input.MachineImage,
 	}
 	if err := machineImagesClient.DeleteMachineImage(deleteMachineImageRequest); err != nil {
 		return fmt.Errorf("Could not delete machine image associated with snapshot: %s", err)
@@ -163,10 +177,10 @@ func (c *SnapshotsClient) DeleteSnapshot(machineImagesClient *MachineImagesClien
 }
 
 // WaitForSnapshotComplete waits for an snapshot to be completely initialized and available.
-func (c *SnapshotsClient) WaitForSnapshotComplete(input *GetSnapshotInput, timeoutSeconds int) (*Snapshot, error) {
+func (c *SnapshotsClient) WaitForSnapshotComplete(input *GetSnapshotInput, timeout time.Duration) (*Snapshot, error) {
 	var info *Snapshot
 	var getErr error
-	err := c.client.WaitFor("snapshot to be complete", timeoutSeconds, func() (bool, error) {
+	err := c.client.WaitFor("snapshot to be complete", timeout, func() (bool, error) {
 		info, getErr = c.GetSnapshot(input)
 		if getErr != nil {
 			return false, getErr

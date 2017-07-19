@@ -7,6 +7,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
@@ -31,6 +32,12 @@ func resourceInstance() *schema.Resource {
 				d.SetId(combined[1])
 				return []*schema.ResourceData{d}, nil
 			},
+		},
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(20 * time.Minute),
+			Update: schema.DefaultTimeout(20 * time.Minute),
+			Delete: schema.DefaultTimeout(20 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -367,8 +374,9 @@ func resourceInstanceCreate(d *schema.ResourceData, meta interface{}) error {
 
 	// Get Required Attributes
 	input := &compute.CreateInstanceInput{
-		Name:  d.Get("name").(string),
-		Shape: d.Get("shape").(string),
+		Name:    d.Get("name").(string),
+		Shape:   d.Get("shape").(string),
+		Timeout: d.Timeout(schema.TimeoutCreate),
 	}
 
 	// Get optional instance attributes
@@ -554,8 +562,9 @@ func resourceInstanceUpdate(d *schema.ResourceData, meta interface{}) error {
 	name := d.Get("name").(string)
 
 	input := &compute.UpdateInstanceInput{
-		Name: name,
-		ID:   d.Id(),
+		Name:    name,
+		ID:      d.Id(),
+		Timeout: d.Timeout(schema.TimeoutUpdate),
 	}
 
 	if d.HasChange("desired_state") {
@@ -584,8 +593,9 @@ func resourceInstanceDelete(d *schema.ResourceData, meta interface{}) error {
 	name := d.Get("name").(string)
 
 	input := &compute.DeleteInstanceInput{
-		ID:   d.Id(),
-		Name: name,
+		ID:      d.Id(),
+		Name:    name,
+		Timeout: d.Timeout(schema.TimeoutDelete),
 	}
 	log.Printf("[DEBUG] Deleting instance %s", name)
 

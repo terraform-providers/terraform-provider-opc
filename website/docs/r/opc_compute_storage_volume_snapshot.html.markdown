@@ -57,3 +57,12 @@ Storage Volume Snapshot's can be imported using the `resource name`, e.g.
 ```shell
 $ terraform import opc_compute_storage_volume_snapshot.volume1 example
 ```
+
+<a id="timeouts"></a>
+## Timeouts
+
+`opc_compute_storage_volume_snapshot` provides the following
+[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
+
+- `create` - (Default `30 minutes`) Used for Creating Storage Volume Snapshots.
+- `delete` - (Default `30 minutes`) Used for Deleting Storage Volume Snapshots.

@@ -3,6 +3,7 @@ package compute
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/hashicorp/go-oracle-terraform/client"
 )
@@ -12,8 +13,8 @@ const (
 	StorageVolumeSnapshotContainerPath = "/storage/snapshot/"
 	StorageVolumeSnapshotResourcePath  = "/storage/snapshot"
 
-	WaitForSnapshotCreateTimeout = 1200
-	WaitForSnapshotDeleteTimeout = 1500
+	WaitForSnapshotCreateTimeout = time.Duration(1200 * time.Second)
+	WaitForSnapshotDeleteTimeout = time.Duration(1500 * time.Second)
 
 	// Collocated Snapshot Property
 	SnapshotPropertyCollocated = "/oracle/private/storage/snapshot/collocated"
@@ -115,8 +116,8 @@ type CreateStorageVolumeSnapshotInput struct {
 	// Required
 	Volume string `json:"volume"`
 
-	// Timeout (in seconds) to wait for snapshot to be completed. Will use default if unspecified
-	Timeout int
+	// Timeout to wait for snapshot to be completed. Will use default if unspecified
+	Timeout time.Duration `json:"-"`
 }
 
 // CreateStorageVolumeSnapshot creates a snapshot based on the supplied information struct
@@ -131,13 +132,12 @@ func (c *StorageVolumeSnapshotClient) CreateStorageVolumeSnapshot(input *CreateS
 		return nil, err
 	}
 
-	timeout := WaitForSnapshotCreateTimeout
-	if input.Timeout != 0 {
-		timeout = input.Timeout
+	if input.Timeout == 0 {
+		input.Timeout = WaitForSnapshotCreateTimeout
 	}
 
 	// The name of the snapshot could have been generated. Use the response name as input
-	return c.waitForStorageSnapshotAvailable(storageSnapshotInfo.Name, timeout)
+	return c.waitForStorageSnapshotAvailable(storageSnapshotInfo.Name, input.Timeout)
 }
 
 // GetStorageVolumeSnapshotInput represents the body of an API request to get information on a storage volume snapshot
@@ -165,8 +165,8 @@ type DeleteStorageVolumeSnapshotInput struct {
 	// Name of the snapshot to delete
 	Name string `json:"name"`
 
-	// Timeout in seconds to wait for deletion, will use default if unspecified
-	Timeout int
+	// Timeout to wait for deletion, will use default if unspecified
+	Timeout time.Duration `json:"-"`
 }
 
 // DeleteStoragevolumeSnapshot makes an API request to delete a storage volume snapshot
@@ -177,12 +177,11 @@ func (c *StorageVolumeSnapshotClient) DeleteStorageVolumeSnapshot(input *DeleteS
 		return err
 	}
 
-	timeout := WaitForSnapshotDeleteTimeout
-	if input.Timeout != 0 {
-		timeout = input.Timeout
+	if input.Timeout == 0 {
+		input.Timeout = WaitForSnapshotDeleteTimeout
 	}
 
-	return c.waitForStorageSnapshotDeleted(input.Name, timeout)
+	return c.waitForStorageSnapshotDeleted(input.Name, input.Timeout)
 }
 
 func (c *StorageVolumeSnapshotClient) success(result *StorageVolumeSnapshotInfo) (*StorageVolumeSnapshotInfo, error) {
@@ -199,7 +198,7 @@ func (c *StorageVolumeSnapshotClient) success(result *StorageVolumeSnapshotInfo)
 }
 
 // Waits for a storage snapshot to become available
-func (c *StorageVolumeSnapshotClient) waitForStorageSnapshotAvailable(name string, timeout int) (*StorageVolumeSnapshotInfo, error) {
+func (c *StorageVolumeSnapshotClient) waitForStorageSnapshotAvailable(name string, timeout time.Duration) (*StorageVolumeSnapshotInfo, error) {
 	var result *StorageVolumeSnapshotInfo
 
 	err := c.client.WaitFor(
@@ -230,7 +229,7 @@ func (c *StorageVolumeSnapshotClient) waitForStorageSnapshotAvailable(name strin
 }
 
 // Waits for a storage snapshot to be deleted
-func (c *StorageVolumeSnapshotClient) waitForStorageSnapshotDeleted(name string, timeout int) error {
+func (c *StorageVolumeSnapshotClient) waitForStorageSnapshotDeleted(name string, timeout time.Duration) error {
 	return c.client.WaitFor(
 		fmt.Sprintf("storage volume snapshot %s to be deleted", c.getQualifiedName(name)),
 		timeout,
