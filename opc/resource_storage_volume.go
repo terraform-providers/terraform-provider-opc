@@ -50,6 +50,7 @@ func resourceOPCStorageVolume() *schema.Resource {
 				ValidateFunc: validation.StringInSlice([]string{
 					string(compute.StorageVolumeKindDefault),
 					string(compute.StorageVolumeKindLatency),
+					string(compute.StorageVolumeKindSSD),
 				}, true),
 			},
 

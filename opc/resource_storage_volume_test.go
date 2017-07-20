@@ -201,6 +201,25 @@ func TestAccOPCStorageVolume_FromSnapshot(t *testing.T) {
 	})
 }
 
+func TestAccOPCStorageVolume_SSD(t *testing.T) {
+	volumeResourceName := "opc_compute_storage_volume.test"
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: opcResourceCheck(volumeResourceName, testAccCheckStorageVolumeDestroyed),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccStorageVolumeSSD(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					opcResourceCheck(volumeResourceName, testAccCheckStorageVolumeExists),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckStorageVolumeExists(state *OPCResourceState) error {
 	sv := state.ComputeClient.StorageVolumes()
 	volumeName := state.Attributes["name"]
@@ -429,4 +448,13 @@ func testAccStorageVolumeLowLatency(rInt int) string {
     storage_type = "/oracle/public/storage/latency"
     size         = 5
   }`, rInt)
+}
+
+func testAccStorageVolumeSSD(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_storage_volume" "test" {
+	name = "test-acc-stor-vol-%d"
+	size = 1
+	storage_type = "/oracle/public/storage/ssd/gp1"
+}`, rInt)
 }
