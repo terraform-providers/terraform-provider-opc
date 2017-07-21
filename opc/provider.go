@@ -59,8 +59,9 @@ func Provider() terraform.ResourceProvider {
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
-			"opc_compute_network_interface": dataSourceNetworkInterface(),
-			"opc_compute_vnic":              dataSourceVNIC(),
+			"opc_compute_network_interface":       dataSourceNetworkInterface(),
+			"opc_compute_vnic":                    dataSourceVNIC(),
+			"opc_compute_storage_volume_snapshot": dataSourceStorageVolumeSnapshot(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
