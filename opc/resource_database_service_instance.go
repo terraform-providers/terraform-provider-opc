@@ -1,0 +1,586 @@
+package opc
+
+import (
+	"fmt"
+	"log"
+	"strconv"
+	"time"
+
+	"github.com/hashicorp/go-oracle-terraform/client"
+	"github.com/hashicorp/go-oracle-terraform/database"
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
+)
+
+func resourceOPCDatabaseServiceInstance() *schema.Resource {
+	return &schema.Resource{
+		Create: resourceOPCDatabaseServiceInstanceCreate,
+		Read:   resourceOPCDatabaseServiceInstanceRead,
+		Delete: resourceOPCDatabaseServiceInstanceDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(60 * time.Minute),
+			Delete: schema.DefaultTimeout(60 * time.Minute),
+		},
+
+		Schema: map[string]*schema.Schema{
+			"name": {
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+			},
+			"description": {
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+			},
+			"edition": {
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					string(database.ServiceInstanceStandardEdition),
+					string(database.ServiceInstanceEnterpriseEdition),
+					string(database.ServiceInstanceEnterpriseEditionHighPerformance),
+					string(database.ServiceInstanceEnterpriseEditionExtremePerformance),
+				}, true),
+			},
+			"level": {
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					string(database.ServiceInstanceLevelPAAS),
+					string(database.ServiceInstanceLevelBasic),
+				}, true),
+			},
+			"shape": {
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					string(database.ServiceInstanceShapeOC3),
+					string(database.ServiceInstanceShapeOC4),
+					string(database.ServiceInstanceShapeOC5),
+					string(database.ServiceInstanceShapeOC6),
+					string(database.ServiceInstanceShapeOC1M),
+					string(database.ServiceInstanceShapeOC2M),
+					string(database.ServiceInstanceShapeOC3M),
+					string(database.ServiceInstanceShapeOC4M),
+				}, true),
+			},
+			"subscription_type": {
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					string(database.ServiceInstanceSubscriptionTypeHourly),
+					string(database.ServiceInstanceSubscriptionTypeMonthly),
+				}, true),
+			},
+			"version": {
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					string(database.ServiceInstanceVersion12201),
+					string(database.ServiceInstanceVersion12102),
+					string(database.ServiceInstanceVersion11204),
+				}, true),
+			},
+			"vm_public_key": {
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+			},
+			"parameter": {
+				Type:     schema.TypeSet,
+				Optional: true,
+				ForceNew: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"db_demo": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+							ValidateFunc: validation.StringInSlice([]string{
+								string(database.ServiceInstanceYes),
+								string(database.ServiceInstanceNo),
+							}, true),
+						},
+						"admin_password": {
+							Type:     schema.TypeString,
+							Required: true,
+							ForceNew: true,
+						},
+						"backup_destination": {
+							Type:     schema.TypeString,
+							Required: true,
+							ForceNew: true,
+							ValidateFunc: validation.StringInSlice([]string{
+								string(database.ServiceInstanceBackupDestinationBoth),
+								string(database.ServiceInstanceBackupDestinationOSS),
+								string(database.ServiceInstanceBackupDestinationNone),
+							}, true),
+						},
+						"char_set": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+							Default:  "AL32UTF8",
+						},
+						"cloud_storage_container": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+						},
+						"cloud_storage_username": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+						},
+						"cloud_storage_password": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+						},
+						"create_storage_container_if_missing": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Default:  false,
+							ForceNew: true,
+						},
+						"disaster_recovery": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+							Default:  database.ServiceInstanceNo,
+							ValidateFunc: validation.StringInSlice([]string{
+								string(database.ServiceInstanceYes),
+								string(database.ServiceInstanceNo),
+							}, true),
+						},
+						"failover_database": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+							Default:  database.ServiceInstanceNo,
+							ValidateFunc: validation.StringInSlice([]string{
+								string(database.ServiceInstanceYes),
+								string(database.ServiceInstanceNo),
+							}, true),
+						},
+						"golden_gate": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+							Default:  database.ServiceInstanceNo,
+							ValidateFunc: validation.StringInSlice([]string{
+								string(database.ServiceInstanceYes),
+								string(database.ServiceInstanceNo),
+							}, true),
+						},
+						"ibkup": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+							Default:  database.ServiceInstanceNo,
+							ValidateFunc: validation.StringInSlice([]string{
+								string(database.ServiceInstanceYes),
+								string(database.ServiceInstanceNo),
+							}, true),
+						},
+						"ibkup_cloud_storage_password": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+						},
+						"ibkup_cloud_storage_username": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+						},
+						"ibkup_database_id": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+						},
+						"ibkup_decryption_key": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+						},
+						"ibkup_wallet_file_content": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+						},
+						"is_rac": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+							Default:  database.ServiceInstanceNo,
+							ValidateFunc: validation.StringInSlice([]string{
+								string(database.ServiceInstanceYes),
+								string(database.ServiceInstanceNo),
+							}, true),
+						},
+						"n_char_set": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+							Default:  database.ServiceInstanceNCharSetUTF16,
+							ValidateFunc: validation.StringInSlice([]string{
+								string(database.ServiceInstanceNCharSetUTF16),
+								string(database.ServiceInstanceNCharSetUTF8),
+							}, true),
+						},
+						"pdb_name": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+							Default:  "pdb1",
+						},
+						"sid": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+							Default: "ORCL"
+						},
+						"snapshot_name": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+						},
+						"source_service_name": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+						},
+						"timezone": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+							Default:  "UTC",
+						},
+						"type": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+							Default:  database.ServiceInstanceTypeDB,
+							ValidateFunc: validation.StringInSlice([]string{
+								string(database.ServiceInstanceTypeDB),
+							}, true),
+						},
+						"usable_storage": {
+							Type:         schema.TypeInt,
+							Required:     true,
+							ForceNew:     true,
+							ValidateFunc: validation.IntBetween(15, 2048),
+						},
+					},
+				},
+			},
+			"apex_url": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Computed: true,
+			},
+			"backup_supported_version": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Computed: true,
+			},
+			"compute_site_name": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Computed: true,
+			},
+			"connect_descriptor_with_public_ip": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Computed: true,
+			},
+			"created_by": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Computed: true,
+			},
+			"creation_time": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Computed: true,
+			},
+			"current_version": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Computed: true,
+			},
+			"dbaasmonitor_url": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Computed: true,
+			},
+			"em_url": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Computed: true,
+			},
+			"glassfish_url": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Computed: true,
+			},
+			"hdg_prem_ip": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Computed: true,
+			},
+			"hybrid_db": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Computed: true,
+			},
+			"identity_domain": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Computed: true,
+			},
+			"ip_network": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"ip_reservations": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"jaas_instances_using_service": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"listener_port": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Computed: true,
+			},
+			"num_ip_reservations": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"num_nodes": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"rac_database": {
+				Type:     schema.TypeBool,
+				ForceNew: true,
+				Computed: true,
+			},
+			"region": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Computed: true,
+			},
+			"uri": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Computed: true,
+			},
+			"sm_plugin_version": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Computed: true,
+			},
+			"total_shared_storage": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Computed: true,
+			},
+		},
+	}
+}
+
+func resourceOPCDatabaseServiceInstanceCreate(d *schema.ResourceData, meta interface{}) error {
+	log.Printf("[DEBUG] Resource state: %#v", d.State())
+
+	log.Print("[DEBUG] Creating database service instance")
+
+	client := meta.(*OPCClient).databaseClient.ServiceInstanceClient()
+	input := database.CreateServiceInstanceInput{
+		Name:             d.Get("name").(string),
+		Edition:          database.ServiceInstanceEdition(d.Get("edition").(string)),
+		Level:            database.ServiceInstanceLevel(d.Get("level").(string)),
+		Shape:            database.ServiceInstanceShape(d.Get("shape").(string)),
+		SubscriptionType: database.ServiceInstanceSubscriptionType(d.Get("subscription_type").(string)),
+		Version:          database.ServiceInstanceVersion(d.Get("version").(string)),
+		VMPublicKey:      d.Get("vm_public_key").(string),
+	}
+	if description, ok := d.GetOk("description"); ok {
+		input.Description = description.(string)
+	}
+
+	// Only the PaaS level can have a parameter.
+	if input.Level == database.ServiceInstanceLevelPAAS {
+		input.Parameters = getParameter(d)
+	}
+
+	info, err := client.CreateServiceInstance(&input)
+	if err != nil {
+		return fmt.Errorf("Error creating DatabaseServiceInstance: %s", err)
+	}
+
+	d.SetId(info.Name)
+	return resourceOPCDatabaseServiceInstanceRead(d, meta)
+}
+
+// TODO all of this
+func resourceOPCDatabaseServiceInstanceRead(d *schema.ResourceData, meta interface{}) error {
+	log.Printf("[DEBUG] Resource state: %#v", d.State())
+	databaseClient := meta.(*OPCClient).databaseClient.ServiceInstanceClient()
+
+	log.Printf("[DEBUG] Reading state of ip reservation %s", d.Id())
+	getInput := database.GetServiceInstanceInput{
+		Name: d.Id(),
+	}
+
+	result, err := databaseClient.GetServiceInstance(&getInput)
+	if err != nil {
+		// DatabaseServiceInstance does not exist
+		if client.WasNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("Error reading database service instance %s: %s", d.Id(), err)
+	}
+
+	if result == nil {
+		d.SetId("")
+		return nil
+	}
+
+	log.Printf("[DEBUG] Read state of database service instance %s: %#v", d.Id(), result)
+	d.Set("name", result.Name)
+	d.Set("description", result.Description)
+	d.Set("apex_url", result.ApexURL)
+	d.Set("backup_destination", result.BackupDestination)
+	d.Set("backup_supported_version", result.BackupSupportedVersion)
+	d.Set("char_set", result.CharSet)
+	d.Set("cloud_storage_container", result.CloudStorageContainer)
+	d.Set("compute_site_name", result.ComputeSiteName)
+	d.Set("connect_descriptor", result.ConnectDescriptor)
+	d.Set("connect_descriptor_with_public_ip", result.ConnectorDescriptorWithPublicIP)
+	d.Set("created_by", result.CreatedBy)
+	d.Set("creation_time", result.CreationTime)
+	d.Set("current_version", result.CurrentVersion)
+	d.Set("dbaasmonitor_url", result.DBAASMonitorURL)
+	d.Set("edition", result.Edition)
+	d.Set("em_url", result.EMURL)
+	d.Set("failover_database", result.FailoverDatabase)
+	d.Set("glassfish_url", result.GlassFishURL)
+	d.Set("hdg_prem_ip", result.HDGPremIP)
+	d.Set("hybrid_db", result.HybridDG)
+	d.Set("identity_domain", result.IdentityDomain)
+	d.Set("ip_network", result.IPNetwork)
+	d.Set("ip_reservations", result.IPReservations)
+	d.Set("jaas_instances_using_service", result.JAASInstancesUsingService)
+	d.Set("level", result.Level)
+	d.Set("listener_port", result.ListenerPort)
+	d.Set("n_char_set", result.NCharSet)
+	d.Set("num_ip_reservations", result.NumIPReservations)
+	d.Set("num_nodes", result.NumNodes)
+	d.Set("pdb_name", result.PDBName)
+	d.Set("rac_database", result.PDBName)
+	d.Set("region", result.Region)
+	d.Set("uri", result.URI)
+	d.Set("shape", result.Shape)
+	d.Set("sid", result.SID)
+	d.Set("sm_plugin_version", result.SMPluginVersion)
+	d.Set("subscription_type", result.SubscriptionType)
+	d.Set("timezone", result.Timezone)
+	d.Set("total_shared_storage", result.TotalSharedStorage)
+	d.Set("version", result.Version)
+	return nil
+}
+
+func resourceOPCDatabaseServiceInstanceDelete(d *schema.ResourceData, meta interface{}) error {
+	log.Printf("[DEBUG] Resource state: %#v", d.State())
+	client := meta.(*OPCClient).databaseClient.ServiceInstanceClient()
+	name := d.Id()
+
+	log.Printf("[DEBUG] Deleting DatabaseServiceInstance: %v", name)
+
+	input := database.DeleteServiceInstanceInput{
+		Name: name,
+	}
+	if err := client.DeleteServiceInstance(&input); err != nil {
+		return fmt.Errorf("Error deleting DatabaseServiceInstance")
+	}
+	return nil
+}
+
+func getParameter(d *schema.ResourceData) []database.Parameter {
+	info := d.Get("parameter").(*schema.Set)
+	var parameter database.Parameter
+	for _, i := range info.List() {
+		attrs := i.(map[string]interface{})
+		parameter = database.Parameter{
+			AdminPassword:     attrs["admin_password"].(string),
+			BackupDestination: database.ServiceInstanceBackupDestination(attrs["backup_destination"].(string)),
+			CharSet:           attrs["char_set"].(string),
+			CreateStorageContainerIfMissing: attrs["create_storage_container_if_missing"].(bool),
+			DisasterRecovery:                database.ServiceInstanceBool(attrs["disaster_recovery"].(string)),
+			FailoverDatabase:                database.ServiceInstanceBool(attrs["failover_database"].(string)),
+			GoldenGate:                      database.ServiceInstanceBool(attrs["golden_gate"].(string)),
+			IBKUP:                           database.ServiceInstanceBool(attrs["ibkup"].(string)),
+			IsRAC:                           database.ServiceInstanceBool(attrs["is_rac"].(string)),
+			NCharSet:                        database.ServiceInstanceNCharSet(attrs["n_char_set"].(string)),
+			PDBName:                         attrs["pdb_name"].(string),
+			SID:                             attrs["sid"].(string),
+			Timezone:                        attrs["timezone"].(string),
+			Type:                            database.ServiceInstanceType(attrs["type"].(string)),
+			UsableStorage:                   strconv.Itoa(attrs["usable_storage"].(int)),
+		}
+
+		if val, ok := attrs["cloud_storage_container"].(string); ok && val != "" {
+			parameter.CloudStorageContainer = val
+		}
+		if val, ok := attrs["cloud_storage_username"].(string); ok && val != "" {
+			parameter.CloudStorageUsername = val
+		}
+		if val, ok := attrs["cloud_storage_password"].(string); ok && val != "" {
+			parameter.CloudStoragePassword = val
+		}
+		if val, ok := attrs["ibkup_cloud_storage_username"].(string); ok && val != "" {
+			parameter.IBKUPCloudStorageUser = val
+		}
+		if val, ok := attrs["ibkup_cloud_storage_password"].(string); ok && val != "" {
+			parameter.IBKUPCloudStoragePassword = val
+		}
+		if val, ok := attrs["ibkup_database_id"].(string); ok && val != "" {
+			parameter.IBKUPDatabaseID = val
+		}
+		if val, ok := attrs["ibkup_decryption_key"].(string); ok && val != "" {
+			parameter.IBKUPDecryptionKey = val
+		}
+		if val, ok := attrs["ibkup_wallet_file_content"].(string); ok && val != "" {
+			parameter.IBKUPWalletFileContent = val
+		}
+		if val, ok := attrs["snapshot_name"].(string); ok && val != "" {
+			parameter.SnapshotName = val
+		}
+		if val, ok := attrs["source_service_name"].(string); ok && val != "" {
+			parameter.SourceServiceName = val
+		}
+		if val, ok := attrs["db_demo"].(string); ok && val != "" {
+			addParam := database.AdditionalParameters{
+				DBDemo: database.ServiceInstanceBool(val),
+			}
+			parameter.AdditonalParameters = addParam
+		}
+	}
+	return []database.Parameter{parameter}
+}
