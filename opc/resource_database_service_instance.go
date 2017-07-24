@@ -249,7 +249,7 @@ func resourceOPCDatabaseServiceInstance() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
-							Default: "ORCL"
+							Default:  "ORCL",
 						},
 						"snapshot_name": {
 							Type:     schema.TypeString,
@@ -437,7 +437,6 @@ func resourceOPCDatabaseServiceInstanceCreate(d *schema.ResourceData, meta inter
 	return resourceOPCDatabaseServiceInstanceRead(d, meta)
 }
 
-// TODO all of this
 func resourceOPCDatabaseServiceInstanceRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
 	databaseClient := meta.(*OPCClient).databaseClient.ServiceInstanceClient()

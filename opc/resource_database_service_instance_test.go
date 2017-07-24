@@ -29,6 +29,8 @@ func TestAccOPCDatabaseServiceInstance_Basic(t *testing.T) {
 						resourceName, "edition", "EE_EP"),
 					resource.TestCheckResourceAttr(
 						resourceName, "version", "12.2.0.1"),
+					resource.TestCheckResourceAttr(
+						resourceName, "parameter.#", "1"),
 				),
 			},
 		},
