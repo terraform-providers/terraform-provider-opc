@@ -410,6 +410,9 @@ func resourceOPCDatabaseServiceInstanceCreate(d *schema.ResourceData, meta inter
 	log.Print("[DEBUG] Creating database service instance")
 
 	client := meta.(*OPCClient).databaseClient.ServiceInstanceClient()
+	if client == nil {
+		return fmt.Errorf("Database Client is not initialized. Make sure to use `database_endpoint` variable or `OPC_DATABASE_ENDPOINT` env variable")
+	}
 	input := database.CreateServiceInstanceInput{
 		Name:             d.Get("name").(string),
 		Edition:          database.ServiceInstanceEdition(d.Get("edition").(string)),
@@ -440,6 +443,9 @@ func resourceOPCDatabaseServiceInstanceCreate(d *schema.ResourceData, meta inter
 func resourceOPCDatabaseServiceInstanceRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
 	databaseClient := meta.(*OPCClient).databaseClient.ServiceInstanceClient()
+	if databaseClient == nil {
+		return fmt.Errorf("Database Client is not initialized. Make sure to use `database_endpoint` variable or `OPC_DATABASE_ENDPOINT` env variable")
+	}
 
 	log.Printf("[DEBUG] Reading state of ip reservation %s", d.Id())
 	getInput := database.GetServiceInstanceInput{
@@ -508,6 +514,9 @@ func resourceOPCDatabaseServiceInstanceRead(d *schema.ResourceData, meta interfa
 func resourceOPCDatabaseServiceInstanceDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
 	client := meta.(*OPCClient).databaseClient.ServiceInstanceClient()
+	if client == nil {
+		return fmt.Errorf("Database Client is not initialized. Make sure to use `database_endpoint` variable or `OPC_DATABASE_ENDPOINT` env variable")
+	}
 	name := d.Id()
 
 	log.Printf("[DEBUG] Deleting DatabaseServiceInstance: %v", name)
