@@ -460,8 +460,6 @@ func (c *ServiceInstanceClient) CreateServiceInstance(input *CreateServiceInstan
 			return serviceInstance, nil
 		}
 	}
-	time.Sleep(10 * time.Minute)
-
 	return nil, serviceInstanceError
 }
 
@@ -489,7 +487,6 @@ func (c *ServiceInstanceClient) startServiceInstance(name string, input *CreateS
 		}
 		return nil, serviceInstanceError
 	}
-
 	return serviceInstance, nil
 }
 

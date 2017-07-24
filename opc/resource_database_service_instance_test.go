@@ -57,7 +57,7 @@ func testAccCheckDatabaseServiceInstanceExists(s *terraform.State) error {
 }
 
 func testAccCheckDatabaseServiceInstanceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta()
+	client := testAccProvider.Meta().(*OPCClient).databaseClient.ServiceInstanceClient()
 	if client == nil {
 		return fmt.Errorf("Database Client is not initialized. Make sure to use `database_endpoint` variable or `OPC_DATABASE_ENDPOINT` env variable")
 	}
@@ -70,7 +70,7 @@ func testAccCheckDatabaseServiceInstanceDestroy(s *terraform.State) error {
 		input := database.GetServiceInstanceInput{
 			Name: rs.Primary.Attributes["name"],
 		}
-		if info, err := client.(*OPCClient).databaseClient.ServiceInstanceClient().GetServiceInstance(&input); err == nil {
+		if info, err := client.GetServiceInstance(&input); err == nil {
 			return fmt.Errorf("DatabaseServiceInstance %s still exists: %#v", input.Name, info)
 		}
 	}

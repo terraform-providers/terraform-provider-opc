@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/hashicorp/go-oracle-terraform/client"
+	opcClient "github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/database"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
@@ -442,8 +442,8 @@ func resourceOPCDatabaseServiceInstanceCreate(d *schema.ResourceData, meta inter
 
 func resourceOPCDatabaseServiceInstanceRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	databaseClient := meta.(*OPCClient).databaseClient.ServiceInstanceClient()
-	if databaseClient == nil {
+	client := meta.(*OPCClient).databaseClient.ServiceInstanceClient()
+	if client == nil {
 		return fmt.Errorf("Database Client is not initialized. Make sure to use `database_endpoint` variable or `OPC_DATABASE_ENDPOINT` env variable")
 	}
 
@@ -452,10 +452,10 @@ func resourceOPCDatabaseServiceInstanceRead(d *schema.ResourceData, meta interfa
 		Name: d.Id(),
 	}
 
-	result, err := databaseClient.GetServiceInstance(&getInput)
+	result, err := client.GetServiceInstance(&getInput)
 	if err != nil {
 		// DatabaseServiceInstance does not exist
-		if client.WasNotFoundError(err) {
+		if opcClient.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}

@@ -38,6 +38,26 @@ func testAccPreCheck(t *testing.T) {
 			t.Fatalf("%s must be set for acceptance test", prop)
 		}
 	}
+	config := Config{
+		User:             os.Getenv("OPC_USERNAME"),
+		Password:         os.Getenv("OPC_PASSWORD"),
+		IdentityDomain:   os.Getenv("OPC_IDENTITY_DOMAIN"),
+		Endpoint:         os.Getenv("OPC_ENDPOINT"),
+		MaxRetries:       1,
+		Insecure:         false,
+		StorageEndpoint:  os.Getenv("OPC_STORAGE_ENDPOINT"),
+		DatabaseEndpoint: os.Getenv("OPC_DATABASE_ENDPOINT"),
+	}
+	client, err := config.Client()
+	if err != nil {
+		t.Fatal(fmt.Sprintf("%s", err))
+	}
+	if client.storageClient == nil {
+		t.Fatalf("Storage Client is nil. Make sure your Oracle Cloud Account has access to the Storage Cloud")
+	}
+	if client.databaseClient == nil {
+		t.Fatalf("Database Client is nil. Make sure your Oracle Cloud Account has access to the Database Cloud")
+	}
 }
 
 type OPCResourceState struct {

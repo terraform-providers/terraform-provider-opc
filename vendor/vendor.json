@@ -252,7 +252,7 @@
 			"path": "github.com/hashicorp/go-oracle-terraform/client",
 			"revision": "21e2696ebec1849c0622c5c366a732d12e5c2d21",
 			"revisionTime": "2017-07-20T21:51:35Z",
-			"version": "v0.1.9",
+			"version": "=v0.1.9",
 			"versionExact": "v0.1.9"
 		},
 		{
@@ -260,7 +260,7 @@
 			"path": "github.com/hashicorp/go-oracle-terraform/compute",
 			"revision": "21e2696ebec1849c0622c5c366a732d12e5c2d21",
 			"revisionTime": "2017-07-20T21:51:35Z",
-			"version": "v0.1.9",
+			"version": "=v0.1.9",
 			"versionExact": "v0.1.9"
 		},
 		{
@@ -268,7 +268,7 @@
 			"path": "github.com/hashicorp/go-oracle-terraform/database",
 			"revision": "21e2696ebec1849c0622c5c366a732d12e5c2d21",
 			"revisionTime": "2017-07-20T21:51:35Z",
-			"version": "v0.1.9",
+			"version": "=v0.1.9",
 			"versionExact": "v0.1.9"
 		},
 		{
@@ -276,7 +276,7 @@
 			"path": "github.com/hashicorp/go-oracle-terraform/opc",
 			"revision": "21e2696ebec1849c0622c5c366a732d12e5c2d21",
 			"revisionTime": "2017-07-20T21:51:35Z",
-			"version": "v0.1.9",
+			"version": "=v0.1.9",
 			"versionExact": "v0.1.9"
 		},
 		{
@@ -284,7 +284,7 @@
 			"path": "github.com/hashicorp/go-oracle-terraform/storage",
 			"revision": "21e2696ebec1849c0622c5c366a732d12e5c2d21",
 			"revisionTime": "2017-07-20T21:51:35Z",
-			"version": "v0.1.9",
+			"version": "=v0.1.9",
 			"versionExact": "v0.1.9"
 		},
 		{
