@@ -24,9 +24,10 @@ func TestAccOPCDatabaseServiceInstance_importBasic(t *testing.T) {
 				Config: config,
 			},
 			{
-				ResourceName:      resourceName,
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"parameter", "vm_public_key"},
 			},
 		},
 	})
