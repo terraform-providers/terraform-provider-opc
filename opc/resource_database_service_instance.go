@@ -320,7 +320,7 @@ func resourceOPCDatabaseServiceInstance() *schema.Resource {
 				ForceNew: true,
 				Computed: true,
 			},
-			"dbaasmonitor_url": {
+			"dbaas_monitor_url": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Computed: true,
@@ -428,12 +428,12 @@ func resourceOPCDatabaseServiceInstanceCreate(d *schema.ResourceData, meta inter
 
 	// Only the PaaS level can have a parameter.
 	if input.Level == database.ServiceInstanceLevelPAAS {
-		input.Parameters = getParameter(d)
+		input.Parameters = expandParameter(d)
 	}
 
 	info, err := client.CreateServiceInstance(&input)
 	if err != nil {
-		return fmt.Errorf("Error creating DatabaseServiceInstance: %s", err)
+		return fmt.Errorf("Error creating DatabaseServiceInstance: %+v", err)
 	}
 
 	d.SetId(info.Name)
@@ -459,7 +459,7 @@ func resourceOPCDatabaseServiceInstanceRead(d *schema.ResourceData, meta interfa
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Error reading database service instance %s: %s", d.Id(), err)
+		return fmt.Errorf("Error reading database service instance %s: %+v", d.Id(), err)
 	}
 
 	if result == nil {
@@ -481,7 +481,7 @@ func resourceOPCDatabaseServiceInstanceRead(d *schema.ResourceData, meta interfa
 	d.Set("created_by", result.CreatedBy)
 	d.Set("creation_time", result.CreationTime)
 	d.Set("current_version", result.CurrentVersion)
-	d.Set("dbaasmonitor_url", result.DBAASMonitorURL)
+	d.Set("dbaas_monitor_url", result.DBAASMonitorURL)
 	d.Set("edition", result.Edition)
 	d.Set("em_url", result.EMURL)
 	d.Set("failover_database", result.FailoverDatabase)
@@ -525,12 +525,12 @@ func resourceOPCDatabaseServiceInstanceDelete(d *schema.ResourceData, meta inter
 		Name: name,
 	}
 	if err := client.DeleteServiceInstance(&input); err != nil {
-		return fmt.Errorf("Error deleting DatabaseServiceInstance")
+		return fmt.Errorf("Error deleting DatabaseServiceInstance: %+v", err)
 	}
 	return nil
 }
 
-func getParameter(d *schema.ResourceData) []database.Parameter {
+func expandParameter(d *schema.ResourceData) []database.Parameter {
 	info := d.Get("parameter").(*schema.Set)
 	var parameter database.Parameter
 	for _, i := range info.List() {

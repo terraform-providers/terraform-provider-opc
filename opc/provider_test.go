@@ -50,7 +50,7 @@ func testAccPreCheck(t *testing.T) {
 	}
 	client, err := config.Client()
 	if err != nil {
-		t.Fatal(fmt.Sprintf("%s", err))
+		t.Fatal(fmt.Sprintf("%+v", err))
 	}
 	if client.storageClient == nil {
 		t.Fatalf("Storage Client is nil. Make sure your Oracle Cloud Account has access to the Storage Cloud")

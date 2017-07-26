@@ -49,7 +49,7 @@ func testAccCheckDatabaseServiceInstanceExists(s *terraform.State) error {
 			Name: rs.Primary.Attributes["name"],
 		}
 		if _, err := client.GetServiceInstance(&input); err != nil {
-			return fmt.Errorf("Error retrieving state of DatabaseServiceInstance %s: %s", input.Name, err)
+			return fmt.Errorf("Error retrieving state of DatabaseServiceInstance %s: %+v", input.Name, err)
 		}
 	}
 

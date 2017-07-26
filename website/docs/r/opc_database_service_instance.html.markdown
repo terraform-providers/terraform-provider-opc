@@ -4,6 +4,7 @@ page_title: "Oracle: opc_database_service_instance"
 sidebar_current: "docs-opc-resource-service-instance"
 description: |-
   Creates and manages a service instance in an OPC identity domain.
+
 ---
 
 # opc\_database\_service\_instance
@@ -21,7 +22,7 @@ resource "opc_database_service_instance" "default" {
   shape = "oc1m"
   subscription_type = "HOURLY"
   version = "12.2.0.1"
-  vm_public_key = "an ssh public key"
+  vm_public_key = "A ssh public key"
   parameter {
     admin_password = "Test_String7"
     backup_destination = "NONE"
@@ -37,15 +38,15 @@ The following arguments are supported:
 
 * `name` - (Required) The name of the Service Instance.
 
-* `edition` - (Required) Database edition for the service instance. Possible values are SE, EE, EE_HP, or EE_EP.
+* `edition` - (Required) Database edition for the service instance. Possible values are `SE`, `EE`, `EE_HP`, or `EE_EP`.
 
-* `level` - (Required) Service level for the service instance. Possible values are BASIC or PAAS.
+* `level` - (Required) Service level for the service instance. Possible values are `BASIC` or `PAAS`.
 
-* `shape` - (Required) Desired compute shape. Possible values are oc3, oc4, oc5, oc6, oc1m, oc2m, oc3m, or oc4m.
+* `shape` - (Required) Desired compute shape. Possible values are `oc3`, `oc4`, `oc5`, `oc6`, `oc1m`, `oc2m`, `oc3m`, or `oc4m`.
 
-* `subscription_type` - (Required) Billing unit. Possible values are HOURLY or MONTHLY.
+* `subscription_type` - (Required) Billing unit. Possible values are `HOURLY` or `MONTHLY`.
 
-* `version` - (Required) Oracle Database software version; one of: 12.2.0.1, 12.1.0.2, or 11.2.0.4.
+* `version` - (Required) Oracle Database software version; one of: `12.2.0.1`, `12.1.0.2`, or `11.2.0.4`.
 
 * `vm_public_key` - (Required) Public key for the secure shell (SSH). This key will be used for authentication when connecting to the Database Cloud Service instance using an SSH client.
 
@@ -57,57 +58,57 @@ Parameter supports the following:
 
 * `admin_password` - (Required) Password for Oracle Database administrator users sys and system. The password must meet the following requirements: Starts with a letter. Is between 8 and 30 characters long. Contains letters, at least one number, and optionally, any number of these special characters: dollar sign ($), pound sign (#), and underscore ( _ )
 
-* `backup_destination` - (Required) Backup Destination. Possible values are BOTH, OSS, NONE.
+* `backup_destination` - (Required) Backup Destination. Possible values are `BOTH`, `OSS`, `NONE`.
 
-* `char_set` - (Required) Character Set for the Database Cloud Service Instance. Default value is AL32UTF8.
+* `char_set` - (Required) Character Set for the Database Cloud Service Instance. All possible values are listed under the [parameters section documentation](http://docs.oracle.com/en/cloud/paas/database-dbaas-cloud/csdbr/op-paas-service-dbcs-api-v1.1-instances-%7BidentityDomainId%7D-post.html). Default value is `AL32UTF8`.
 
-`usable_storage` - (Required) Storage size for data (in GB). Minimum value is 15. Maximum value depends on the backup destination: if BOTH is specified, the maximum value is 1200; if OSS or NONE is specified, the maximum value is 2048.
+`usable_storage` - (Required) Storage size for data (in GB). Minimum value is `15`. Maximum value depends on the backup destination: if `BOTH` is specified, the maximum value is `1200`; if `OSS` or `NONE` is specified, the maximum value is `2048`.
 
-* `cloud_storage_container` - (Optional) Name of the Oracle Storage Cloud Service container used to provide storage for your service instance backups. Use the following format to specify the container name: <storageservicename>-<storageidentitydomain>/<containername>
+* `cloud_storage_container` - (Optional) Name of the Oracle Storage Cloud Service container used to provide storage for your service instance backups. Use the following format to specify the container name: `<storageservicename>-<storageidentitydomain>/<containername>`
 
 * `cloud_storage_username` - (Optional) Username for the Oracle Storage Cloud Service administrator.
 
 * `cloud_storage_password` - (Optional) Password for the Oracle Storage Cloud Service administrator.
 
-* `create_storage_container_if_missing` - (Optional) Specify if the given cloud_storage_container is to be created if it does not already exist. Valid values are true and false. Default value is false.
+* `create_storage_container_if_missing` - (Optional) Specify if the given cloud_storage_container is to be created if it does not already exist. Default value is `false`.
 
-* `disaster_recovery` - (Optional) Specify if an Oracle Data Guard configuration is created using the Disaster Recovery option or the High Availability option. Valid values are yes and no. Default value is no.
+* `disaster_recovery` - (Optional) Specify if an Oracle Data Guard configuration is created using the Disaster Recovery option or the High Availability option. Valid values are `yes` and `no`. Default value is no.
 
-* `failover_database` - Specify if an Oracle Data Guard configuration comprising a primary database and a standby database is created. Valid values are yes and no. Default value is no.
+* `failover_database` - Specify if an Oracle Data Guard configuration comprising a primary database and a standby database is created. Valid values are `yes` and `no`. Default value is `no`.
 
-* `golden_gate` - (Optional) Specify if the database should be configured for use as the replication database of an Oracle GoldenGate Cloud Service instance. Valid values are yes and no. Default value is no. You cannot set goldenGate to yes if either isRac or failoverDatabase is set to yes.
+* `golden_gate` - (Optional) Specify if the database should be configured for use as the replication database of an Oracle GoldenGate Cloud Service instance. Valid values are `yes` and `no`. Default value is `no`. You cannot set `goldenGate` to `yes` if either `is_rac` or `failoverDatabase` is set to `yes`.
 
-* `ibkup` - (Optional) Specify if the service instance's database should, after the instance is created, be replaced by a database stored in an existing cloud backup that was created using Oracle Database Backup Cloud Service. Valid values are yes and no. Default value is no.
+* `ibkup` - (Optional) Specify if the service instance's database should, after the instance is created, be replaced by a database stored in an existing cloud backup that was created using Oracle Database Backup Cloud Service. Valid values are `yes` and `no`. Default value is `no`.
 
 * `ibkup_cloud_storage_username` - (Optional)
-Username of the Oracle Cloud user. This parameter is required if ibkup is set to yes.
+Username of the Oracle Cloud user. This parameter is required if `ibkup` is set to `yes`.
 
 * `ibkup_cloud_storage_password` - (Optional)
-Password of the Oracle Cloud user specified in ibkup_cloud_storage_user. This parameter is required if ibkup is set to yes.
+Password of the Oracle Cloud user specified in `ibkup_cloud_storage_user`. This parameter is required if `ibkup` is set to yes.
 
-* `ibkup_database_id` - (Optional) Database id of the database from which the existing cloud backup was created. This parameter is required if ibkup is set to yes.
+* `ibkup_database_id` - (Optional) Database id of the database from which the existing cloud backup was created. This parameter is required if `ibkup` is set to `yes`.
 
-* `ibkup_decryption_key` - (Optional) Password used to create the existing, password-encrypted cloud backup. This password is used to decrypt the backup. Specify either ibkup_decryption_key or ibkup_wallet_file_content for decrypting the backup. This parameter is required if ibkup is set to yes.
+* `ibkup_decryption_key` - (Optional) Password used to create the existing, password-encrypted cloud backup. This password is used to decrypt the backup. Specify either `ibkup_decryption_key` or `ibkup_wallet_file_content` for decrypting the backup. This parameter is required if `ibkup` is set to `yes`.
 
-* `ibkup_wallet_file_content` - (Optional) String containing the xsd:base64Binary representation of the cloud backup's wallet file. This wallet is used to decrypt the backup. Specify either ibkup_decryption_key or ibkup_wallet_file_content for decrypting the backup. This parameter is required if ibkup is set to yes.
+* `ibkup_wallet_file_content` - (Optional) String containing the xsd:base64Binary representation of the cloud backup's wallet file. This wallet is used to decrypt the backup. Specify either `ibkup_decryption_key` or `ibkup_wallet_file_content` for decrypting the backup. This parameter is required if `ibkup` is set to yes.
 
-* `is_rac` - (Optional) Specify if a cluster database using Oracle Real Application Clusters should be configured. Valid values are yes and no. Default value is no.
+* `is_rac` - (Optional) Specify if a cluster database using Oracle Real Application Clusters should be configured. Valid values are `yes` and `no`. Default value is `no`.
 
-* `n_char_set` - (Optional) National Character Set for the Database Cloud Service instance. Valid values are AL16UTF16 and UTF8. Default value is AL16UTF16.
+* `n_char_set` - (Optional) National Character Set for the Database Cloud Service instance. Valid values are `AL16UTF16` and `UTF8`. Default value is `AL16UTF16`.
 
-* `pdb_name` - (Optional) This attribute is valid when Database Cloud Service instance is configured with version 12c. Pluggable Database Name for the Database Cloud Service instance. Default value is pdb1.
+* `pdb_name` - (Optional) This attribute is valid when Database Cloud Service instance is configured with version 12c. Pluggable Database Name for the Database Cloud Service instance. Default value is `pdb1`.
 
-* `sid` - (Optional) Database Name for the Database Cloud Service instance. Default value is ORCL.
+* `sid` - (Optional) Database Name for the Database Cloud Service instance. Default value is `ORCL`.
 
 * `source_service_name` - (Optional) Indicates that the service instance should be created as a "snapshot clone" of another service instance. Provide the name of the existing service instance whose snapshot is to be used.
 
 * `snapshot_name` - (Optional) The name of the snapshot of the service instance specified by sourceServiceName that is to be used to create a "snapshot clone". This parameter is valid only if source_service_name is specified.
 
-* `timezone` - (Optional) Time Zone for the Database Cloud Service instance. Default value is UTC.
+* `timezone` - (Optional) Time Zone for the Database Cloud Service instance. Default value is `UTC`.
 
-* `type` - (Optional) Component type to which the set of parameters applies. Defaults to db
+* `type` - (Optional) Component type to which the set of parameters applies. Defaults to `db`
 
-* `db_demo` - (Optional) Indicates whether to include the Demos PDB. Valid values are yes or no.
+* `db_demo` - (Optional) Indicates whether to include the Demos PDB. Valid values are `yes` or `no`.
 
 In addition to the above, the following values are exported:
 

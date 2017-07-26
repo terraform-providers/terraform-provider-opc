@@ -75,7 +75,7 @@ func (c *Config) Client() (*OPCClient, error) {
 	if c.StorageEndpoint != "" {
 		storageEndpoint, err := url.ParseRequestURI(c.StorageEndpoint)
 		if err != nil {
-			return nil, fmt.Errorf("Invalid storage endpoint URI: %s", err)
+			return nil, fmt.Errorf("Invalid storage endpoint URI: %+v", err)
 		}
 		config.APIEndpoint = storageEndpoint
 		storageClient, err := storage.NewStorageClient(&config)
@@ -88,7 +88,7 @@ func (c *Config) Client() (*OPCClient, error) {
 	if c.DatabaseEndpoint != "" {
 		databaseEndpoint, err := url.ParseRequestURI(c.DatabaseEndpoint)
 		if err != nil {
-			return nil, fmt.Errorf("Invalid database endpoint URI: %s", err)
+			return nil, fmt.Errorf("Invalid database endpoint URI: %+v", err)
 		}
 		config.APIEndpoint = databaseEndpoint
 		databaseClient, err := database.NewDatabaseClient(&config)
