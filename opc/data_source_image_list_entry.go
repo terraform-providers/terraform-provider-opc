@@ -94,7 +94,7 @@ func dataSourceImageListEntryRead(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	// Populate schema attributes
-	d.SetId(fmt.Sprintf("%s|%s:%d", image_list, version, entry))
+	d.SetId(fmt.Sprintf("%s|%d:%d", image_list, version, entry))
 	d.Set("uri", result.Uri)
 	if err := d.Set("attributes", attrs); err != nil {
 		return err
