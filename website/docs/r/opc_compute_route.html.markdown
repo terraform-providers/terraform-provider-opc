@@ -8,7 +8,7 @@ description: |-
 
 # opc\_compute\_route
 
-The ``opc_compute_route`` resource creates and manages a route for an IP Network.
+The `opc_compute_route` resource creates and manages a route for an IP Network.
 
 ## Example Usage
 

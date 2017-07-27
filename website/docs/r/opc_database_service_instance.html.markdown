@@ -52,45 +52,28 @@ The following arguments are supported:
 
 * `parameter` - (Optional) Additional configuration for a service instance. This set is required if level is PAAS. Parameter is documented below.
 
+* `ibkup` - (Optional) Specify if the service instance's database should, after the instance is created, be replaced by a database stored in an existing cloud backup that was created using Oracle Database Backup Cloud Service. IBKUP is documented below.
+
+* `cloud_storage` - (Optional) Provides Cloud Storage for service instance backups. Cloud Storage
+is documented below
+
 * `description` - (Optional) A description of the Service Instance.
 
 Parameter supports the following:
 
-* `admin_password` - (Required) Password for Oracle Database administrator users sys and system. The password must meet the following requirements: Starts with a letter. Is between 8 and 30 characters long. Contains letters, at least one number, and optionally, any number of these special characters: dollar sign ($), pound sign (#), and underscore ( _ )
+* `admin_password` - (Required) Password for Oracle Database administrator users sys and system. The password must meet the following requirements: Starts with a letter. Is between 8 and 30 characters long. Contains letters, at least one number, and optionally, any number of these special characters: dollar sign `$`, pound sign `#`, and underscore `_`.
 
 * `backup_destination` - (Required) Backup Destination. Possible values are `BOTH`, `OSS`, `NONE`.
 
 * `char_set` - (Required) Character Set for the Database Cloud Service Instance. All possible values are listed under the [parameters section documentation](http://docs.oracle.com/en/cloud/paas/database-dbaas-cloud/csdbr/op-paas-service-dbcs-api-v1.1-instances-%7BidentityDomainId%7D-post.html). Default value is `AL32UTF8`.
 
-`usable_storage` - (Required) Storage size for data (in GB). Minimum value is `15`. Maximum value depends on the backup destination: if `BOTH` is specified, the maximum value is `1200`; if `OSS` or `NONE` is specified, the maximum value is `2048`.
-
-* `cloud_storage_container` - (Optional) Name of the Oracle Storage Cloud Service container used to provide storage for your service instance backups. Use the following format to specify the container name: `<storageservicename>-<storageidentitydomain>/<containername>`
-
-* `cloud_storage_username` - (Optional) Username for the Oracle Storage Cloud Service administrator.
-
-* `cloud_storage_password` - (Optional) Password for the Oracle Storage Cloud Service administrator.
-
-* `create_storage_container_if_missing` - (Optional) Specify if the given cloud_storage_container is to be created if it does not already exist. Default value is `false`.
+* `usable_storage` - (Required) Storage size for data (in GB). Minimum value is `15`. Maximum value depends on the backup destination: if `BOTH` is specified, the maximum value is `1200`; if `OSS` or `NONE` is specified, the maximum value is `2048`.
 
 * `disaster_recovery` - (Optional) Specify if an Oracle Data Guard configuration is created using the Disaster Recovery option or the High Availability option. Valid values are `yes` and `no`. Default value is no.
 
 * `failover_database` - Specify if an Oracle Data Guard configuration comprising a primary database and a standby database is created. Valid values are `yes` and `no`. Default value is `no`.
 
 * `golden_gate` - (Optional) Specify if the database should be configured for use as the replication database of an Oracle GoldenGate Cloud Service instance. Valid values are `yes` and `no`. Default value is `no`. You cannot set `goldenGate` to `yes` if either `is_rac` or `failoverDatabase` is set to `yes`.
-
-* `ibkup` - (Optional) Specify if the service instance's database should, after the instance is created, be replaced by a database stored in an existing cloud backup that was created using Oracle Database Backup Cloud Service. Valid values are `yes` and `no`. Default value is `no`.
-
-* `ibkup_cloud_storage_username` - (Optional)
-Username of the Oracle Cloud user. This parameter is required if `ibkup` is set to `yes`.
-
-* `ibkup_cloud_storage_password` - (Optional)
-Password of the Oracle Cloud user specified in `ibkup_cloud_storage_user`. This parameter is required if `ibkup` is set to yes.
-
-* `ibkup_database_id` - (Optional) Database id of the database from which the existing cloud backup was created. This parameter is required if `ibkup` is set to `yes`.
-
-* `ibkup_decryption_key` - (Optional) Password used to create the existing, password-encrypted cloud backup. This password is used to decrypt the backup. Specify either `ibkup_decryption_key` or `ibkup_wallet_file_content` for decrypting the backup. This parameter is required if `ibkup` is set to `yes`.
-
-* `ibkup_wallet_file_content` - (Optional) String containing the xsd:base64Binary representation of the cloud backup's wallet file. This wallet is used to decrypt the backup. Specify either `ibkup_decryption_key` or `ibkup_wallet_file_content` for decrypting the backup. This parameter is required if `ibkup` is set to yes.
 
 * `is_rac` - (Optional) Specify if a cluster database using Oracle Real Application Clusters should be configured. Valid values are `yes` and `no`. Default value is `no`.
 
@@ -109,6 +92,29 @@ Password of the Oracle Cloud user specified in `ibkup_cloud_storage_user`. This 
 * `type` - (Optional) Component type to which the set of parameters applies. Defaults to `db`
 
 * `db_demo` - (Optional) Indicates whether to include the Demos PDB. Valid values are `yes` or `no`.
+
+IBKUP supports the following:
+
+* `cloud_storage_username` - (Required) Username of the Oracle Cloud user.
+
+* `cloud_storage_password` - (Required) Password of the Oracle Cloud user specified in `ibkup_cloud_storage_user`.
+
+* `database_id` - (Required) Database id of the database from which the existing cloud backup was created.
+
+* `decryption_key` - (Optional) Password used to create the existing, password-encrypted cloud backup. This password is used to decrypt the backup. Specify either `ibkup_decryption_key` or `ibkup_wallet_file_content` for decrypting the backup.
+
+* `wallet_file_content` - (Optional) String containing the xsd:base64Binary representation of the cloud backup's wallet file. This wallet is used to decrypt the backup. Specify either `ibkup_decryption_key` or `ibkup_wallet_file_content` for decrypting the backup.
+
+Cloud Storage supports the following:
+
+* `container` - (Required) Name of the Oracle Storage Cloud Service container used to provide storage for your service instance backups. Use the following format to specify the container name: `<storageservicename>-<storageidentitydomain>/<containername>`
+
+* `username` - (Required) Username for the Oracle Storage Cloud Service administrator.
+
+* `password` - (Required) Password for the Oracle Storage Cloud Service administrator.
+
+* `create_if_missing` - (Optional) Specify if the given cloud_storage_container is to be created if it does not already exist. Default value is `false`.
+
 
 In addition to the above, the following values are exported:
 
