@@ -55,13 +55,6 @@ const (
 	ServiceInstanceLevelBasic ServiceInstanceLevel = "BASIC"
 )
 
-type ServiceInstanceBool string
-
-const (
-	ServiceInstanceYes ServiceInstanceBool = "yes"
-	ServiceInstanceNo  ServiceInstanceBool = "no"
-)
-
 type ServiceInstanceBackupDestination string
 
 const (
@@ -254,7 +247,7 @@ type CreateServiceInstanceInput struct {
 	// Array of one JSON object that specifies configuration details of the services instance.
 	// This array is not required if the level value is BASIC.
 	// Required if level value is PAAS.
-	Parameters []Parameter `json:"parameters,omitempty"`
+	Parameter ParameterInput `json:"-"`
 	// Name of Database Cloud Service instance. The service name:
 	// Must not exceed 50 characters.
 	// Must start with a letter.
@@ -283,8 +276,13 @@ type CreateServiceInstanceInput struct {
 	VMPublicKey string `json:"vmPublicKeyText"`
 }
 
-type Parameter struct {
-	AdditonalParameters AdditionalParameters `json:"additionalParams,omitempty"`
+type CreateServiceInstanceRequest struct {
+	CreateServiceInstanceInput
+	ParameterRequest []ParameterRequest `json:"parameters"`
+}
+
+type ParameterInput struct {
+	AdditionalParameters AdditionalParameters `json:"additionalParams,omitempty"`
 	// Password for Oracle Database administrator users sys and system. The password must meet the following requirements:
 	// Starts with a letter
 	// Is between 8 and 30 characters long
@@ -335,31 +333,31 @@ type Parameter struct {
 	// Optional.
 	CreateStorageContainerIfMissing bool `json:"createStorageContainerIfMissing,omitempty"`
 	// Specify if an Oracle Data Guard configuration is created using the Disaster Recovery option
-	// or the High Availability option. Valid values are yes and no:
-	// yes - The Disaster Recovery option is used, which places the compute node hosting the primary
+	// or the High Availability option.
+	// true - The Disaster Recovery option is used, which places the compute node hosting the primary
 	// database and the compute node hosting the standby database in compute zones of different data centers.
-	// no - The High Availability option is used, which places the compute node hosting the primary
+	// false - The High Availability option is used, which places the compute node hosting the primary
 	// database and the compute node hosting the standby database in different compute zones of the same
 	// data center.
-	// Default value is no.
-	// This option is applicable only when failoverDatabase is set to yes.
+	// Default value is false.
+	// This option is applicable only when failoverDatabase is set to true.
 	// Optional
-	DisasterRecovery ServiceInstanceBool `json:"disasterRecovery,omitempty"`
+	DisasterRecovery bool `json:"-"`
 	// Specify if an Oracle Data Guard configuration comprising a primary database and a
-	// standby database is created. Valid values are yes and no. Default value is no.
-	// You cannot set both failoverDatabase and isRac to yes.
+	// standby database is created. Default value is false.
+	// You cannot set both failoverDatabase and isRac to false.
 	// Optional
-	FailoverDatabase ServiceInstanceBool `json:"failoverDatabase,omitempty"`
+	FailoverDatabase bool `json:"-"`
 	// Specify if the database should be configured for use as the replication database of an
-	// Oracle GoldenGate Cloud Service instance. Valid values are yes and no. Default value is no.
-	// You cannot set goldenGate to yes if either isRac or failoverDatabase is set to yes.
+	// Oracle GoldenGate Cloud Service instance. Default value is false.
+	// You cannot set goldenGate to true if either isRac or failoverDatabase is set to true.
 	// Optional
-	GoldenGate ServiceInstanceBool `json:"goldenGate,omitempty"`
+	GoldenGate bool `json:"-"`
 	// Specify if the service instance's database should, after the instance is created, be replaced
 	// by a database stored in an existing cloud backup that was created using Oracle Database Backup
-	// Cloud Service. Valid values are yes and no. Default value is no.
+	// Cloud Service. Default value is false.
 	// Optional
-	IBKUP ServiceInstanceBool `json:"ibkup,omitempty"`
+	IBKUP bool `json:"-"`
 	// Name of the Oracle Storage Cloud Service container where the existing cloud backup is stored.
 	// This parameter is required if ibkup is set to yes.
 	IBKUPCloudStoragePassword string `json:"ibkupCloudStoragePassword,omitempty"`
@@ -380,7 +378,7 @@ type Parameter struct {
 	// Specify if a cluster database using Oracle Real Application Clusters should be configured.
 	// Valid values are yes and no. Default value is no.
 	// Optional
-	IsRAC ServiceInstanceBool `json:"isRac,omitempty"`
+	IsRAC bool `json:"-"`
 	// National Character Set for the Database Cloud Service instance.
 	// Default value is AL16UTF16.
 	// Optional.
@@ -435,10 +433,19 @@ type Parameter struct {
 	UsableStorage string `json:"usableStorage"`
 }
 
+type ParameterRequest struct {
+	ParameterInput
+	DisasterRecoveryString string `json:"disasterRecovery,omitempty"`
+	FailoverDatabaseString string `json:"failoverDatabase,omitempty"`
+	GoldenGateString       string `json:"goldenGate,omitempty"`
+	IsRACString            string `json:"isRac,omitempty"`
+	IBKUPString            string `json:"ibkup,omitempty"`
+}
+
 type AdditionalParameters struct {
 	// Indicates whether to include the Demos PDB
 	// Optional
-	DBDemo ServiceInstanceBool `json:"db_demo,omitempty"`
+	DBDemo string `json:"db_demo,omitempty"`
 }
 
 // CreateServiceInstance creates a new ServiceInstace.
@@ -450,11 +457,13 @@ func (c *ServiceInstanceClient) CreateServiceInstance(input *CreateServiceInstan
 	if c.Timeout == 0 {
 		c.Timeout = WaitForServiceInstanceReadyTimeout
 	}
-	// return nil, fmt.Errorf("%+v", input)
+
+	// Create request where bools(true/false) are switched to strings(yes/no).
+	request := createRequest(input)
 	for i := 0; i < *c.DatabaseClient.client.MaxRetries; i++ {
 		c.client.DebugLogString(fmt.Sprintf("(Iteration: %d of %d) Creating service instance with name %s\n Input: %+v", i, *c.DatabaseClient.client.MaxRetries, input.Name, input))
 
-		serviceInstance, serviceInstanceError = c.startServiceInstance(input.Name, input)
+		serviceInstance, serviceInstanceError = c.startServiceInstance(request.Name, request)
 		if serviceInstanceError == nil {
 			c.client.DebugLogString(fmt.Sprintf("(Iteration: %d of %d) Finished creating service instance with name %s\n Info: %+v", i, *c.DatabaseClient.client.MaxRetries, input.Name, serviceInstance))
 			return serviceInstance, nil
@@ -463,7 +472,24 @@ func (c *ServiceInstanceClient) CreateServiceInstance(input *CreateServiceInstan
 	return nil, serviceInstanceError
 }
 
-func (c *ServiceInstanceClient) startServiceInstance(name string, input *CreateServiceInstanceInput) (*ServiceInstance, error) {
+func createRequest(input *CreateServiceInstanceInput) *CreateServiceInstanceRequest {
+	parameterRequest := ParameterRequest{
+		ParameterInput:         input.Parameter,
+		DisasterRecoveryString: convertOracleBool(input.Parameter.DisasterRecovery),
+		FailoverDatabaseString: convertOracleBool(input.Parameter.FailoverDatabase),
+		GoldenGateString:       convertOracleBool(input.Parameter.GoldenGate),
+		IsRACString:            convertOracleBool(input.Parameter.IsRAC),
+		IBKUPString:            convertOracleBool(input.Parameter.IBKUP),
+	}
+	request := &CreateServiceInstanceRequest{
+		CreateServiceInstanceInput: *input,
+		ParameterRequest:           []ParameterRequest{parameterRequest},
+	}
+
+	return request
+}
+
+func (c *ServiceInstanceClient) startServiceInstance(name string, input *CreateServiceInstanceRequest) (*ServiceInstance, error) {
 	if err := c.createResource(*input, nil); err != nil {
 		return nil, err
 	}
@@ -589,4 +615,11 @@ func (c *ServiceInstanceClient) WaitForServiceInstanceDeleted(input *GetServiceI
 			return false, nil
 		}
 	})
+}
+
+func convertOracleBool(val bool) string {
+	if val {
+		return "yes"
+	}
+	return "no"
 }

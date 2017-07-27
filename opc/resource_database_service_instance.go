@@ -89,7 +89,7 @@ func resourceOPCDatabaseServiceInstance() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"db_demo": {
-							Type:     schema.TypeBool,
+							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
@@ -403,7 +403,7 @@ func resourceOPCDatabaseServiceInstanceCreate(d *schema.ResourceData, meta inter
 
 	// Only the PaaS level can have a parameter.
 	if input.Level == database.ServiceInstanceLevelPAAS {
-		input.Parameters = expandParameter(client, d)
+		input.Parameter = expandParameter(client, d)
 	}
 
 	info, err := client.CreateServiceInstance(&input)
@@ -506,19 +506,19 @@ func resourceOPCDatabaseServiceInstanceDelete(d *schema.ResourceData, meta inter
 	return nil
 }
 
-func expandParameter(client *database.ServiceInstanceClient, d *schema.ResourceData) []database.Parameter {
+func expandParameter(client *database.ServiceInstanceClient, d *schema.ResourceData) database.ParameterInput {
 	parameterInfo := d.Get("parameter").(*schema.Set)
-	var parameter database.Parameter
+	var parameter database.ParameterInput
 	for _, i := range parameterInfo.List() {
 		attrs := i.(map[string]interface{})
-		parameter = database.Parameter{
+		parameter = database.ParameterInput{
 			AdminPassword:     attrs["admin_password"].(string),
 			BackupDestination: database.ServiceInstanceBackupDestination(attrs["backup_destination"].(string)),
 			CharSet:           attrs["char_set"].(string),
-			DisasterRecovery:  client.SwapBoolToString(attrs["disaster_recovery"].(bool)),
-			FailoverDatabase:  client.SwapBoolToString(attrs["failover_database"])
-			GoldenGate:        client.SwapBoolToString(attrs["golden_gate"].(bool)),
-			IsRAC:             client.SwapBoolToString(attrs["is_rac"].(bool)),
+			DisasterRecovery:  attrs["disaster_recovery"].(bool),
+			FailoverDatabase:  attrs["failover_database"].(bool),
+			GoldenGate:        attrs["golden_gate"].(bool),
+			IsRAC:             attrs["is_rac"].(bool),
 			NCharSet:          database.ServiceInstanceNCharSet(attrs["n_char_set"].(string)),
 			PDBName:           attrs["pdb_name"].(string),
 			SID:               attrs["sid"].(string),
@@ -533,23 +533,23 @@ func expandParameter(client *database.ServiceInstanceClient, d *schema.ResourceD
 		if val, ok := attrs["source_service_name"].(string); ok && val != "" {
 			parameter.SourceServiceName = val
 		}
-		if val, ok := attrs["db_demo"].(bool); ok {
+		if val, ok := attrs["db_demo"].(string); ok {
 			addParam := database.AdditionalParameters{
-				DBDemo: client.SwapBoolToString(val),
+				DBDemo: val,
 			}
 			parameter.AdditionalParameters = addParam
 		}
 	}
 	expandIbkup(d, &parameter)
 	expandCloudStorage(d, &parameter)
-	return []database.Parameter{parameter}
+	return parameter
 }
 
-func expandIbkup(d *schema.ResourceData, parameter *database.Parameter) {
+func expandIbkup(d *schema.ResourceData, parameter *database.ParameterInput) {
 	ibkupInfo := d.Get("ibkup").(*schema.Set)
 	for _, i := range ibkupInfo.List() {
 		attrs := i.(map[string]interface{})
-		parameter.IBKUP = "yes"
+		parameter.IBKUP = true
 		parameter.IBKUPCloudStorageUser = attrs["cloud_storage_username"].(string)
 		parameter.IBKUPCloudStoragePassword = attrs["cloud_storage_password"].(string)
 		parameter.IBKUPDatabaseID = attrs["database_id"].(string)
@@ -562,7 +562,7 @@ func expandIbkup(d *schema.ResourceData, parameter *database.Parameter) {
 	}
 }
 
-func expandCloudStorage(d *schema.ResourceData, parameter *database.Parameter) {
+func expandCloudStorage(d *schema.ResourceData, parameter *database.ParameterInput) {
 	cloudStorageInfo := d.Get("cloud_storage").(*schema.Set)
 	for _, i := range cloudStorageInfo.List() {
 		attrs := i.(map[string]interface{})
