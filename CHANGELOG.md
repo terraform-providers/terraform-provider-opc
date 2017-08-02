@@ -1,16 +1,16 @@
-## 0.1.2 (Unreleased)
+## 0.1.2 (August 02, 2017)
 
 FEATURES:
 
- * **New Datasource:** `opc_compute_image_list_entry` [GH-50]
- * **New Datasource:** `opc_compute_storage_volume_snapshot` [GH-46]
- * **New Resource:** `opc_compute_storage_container` [GH-23]
- * Add timeout configuration: [GH-41]
+ * **New Datasource:** `opc_compute_image_list_entry` ([#50](https://github.com/terraform-providers/terraform-provider-opc/issues/50))
+ * **New Datasource:** `opc_compute_storage_volume_snapshot` ([#46](https://github.com/terraform-providers/terraform-provider-opc/issues/46))
+ * **New Resource:** `opc_compute_storage_container` ([#23](https://github.com/terraform-providers/terraform-provider-opc/issues/23))
+ * Add timeout configuration: ([#41](https://github.com/terraform-providers/terraform-provider-opc/issues/41))
   
 BUG FIXES:
- * `opc_storage_volume_snapshot`: Fix crash on import [GH-10]
- * `opc_compute_storage_volume`: bootable volumes can be added without an image list/image list entry [GH-19]
- * r/security_list: Suppress case diffs for security_list [GH-27]
+ * `opc_storage_volume_snapshot`: Fix crash on import ([#10](https://github.com/terraform-providers/terraform-provider-opc/issues/10))
+ * `opc_compute_storage_volume`: bootable volumes can be added without an image list/image list entry ([#19](https://github.com/terraform-providers/terraform-provider-opc/issues/19))
+ * r/security_list: Suppress case diffs for security_list ([#27](https://github.com/terraform-providers/terraform-provider-opc/issues/27))
 
 ## 0.1.1 (June 21, 2017)
 
