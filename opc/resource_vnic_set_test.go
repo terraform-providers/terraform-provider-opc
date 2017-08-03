@@ -52,6 +52,34 @@ func TestAccOPCVNICSet_Basic(t *testing.T) {
 	})
 }
 
+// Setting this takes two applies. This is... not "optimal"
+// However, fixing this would require some core changes that
+// allow for multiple level dependencies, ie: refresh after apply
+// for a resource dependency loop.
+func TestAccOPCVNICSet_UpdateFromInstance(t *testing.T) {
+	rInt := acctest.RandInt()
+	resourceName := "opc_compute_vnic_set.test"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccOPCCheckVNICSetDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccVnicSetInstance(rInt),
+			},
+			{
+				Config: testAccVnicSetInstance(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccOPCCheckVNICSetExists,
+					resource.TestCheckResourceAttr(resourceName, "name", fmt.Sprintf("vnicset-acctest-%d", rInt)),
+					resource.TestCheckResourceAttr(resourceName, "virtual_nics.#", "1"),
+				),
+			},
+		},
+	})
+}
+
 func testAccOPCCheckVNICSetExists(s *terraform.State) error {
 	client := testAccProvider.Meta().(*OPCClient).computeClient.VirtNICSets()
 
@@ -200,4 +228,36 @@ resource "opc_compute_vnic_set" "test" {
     "${data.opc_compute_network_interface.bar.vnic}",
   ]
 }`, rInt, rInt, rInt, rInt, rInt, rName, rDesc)
+}
+
+func testAccVnicSetInstance(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_ip_network" "foo" {
+  name                = "acctest-ip-network-%d"
+  ip_address_prefix   = "192.168.1.0/24"
+}
+
+resource "opc_compute_acl" "foo" {
+  name        = "acctest-acl-%d"
+}
+
+resource "opc_compute_vnic_set" "test" {
+  name         = "vnicset-acctest-%d"
+  applied_acls = ["${opc_compute_acl.foo.name}"]
+}
+
+resource "opc_compute_instance" "foo" {
+  name = "acctest-%d"
+  hostname = "my-instance"
+  label = "my-instance"
+  shape = "oc3"
+  image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
+  networking_info {
+    index = 0
+    ip_network = "${opc_compute_ip_network.foo.name}"
+    ip_address = "192.168.1.100"
+    vnic = "my-instance_eth0"
+    vnic_sets = [ "${opc_compute_vnic_set.test.name}"]
+  }
+}`, rInt, rInt, rInt, rInt)
 }
