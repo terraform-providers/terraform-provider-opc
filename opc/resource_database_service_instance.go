@@ -202,14 +202,17 @@ func resourceOPCDatabaseServiceInstance() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"cloud_storage_password": {
-							Type:     schema.TypeString,
-							Required: true,
-							ForceNew: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							ForceNew:    true,
+							DefaultFunc: schema.EnvDefaultFunc("OPC_PASSWORD", nil),
+							Sensitive:   true,
 						},
 						"cloud_storage_username": {
-							Type:     schema.TypeString,
-							Required: true,
-							ForceNew: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							ForceNew:    true,
+							DefaultFunc: schema.EnvDefaultFunc("OPC_USERNAME", nil),
 						},
 						"database_id": {
 							Type:     schema.TypeString,
@@ -242,14 +245,17 @@ func resourceOPCDatabaseServiceInstance() *schema.Resource {
 							ForceNew: true,
 						},
 						"username": {
-							Type:     schema.TypeString,
-							Required: true,
-							ForceNew: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							DefaultFunc: schema.EnvDefaultFunc("OPC_USERNAME", nil),
+							ForceNew:    true,
 						},
 						"password": {
-							Type:     schema.TypeString,
-							Required: true,
-							ForceNew: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							ForceNew:    true,
+							DefaultFunc: schema.EnvDefaultFunc("OPC_PASSWORD", nil),
+							Sensitive:   true,
 						},
 						"create_if_missing": {
 							Type:     schema.TypeBool,
@@ -266,6 +272,11 @@ func resourceOPCDatabaseServiceInstance() *schema.Resource {
 				Computed: true,
 			},
 			"backup_supported_version": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Computed: true,
+			},
+			"cloud_storage_container": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Computed: true,
@@ -302,6 +313,11 @@ func resourceOPCDatabaseServiceInstance() *schema.Resource {
 			},
 			"em_url": {
 				Type:     schema.TypeString,
+				ForceNew: true,
+				Computed: true,
+			},
+			"failover_database": {
+				Type:     schema.TypeBool,
 				ForceNew: true,
 				Computed: true,
 			},

@@ -37,6 +37,27 @@ func TestAccOPCDatabaseServiceInstance_Basic(t *testing.T) {
 	})
 }
 
+func TestAccOPCDatabaseServiceInstance_CloudStorage(t *testing.T) {
+	ri := acctest.RandInt()
+	config := testAccDatabaseServiceInstanceCloudStorage(ri)
+	resourceName := "opc_database_service_instance.test"
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDatabaseServiceInstanceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckDatabaseServiceInstanceExists,
+					resource.TestCheckResourceAttr(
+						resourceName, "cloud_storage_container", fmt.Sprintf("Storage-canonical/matthew-test-%d", ri)),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckDatabaseServiceInstanceExists(s *terraform.State) error {
 	client := testAccProvider.Meta().(*OPCClient).databaseClient.ServiceInstanceClient()
 
