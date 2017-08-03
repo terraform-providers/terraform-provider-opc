@@ -1,4 +1,9 @@
 ## 0.1.3 (Unreleased)
+
+BUG FIXES: 
+
+* r/vnic_set: Make `virtual_nics` Computed [GH-52]
+
 ## 0.1.2 (August 02, 2017)
 
 FEATURES:
