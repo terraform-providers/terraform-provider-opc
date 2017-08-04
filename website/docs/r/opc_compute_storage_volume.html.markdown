@@ -25,15 +25,9 @@ resource "opc_compute_storage_volume" "test" {
 
 ## Example Usage (Bootable Volume)
 ```hcl
-resource "opc_compute_image_list" "test" {
-  name        = "imageList1"
-  description = "Description for the Image List"
-}
-
-resource "opc_compute_image_list_entry" "test" {
-  name           = "${opc_compute_image_list.test.name}"
-  machine_images = [ "/oracle/public/oel_6.7_apaas_16.4.5_1610211300" ]
-  version        = 1
+data "opc_compute_image_list_entry" "test" {
+  image_list = "my_image_list"
+  version    = 1
 }
 
 resource "opc_compute_storage_volume" "test" {
@@ -42,8 +36,8 @@ resource "opc_compute_storage_volume" "test" {
   size             = 30
   tags             = ["first", "second"]
   bootable         = true
-  image_list       = "${opc_compute_image_list.test.name}"
-  image_list_entry = "${opc_compute_image_list_entry.test.version}"
+  image_list       = "${data.opc_compute_image_list_entry.test.image_list}"
+  image_list_entry = "${data.opc_compute_image_list_entry.test.version}"
 }
 ```
 
