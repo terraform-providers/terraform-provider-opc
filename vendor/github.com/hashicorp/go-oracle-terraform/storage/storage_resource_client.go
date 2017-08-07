@@ -1,11 +1,16 @@
 package storage
 
 import (
+	"io"
 	"net/http"
 )
 
 func (c *StorageClient) createResource(name string, requestHeaders interface{}) error {
-	_, err := c.executeRequest("PUT", name, requestHeaders)
+	return c.createResourceBody(name, requestHeaders, nil)
+}
+
+func (c *StorageClient) createResourceBody(name string, requestHeaders interface{}, body io.ReadSeeker) error {
+	_, err := c.executeRequestBody("PUT", name, requestHeaders, body)
 	if err != nil {
 		return err
 	}
@@ -23,7 +28,15 @@ func (c *StorageClient) updateResource(name string, requestHeaders interface{}) 
 }
 
 func (c *StorageClient) getResource(name string, responseBody interface{}) (*http.Response, error) {
-	rsp, err := c.executeRequest("GET", name, nil)
+	return c.getResourceHeaders(name, responseBody, nil)
+}
+
+func (c *StorageClient) getResourceHeaders(
+	name string,
+	responseBody interface{},
+	requestHeaders interface{},
+) (*http.Response, error) {
+	rsp, err := c.executeRequest("GET", name, requestHeaders)
 	if err != nil {
 		return nil, err
 	}
