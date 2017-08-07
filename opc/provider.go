@@ -97,6 +97,7 @@ func Provider() terraform.ResourceProvider {
 			"opc_compute_ip_address_association":  resourceOPCIPAddressAssociation(),
 			"opc_compute_snapshot":                resourceOPCSnapshot(),
 			"opc_storage_container":               resourceOPCStorageContainer(),
+			"opc_storage_object":                  resourceOPCStorageObject(),
 			"opc_database_service_instance":       resourceOPCDatabaseServiceInstance(),
 		},
 
