@@ -14,7 +14,7 @@ Use this data source to access the configuration of a storage volume snapshot.
 
 ```hcl
 data "opc_compute_storage_volume_snapshot" "foo" {
-  name = "my-storage-volume-snapshot-name"
+  name = "my-storage-volume/my-storage-volume-snapshot-name"
 }
 ```
 

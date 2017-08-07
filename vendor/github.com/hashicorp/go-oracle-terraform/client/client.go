@@ -95,12 +95,28 @@ func (c *Client) BuildRequest(method, path string, body interface{}) (*http.Requ
 	return req, nil
 }
 
+// Build a new HTTP request that doesn't marshall the request body
+func (c *Client) BuildNonJSONRequest(method, path string, body io.ReadSeeker) (*http.Request, error) {
+	// Parse URL Path
+	urlPath, err := url.Parse(path)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create request
+	req, err := http.NewRequest(method, c.formatURL(urlPath), body)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // This method executes the http.Request from the BuildRequest method.
 // It is split up to add additional authentication that is Oracle API dependent.
 func (c *Client) ExecuteRequest(req *http.Request) (*http.Response, error) {
 	// Execute request with supplied client
 	resp, err := c.retryRequest(req)
-	//resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}

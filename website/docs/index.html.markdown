@@ -45,7 +45,9 @@ The following arguments are supported:
 
 * `endpoint` - (Optional) The API endpoint to use, associated with your Oracle Public Cloud account. This is known as the `REST Endpoint` within the Oracle portal. It can also be sourced from the `OPC_ENDPOINT` environment variable.
 
-* `storage_endpoint` - (Optional) The API endpoint to use, associated with your Oracle Public Cloud account. This is known as the `REST Endpoint` within the Oracle portal. Can also be set via the `OPC_STORAGE_ENDPOINT` environment variable.
+* `storage_endpoint` - (Optional) The API endpoint to use, associated with your Oracle Storage Cloud account. This is known as the `REST Endpoint` within the Oracle portal. Can also be set via the `OPC_STORAGE_ENDPOINT` environment variable.
+
+* `database_endpoint` - (Optional) The API endpoint to use, associated with Oracle Database Cloud account. This is known as the `REST Endpoint` within the Oracle portal. Can also be set via the `OPC_DATABASE_ENDPOINT` environment variable.
 
 * `max_retries` - (Optional) The maximum number of tries to make for a successful response when operating on resources within Oracle Public Cloud. It can also be sourced from the `OPC_MAX_RETRIES` environment variable. Defaults to 1.
 
