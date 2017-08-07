@@ -202,17 +202,18 @@ func resourceOPCDatabaseServiceInstance() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"cloud_storage_password": {
-							Type:        schema.TypeString,
-							Optional:    true,
-							ForceNew:    true,
-							DefaultFunc: schema.EnvDefaultFunc("OPC_PASSWORD", nil),
-							Sensitive:   true,
+							Type:      schema.TypeString,
+							Optional:  true,
+							ForceNew:  true,
+							Sensitive: true,
+							Computed:  true,
 						},
 						"cloud_storage_username": {
-							Type:        schema.TypeString,
-							Optional:    true,
-							ForceNew:    true,
-							DefaultFunc: schema.EnvDefaultFunc("OPC_USERNAME", nil),
+							Type:      schema.TypeString,
+							Optional:  true,
+							ForceNew:  true,
+							Computed:  true,
+							Sensitive: true,
 						},
 						"database_id": {
 							Type:     schema.TypeString,
@@ -245,17 +246,18 @@ func resourceOPCDatabaseServiceInstance() *schema.Resource {
 							ForceNew: true,
 						},
 						"username": {
-							Type:        schema.TypeString,
-							Optional:    true,
-							DefaultFunc: schema.EnvDefaultFunc("OPC_USERNAME", nil),
-							ForceNew:    true,
+							Type:      schema.TypeString,
+							Optional:  true,
+							ForceNew:  true,
+							Computed:  true,
+							Sensitive: true,
 						},
 						"password": {
-							Type:        schema.TypeString,
-							Optional:    true,
-							ForceNew:    true,
-							DefaultFunc: schema.EnvDefaultFunc("OPC_PASSWORD", nil),
-							Sensitive:   true,
+							Type:      schema.TypeString,
+							Optional:  true,
+							ForceNew:  true,
+							Computed:  true,
+							Sensitive: true,
 						},
 						"create_if_missing": {
 							Type:     schema.TypeBool,
@@ -566,9 +568,13 @@ func expandIbkup(d *schema.ResourceData, parameter *database.ParameterInput) {
 	for _, i := range ibkupInfo.List() {
 		attrs := i.(map[string]interface{})
 		parameter.IBKUP = true
-		parameter.IBKUPCloudStorageUser = attrs["cloud_storage_username"].(string)
-		parameter.IBKUPCloudStoragePassword = attrs["cloud_storage_password"].(string)
-		parameter.IBKUPDatabaseID = attrs["database_id"].(string)
+		parameter.IBKUPDatabaseID = attrs["cloud_storage_username"].(string)
+		if val, ok := attrs["decryption_key"].(string); ok && val != "" {
+			parameter.IBKUPCloudStorageUser = val
+		}
+		if val, ok := attrs["cloud_storage_password"].(string); ok && val != "" {
+			parameter.IBKUPCloudStoragePassword = val
+		}
 		if val, ok := attrs["decryption_key"].(string); ok && val != "" {
 			parameter.IBKUPDecryptionKey = val
 		}
@@ -583,8 +589,12 @@ func expandCloudStorage(d *schema.ResourceData, parameter *database.ParameterInp
 	for _, i := range cloudStorageInfo.List() {
 		attrs := i.(map[string]interface{})
 		parameter.CloudStorageContainer = attrs["container"].(string)
-		parameter.CloudStorageUsername = attrs["username"].(string)
-		parameter.CloudStoragePassword = attrs["password"].(string)
 		parameter.CreateStorageContainerIfMissing = attrs["create_if_missing"].(bool)
+		if val, ok := attrs["username"].(string); ok && val != "" {
+			parameter.CloudStorageUsername = val
+		}
+		if val, ok := attrs["password"].(string); ok && val != "" {
+			parameter.CloudStoragePassword = val
+		}
 	}
 }

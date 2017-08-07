@@ -49,14 +49,14 @@ func (c *ResourceClient) getResource(name string, responseBody interface{}) erro
 	return c.unmarshalResponseBody(resp, responseBody)
 }
 
-func (c *ResourceClient) deleteResource(name string) error {
+func (c *ResourceClient) deleteResource(name string, body interface{}) error {
 	var objectPath string
 	if name != "" {
 		objectPath = c.getObjectPath(c.ResourceRootPath, name)
 	} else {
 		objectPath = c.ResourceRootPath
 	}
-	_, err := c.executeRequest("DELETE", objectPath, nil)
+	_, err := c.executeRequest("DELETE", objectPath, body)
 	if err != nil {
 		return err
 	}

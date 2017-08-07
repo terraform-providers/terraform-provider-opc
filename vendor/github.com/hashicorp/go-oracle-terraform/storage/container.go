@@ -6,8 +6,6 @@ import (
 	"strings"
 )
 
-const CONTAINER_VERSION = "v1"
-
 // Container describes an existing Container.
 type Container struct {
 	// The name of the Container
@@ -58,7 +56,7 @@ type CreateContainerInput struct {
 func (c *StorageClient) CreateContainer(input *CreateContainerInput) (*Container, error) {
 	headers := make(map[string]string)
 
-	input.Name = c.getQualifiedName(CONTAINER_VERSION, input.Name)
+	input.Name = c.getQualifiedName(input.Name)
 
 	// There are default values for these that we don't want to zero out if Read and Write ACLs are not set.
 	if len(input.ReadACLs) > 0 {
@@ -88,12 +86,12 @@ func (c *StorageClient) CreateContainer(input *CreateContainerInput) (*Container
 type DeleteContainerInput struct {
 	// The name of the Container
 	// Required
-	Name string `json:name`
+	Name string `json:"name"`
 }
 
 // DeleteContainer deletes the Container with the given name.
 func (c *StorageClient) DeleteContainer(input *DeleteContainerInput) error {
-	input.Name = c.getQualifiedName(CONTAINER_VERSION, input.Name)
+	input.Name = c.getQualifiedName(input.Name)
 	return c.deleteResource(input.Name)
 }
 
@@ -101,13 +99,13 @@ func (c *StorageClient) DeleteContainer(input *DeleteContainerInput) error {
 type GetContainerInput struct {
 	// The name of the Container
 	// Required
-	Name string `json:name`
+	Name string `json:"name"`
 }
 
 // GetContainer retrieves the Container with the given name.
 func (c *StorageClient) GetContainer(input *GetContainerInput) (*Container, error) {
 	var container Container
-	input.Name = c.getQualifiedName(CONTAINER_VERSION, input.Name)
+	input.Name = c.getQualifiedName(input.Name)
 
 	rsp, err := c.getResource(input.Name, &container)
 	if err != nil {
@@ -160,7 +158,7 @@ func (c *StorageClient) UpdateContainer(input *UpdateContainerInput) (*Container
 	headers["X-Container-Meta-Access-Control-Expose-Headers"] = strings.Join(input.AllowedOrigins, " ")
 	headers["X-Container-Meta-Access-Control-Max-Age"] = strconv.Itoa(input.MaxAge)
 
-	input.Name = c.getQualifiedName(CONTAINER_VERSION, input.Name)
+	input.Name = c.getQualifiedName(input.Name)
 	if err := c.updateResource(input.Name, headers); err != nil {
 		return nil, err
 	}

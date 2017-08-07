@@ -457,6 +457,12 @@ func (c *ServiceInstanceClient) CreateServiceInstance(input *CreateServiceInstan
 	if c.Timeout == 0 {
 		c.Timeout = WaitForServiceInstanceReadyTimeout
 	}
+	// Since these CloudStorageUsername and CloudStoragePassword are sensitive we'll read them
+	// from the client if they haven't specified in the config.
+	if input.Parameter.CloudStorageContainer != "" && input.Parameter.CloudStorageUsername == "" && input.Parameter.CloudStoragePassword == "" {
+		input.Parameter.CloudStorageUsername = *c.ResourceClient.DatabaseClient.client.UserName
+		input.Parameter.CloudStoragePassword = *c.ResourceClient.DatabaseClient.client.Password
+	}
 
 	// Create request where bools(true/false) are switched to strings(yes/no).
 	request := createRequest(input)
@@ -513,6 +519,9 @@ func (c *ServiceInstanceClient) startServiceInstance(name string, input *CreateS
 		}
 		return nil, serviceInstanceError
 	}
+	// Jobs are still running on  the instance after it's configured and we need to sleep until they are done.
+	//It doesn't take more than ten minutes however there isn't a way to check for completion
+	time.Sleep(10 * time.Minute)
 	return serviceInstance, nil
 }
 
@@ -563,7 +572,13 @@ func (c *ServiceInstanceClient) GetServiceInstance(getInput *GetServiceInstanceI
 type DeleteServiceInstanceInput struct {
 	// Name of the Database Cloud Service instance.
 	// Required.
-	Name string `json:"serviceId"`
+	Name string `json:"-"`
+	// Flag that when set to true deletes all backups of the service instance from Oracle Cloud Storage container.
+	// Use caution in specifying this option. If this option is specified, instance can not be recovered as all backups
+	// will be deleted. This option is not currently supported for Cluster Databases.
+	// Default value is false.
+	// Optional
+	DeleteBackup bool `json:"deleteBackup"`
 }
 
 func (c *ServiceInstanceClient) DeleteServiceInstance(deleteInput *DeleteServiceInstanceInput) error {
@@ -575,7 +590,7 @@ func (c *ServiceInstanceClient) DeleteServiceInstance(deleteInput *DeleteService
 	// An instance takes additional time to setup after it's configured.
 	var deleteErr error
 	for i := 0; i < ServiceInstanceDeleteRetry; i++ {
-		if deleteErr = c.deleteResource(deleteInput.Name); deleteErr != nil {
+		if deleteErr = c.deleteResource(deleteInput.Name, deleteInput); deleteErr != nil {
 			time.Sleep(30 * time.Second)
 			continue
 		}
