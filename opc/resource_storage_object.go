@@ -16,7 +16,9 @@ func resourceOPCStorageObject() *schema.Resource {
 		Create: resourceOPCStorageObjectCreate,
 		Read:   resourceOPCStorageObjectRead,
 		Delete: resourceOPCStorageObjectDelete,
-		// TODO: Add Import
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
