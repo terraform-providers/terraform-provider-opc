@@ -75,3 +75,14 @@ The following attributes are exported:
 * `timestamp` - Date and Time in UNIX EPOCH when the account, container, or object was initially created at the current version.
 
 * `transaction_id` - Transaction ID of the request. Used for bug reports.
+
+## Import
+
+Storage Object's can be imported using `container_name/object_name`, e.g.
+```shell
+$ terraform import opc_storage_object.test my_container/my_object
+```
+
+Please note though, importing a Storage Object does _not_ allow a user to modify the content, or attributes for the Storage Object.
+It is, however, possible to import a Storage Object, and replace the object with new content, or a copy of another Storage Object.
+It is also possible to import a Storage Object into Terraform in order to delete the object.
