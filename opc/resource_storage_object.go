@@ -60,6 +60,7 @@ func resourceOPCStorageObject() *schema.Resource {
 			"content_type": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				ForceNew:    true,
 				Description: "Set the MIME type for the object",
 			},
@@ -145,7 +146,7 @@ func resourceOPCStorageObject() *schema.Resource {
 func resourceOPCStorageObjectCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*OPCClient).storageClient.Objects()
 	if client == nil {
-		return fmt.Errorf("Storage client is not initialized. Make sure to use `storage_endpoint` variable or the `OPC_STORAGE_ENDPOINT` environment variable")
+		return fmt.Errorf(StorageClientInitError)
 	}
 
 	// Populate required attr
@@ -175,7 +176,7 @@ func resourceOPCStorageObjectCreate(d *schema.ResourceData, meta interface{}) er
 		input.CopyFrom = v.(string)
 	} else {
 		// One of the three attributes are required
-		return fmt.Errorf("Must specify %q, %q, or %q field", "file", "copy_from", "content")
+		return fmt.Errorf("Must specify `file`, `copy_from`, or `content` field")
 	}
 
 	if v, ok := d.GetOk("content_disposition"); ok {
@@ -214,7 +215,7 @@ func resourceOPCStorageObjectCreate(d *schema.ResourceData, meta interface{}) er
 func resourceOPCStorageObjectRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*OPCClient).storageClient.Objects()
 	if client == nil {
-		return fmt.Errorf("Storage client is not initialized. Make sure to use `storage_endpoint` variable or the `OPC_STORAGE_ENDPOINT` environment variable")
+		return fmt.Errorf(StorageClientInitError)
 	}
 
 	input := &storage.GetObjectInput{
@@ -251,7 +252,7 @@ func resourceOPCStorageObjectRead(d *schema.ResourceData, meta interface{}) erro
 func resourceOPCStorageObjectDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*OPCClient).storageClient.Objects()
 	if client == nil {
-		return fmt.Errorf("Storage client is not initialized. Make sure to use `storage_endpoint` variable or the `OPC_STORAGE_ENDPOINT` environment variable")
+		return fmt.Errorf(StorageClientInitError)
 	}
 
 	input := &storage.DeleteObjectInput{

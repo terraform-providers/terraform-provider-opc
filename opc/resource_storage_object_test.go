@@ -41,6 +41,35 @@ func TestAccOPCStorageObject_contentSource(t *testing.T) {
 	})
 }
 
+func TestAccOPCStorageObject_contentSource_nilContentType(t *testing.T) {
+	resName := "opc_storage_object.test"
+	rInt := acctest.RandInt()
+
+	body := _SourceInput
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckStorageObjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccOPCStorageObject_contentSource_nilContentType(rInt, body),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckStorageObjectExists,
+					resource.TestCheckResourceAttr(resName, "name", fmt.Sprintf("test-acc-%d", rInt)),
+					resource.TestCheckResourceAttr(resName, "container", fmt.Sprintf("acc-test-%d", rInt)),
+					resource.TestCheckResourceAttrSet(resName, "content_length"),
+					resource.TestCheckResourceAttrSet(resName, "content_type"),
+					resource.TestCheckResourceAttr(resName, "delete_at", "0"),
+					resource.TestCheckResourceAttrSet(resName, "last_modified"),
+					resource.TestCheckResourceAttrSet(resName, "timestamp"),
+					resource.TestCheckResourceAttrSet(resName, "transaction_id"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccOPCStorageObject_fileSource(t *testing.T) {
 	resName := "opc_storage_object.test"
 	rInt := acctest.RandInt()
@@ -125,6 +154,22 @@ resource "opc_storage_object" "test" {
   name = "test-acc-%d"
   container = "${opc_storage_container.foo.name}"
   content_type = "text/plain;charset=UTF-8"
+  content = <<EOF
+%s
+EOF
+}`,
+		testAccOPCStorageObject_testContainer(rInt),
+		rInt,
+		body)
+}
+
+func testAccOPCStorageObject_contentSource_nilContentType(rInt int, body string) string {
+	return fmt.Sprintf(`
+%s
+
+resource "opc_storage_object" "test" {
+  name = "test-acc-%d"
+  container = "${opc_storage_container.foo.name}"
   content = <<EOF
 %s
 EOF
