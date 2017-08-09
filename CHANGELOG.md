@@ -1,8 +1,16 @@
-## 0.1.3 (Unreleased)
+## 0.1.3 (August 09, 2017)
+
+FEATURES: 
+
+* **New Resource** `opc_database_service_instance` [#48](https://github.com/terraform-providers/terraform-provider-opc/issues/48)
 
 BUG FIXES: 
 
-* r/vnic_set: Make `virtual_nics` Computed [GH-52]
+* r/vnic_set: Make `virtual_nics` Computed [#52](https://github.com/terraform-providers/terraform-provider-opc/issues/52)
+
+NOTES: 
+
+* Various doc fixes/updates
 
 ## 0.1.2 (August 02, 2017)
 
