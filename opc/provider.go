@@ -5,6 +5,8 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
+const StorageClientInitError = "Storage client is not initialized. Make sure to use `storage_endpoint` variable or the `OPC_STORAGE_ENDPOINT` environment variable"
+
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
@@ -97,6 +99,7 @@ func Provider() terraform.ResourceProvider {
 			"opc_compute_ip_address_association":  resourceOPCIPAddressAssociation(),
 			"opc_compute_snapshot":                resourceOPCSnapshot(),
 			"opc_storage_container":               resourceOPCStorageContainer(),
+			"opc_storage_object":                  resourceOPCStorageObject(),
 			"opc_database_service_instance":       resourceOPCDatabaseServiceInstance(),
 		},
 
