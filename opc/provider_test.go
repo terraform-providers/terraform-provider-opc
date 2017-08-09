@@ -32,6 +32,7 @@ func TestProvider_impl(t *testing.T) {
 }
 
 func testAccPreCheck(t *testing.T) {
+	// TODO: Add OPC_DATABASE_ENDPOINT when we release service instance
 	required := []string{"OPC_USERNAME", "OPC_PASSWORD", "OPC_IDENTITY_DOMAIN", "OPC_ENDPOINT", "OPC_STORAGE_ENDPOINT"}
 	for _, prop := range required {
 		if os.Getenv(prop) == "" {
