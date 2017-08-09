@@ -27,7 +27,7 @@ resource "opc_storage_container" "default" {
 
 The following arguments are supported:
 
-* `name` - (Required) The name of the ACL.
+* `name` - (Required) The name of the Storace Container.
 
 * `read_acls` - (Optional) The list of ACLs that grant read access.
 
