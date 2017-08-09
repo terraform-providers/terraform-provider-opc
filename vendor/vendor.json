@@ -272,6 +272,14 @@
 			"versionExact": "v0.3.1"
 		},
 		{
+			"checksumSHA1": "mpyRlU6rcUEwokyEyk8PcWf3hJc=",
+			"path": "github.com/hashicorp/go-oracle-terraform/java",
+			"revision": "ed479c158bbbd73132faf7126cb0e1baaac59b99",
+			"revisionTime": "2017-08-07T20:01:57Z",
+			"version": "=v0.3.1",
+			"versionExact": "v0.3.1"
+		},
+		{
 			"checksumSHA1": "JbuYtbJkx3r1BLuCMymkri0Q1BI=",
 			"path": "github.com/hashicorp/go-oracle-terraform/opc",
 			"revision": "ed479c158bbbd73132faf7126cb0e1baaac59b99",

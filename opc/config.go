@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/go-cleanhttp"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/go-oracle-terraform/database"
+	"github.com/hashicorp/go-oracle-terraform/java"
 	"github.com/hashicorp/go-oracle-terraform/opc"
 	"github.com/hashicorp/go-oracle-terraform/storage"
 	"github.com/hashicorp/terraform/helper/logging"
@@ -24,12 +25,14 @@ type Config struct {
 	Insecure         bool
 	StorageEndpoint  string
 	DatabaseEndpoint string
+	JavaEndpoint     string
 }
 
 type OPCClient struct {
 	computeClient  *compute.ComputeClient
 	storageClient  *storage.StorageClient
 	databaseClient *database.DatabaseClient
+	javaClient     *java.JavaClient
 }
 
 func (c *Config) Client() (*OPCClient, error) {
@@ -96,6 +99,19 @@ func (c *Config) Client() (*OPCClient, error) {
 			return nil, err
 		}
 		opcClient.databaseClient = databaseClient
+	}
+
+	if c.JavaEndpoint != "" {
+		javaEndpoint, err := url.ParseRequestURI(c.JavaEndpoint)
+		if err != nil {
+			return nil, fmt.Errorf("Invalid java endpoint URI: %+v", err)
+		}
+		config.APIEndpoint = javaEndpoint
+		javaClient, err := java.NewJavaClient(&config)
+		if err != nil {
+			return nil, err
+		}
+		opcClient.javaClient = javaClient
 	}
 
 	return opcClient, nil

@@ -62,6 +62,12 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("OPC_DATABASE_ENDPOINT", nil),
 				Description: "The HTTP endpoint for Oracle Database operations.",
 			},
+			"java_endpoint": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("OPC_JAVA_ENDPOINT", nil),
+				Description: "The HTTP endpoint for Oracle Java operations.",
+			},
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
@@ -98,6 +104,7 @@ func Provider() terraform.ResourceProvider {
 			"opc_compute_snapshot":                resourceOPCSnapshot(),
 			"opc_storage_container":               resourceOPCStorageContainer(),
 			"opc_database_service_instance":       resourceOPCDatabaseServiceInstance(),
+			"opc_java_service_instance":           resourceOPCJavaServiceInstance(),
 		},
 
 		ConfigureFunc: providerConfigure,
@@ -114,6 +121,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		Insecure:         d.Get("insecure").(bool),
 		StorageEndpoint:  d.Get("storage_endpoint").(string),
 		DatabaseEndpoint: d.Get("database_endpoint").(string),
+		JavaEndpoint:     d.Get("java_endpoint").(string),
 	}
 
 	return config.Client()
