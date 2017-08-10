@@ -20,6 +20,8 @@ type Container struct {
 	SecondaryKey string
 	// List of origins to be allowed to make cross-origin Requests.
 	AllowedOrigins []string
+	// List of headers exposed to the user agent (e.g. browser) in the actual request response.
+	ExposedHeaders []string
 	// Maximum age in seconds for the origin to hold the preflight results.
 	MaxAge int
 }
@@ -47,6 +49,9 @@ type CreateContainerInput struct {
 	// Sets the list of origins allowed to make cross-origin requests.
 	// Optional
 	AllowedOrigins []string
+	// List of headers exposed to the user agent (e.g. browser) in the actual request response.
+	// Optional
+	ExposedHeaders []string
 	// Sets the maximum age in seconds for the origin to hold the preflight results.
 	// Optional
 	MaxAge int
@@ -68,7 +73,8 @@ func (c *StorageClient) CreateContainer(input *CreateContainerInput) (*Container
 
 	headers["X-Container-Meta-Temp-URL-Key"] = input.PrimaryKey
 	headers["X-Container-Meta-Temp-URL-Key-2"] = input.SecondaryKey
-	headers["X-Container-Meta-Access-Control-Expose-Headers"] = strings.Join(input.AllowedOrigins, " ")
+	headers["X-Container-Meta-Access-Control-Allow-Origin"] = strings.Join(input.AllowedOrigins, " ")
+	headers["X-Container-Meta-Access-Control-Expose-Headers"] = strings.Join(input.ExposedHeaders, " ")
 	headers["X-Container-Meta-Access-Control-Max-Age"] = strconv.Itoa(input.MaxAge)
 
 	if err := c.createResource(input.Name, headers); err != nil {
@@ -136,6 +142,9 @@ type UpdateContainerInput struct {
 	// Updates the list of origins allowed to make cross-origin requests.
 	// Optional
 	AllowedOrigins []string
+	// List of headers exposed to the user agent (e.g. browser) in the actual request response.
+	// Optional
+	ExposedHeaders []string
 	// Updates the maximum age in seconds for the origin to hold the preflight results.
 	// Optional
 	MaxAge int
@@ -155,7 +164,8 @@ func (c *StorageClient) UpdateContainer(input *UpdateContainerInput) (*Container
 
 	headers["X-Container-Meta-Temp-URL-Key"] = input.PrimaryKey
 	headers["X-Container-Meta-Temp-URL-Key-2"] = input.SecondaryKey
-	headers["X-Container-Meta-Access-Control-Expose-Headers"] = strings.Join(input.AllowedOrigins, " ")
+	headers["X-Container-Meta-Access-Control-Allow-Origin"] = strings.Join(input.AllowedOrigins, " ")
+	headers["X-Container-Meta-Access-Control-Expose-Headers"] = strings.Join(input.ExposedHeaders, " ")
 	headers["X-Container-Meta-Access-Control-Max-Age"] = strconv.Itoa(input.MaxAge)
 
 	input.Name = c.getQualifiedName(input.Name)
@@ -175,7 +185,8 @@ func (c *StorageClient) success(rsp *http.Response, container *Container) (*Cont
 	container.WriteACLs = strings.Split(rsp.Header.Get("X-Container-Write"), ",")
 	container.PrimaryKey = rsp.Header.Get("X-Container-Meta-Temp-URL-Key")
 	container.SecondaryKey = rsp.Header.Get("X-Container-Meta-Temp-URL-Key-2")
-	container.AllowedOrigins = strings.Split(rsp.Header.Get("X-Container-Meta-Access-Control-Expose-Headers"), " ")
+	container.AllowedOrigins = strings.Split(rsp.Header.Get("X-Container-Meta-Access-Control-Allow-Origin"), " ")
+	container.ExposedHeaders = strings.Split(rsp.Header.Get("X-Container-Meta-Access-Control-Expose-Headers"), " ")
 	container.MaxAge, err = strconv.Atoi(rsp.Header.Get("X-Container-Meta-Access-Control-Max-Age"))
 	if err != nil {
 		return nil, err
