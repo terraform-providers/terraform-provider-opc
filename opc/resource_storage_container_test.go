@@ -51,6 +51,8 @@ func TestAccOPCStorageContainer_Updated(t *testing.T) {
 					resource.TestCheckResourceAttr(containerResourceName, "primary_key", "test-key"),
 					resource.TestCheckResourceAttr(containerResourceName, "allowed_origins.#", "1"),
 					resource.TestCheckResourceAttr(containerResourceName, "allowed_origins.0", "origin-1"),
+					resource.TestCheckResourceAttr(containerResourceName, "exposed_headers.#", "1"),
+					resource.TestCheckResourceAttr(containerResourceName, "exposed_headers.0", "exposed-header-1"),
 				),
 			},
 			{
@@ -62,6 +64,8 @@ func TestAccOPCStorageContainer_Updated(t *testing.T) {
 					resource.TestCheckResourceAttr(containerResourceName, "secondary_key", "test-key"),
 					resource.TestCheckResourceAttr(containerResourceName, "allowed_origins.#", "2"),
 					resource.TestCheckResourceAttr(containerResourceName, "allowed_origins.1", "origin-2"),
+					resource.TestCheckResourceAttr(containerResourceName, "exposed_headers.#", "2"),
+					resource.TestCheckResourceAttr(containerResourceName, "exposed_headers.1", "exposed-header-2"),
 				),
 			},
 		},
@@ -112,6 +116,7 @@ resource "opc_storage_container" "test" {
   max_age = 50
   primary_key = "test-key"
   allowed_origins = ["origin-1"]
+	exposed_headers = ["exposed-header-1"]
 }
 `
 
@@ -122,5 +127,6 @@ resource "opc_storage_container" "test" {
   primary_key = "test-key-updated"
   secondary_key = "test-key"
   allowed_origins = ["origin-1", "origin-2"]
+	exposed_headers = ["exposed-header-1", "exposed-header-2"]
 }
 `
