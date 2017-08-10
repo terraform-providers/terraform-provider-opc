@@ -8,6 +8,8 @@ import (
 )
 
 func TestAccOPCDatabaseServiceInstance_importBasic(t *testing.T) {
+	t.Skip("Skipping test until we release this resource")
+
 	resourceName := "opc_database_service_instance.test"
 
 	ri := acctest.RandInt()
