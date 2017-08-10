@@ -99,7 +99,7 @@ func resourceOPCJavaServiceInstance() *schema.Resource {
 					string(java.ServiceInstanceTypeOTD),
 				}, false),
 			},
-			"dba": {
+			"database": {
 				Type:     schema.TypeSet,
 				Required: true,
 				ForceNew: true,
@@ -120,6 +120,11 @@ func resourceOPCJavaServiceInstance() *schema.Resource {
 						"name": {
 							Type:     schema.TypeString,
 							Required: true,
+							ForceNew: true,
+						},
+						"network": {
+							Type: schema.TypeString,
+							Optional: true,
 							ForceNew: true,
 						},
 					},
@@ -153,6 +158,11 @@ func resourceOPCJavaServiceInstance() *schema.Resource {
 							ForceNew:  true,
 							Sensitive: true,
 						},
+						"port": {
+							Type: schema.TypeInt,
+							Optional: true,
+							ForceNew: true,
+						},
 					},
 				},
 			},
@@ -172,6 +182,135 @@ func resourceOPCJavaServiceInstance() *schema.Resource {
 				string(java.ServiceInstanceBackupDestinationNone),
 			}, false),
 		},
+		"description": {
+			Type: schema.TypeString,
+			Optional: true,
+			ForceNew: true,
+		},
+		"enable_admin_console": {
+			Type: schema.TypeBool,
+			Optional: true,
+			ForceNew: true,
+			Default: false,
+		},
+		"ip_network": {
+			Type: schema.TypeString,
+			Optional: true,
+			ForceNew: true,
+		},
+		"provision_otd": {
+			Type: schema.TypeBool,
+			Optional: true,
+			ForceNew: true,
+		},
+		"public_network": {
+			Type: schema.TypeString,
+			Optional: true,
+			ForceNew: true,
+		},
+		"region": {
+			Type: schema.TypeString,
+			Optional: true,
+			ForceNew: true,
+		},
+		"sample_app_deployment_requested": {
+			Type: schema.TypeBool,
+			Optional: true,
+			ForceNew: true,
+			Default: false,
+		},
+		"app_db": {
+			Type:     schema.TypeSet,
+			Optional: true,
+			ForceNew: true,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"username": {
+						Type: schema.TypeString,
+						Required: true,
+						ForceNew: true,
+					},
+					"password": {
+						Type: schema.TypeString,
+						Required: true,
+						ForceNew: true,
+					},
+					"name": {
+						Type: schema.TypeString,
+						Required: true,
+						ForceNew: true,
+					},
+					"pdb_name": {
+						Type: schema.TypeString,
+						Optional: true,
+						ForceNew: true,
+					},
+				},
+			},
+			"backup_volume_size": {
+				Type: schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+			},
+			"cluster_name": {
+				Type: schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+			},
+			"connect_string": {
+				Type: schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+			},
+			"content_port": {
+				Type: schema.TypeInt,
+				Optional: true,
+				ForceNew: true,
+				Default: 8001,
+			},
+			"deployment_channel_port": {
+				Type: schema.TypeInt,
+				Optional: true,
+				ForceNew: true,
+			},
+			"domain": {
+				Type:     schema.TypeSet,
+				Optional: true,
+				ForceNew: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"mode": {
+							Type: schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+							Default: "PRODUCTION"
+							ValidateFunc: validation.StringInSlice([]string{
+								string(java.ServiceInstanceDomainModeDev),
+								string(java.ServiceInstanceDomainModePro),
+							}, false),
+						},
+						"name": {
+							Type: schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+							Computed: true,
+						},
+						"partition_count": {
+							Type: schema.TypeInt,
+							Optional: true,
+							ForceNew: true,
+							ValidateFunc: validation.InBetween(0, 4)
+						},
+						"volume_size": {
+							Type: schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+						},
+					},
+				},
+			},
+		},
 	}
 }
 
@@ -188,7 +327,25 @@ func resourceOPCJavaServiceInstanceCreate(d *schema.ResourceData, meta interface
 		ServiceName:      d.Get("name").(string),
 		Level:            java.ServiceInstanceLevel(d.Get("level").(string)),
 		SubscriptionType: java.ServiceInstanceSubscriptionType(d.Get("subscription_type").(string)),
-		BackupDestination: java.ServiceInstanceBackupDestination(d.Get("backup_destination").(string))
+		BackupDestination: java.ServiceInstanceBackupDestination(d.Get("backup_destination").(string)),
+		EnableAdminConsole: d.Get("enable_admin_console").(bool),
+		SampleAppDeploymentRequested: d.Get("sample_app_deployment_requested").(bool),
+	}
+
+	if val, ok := d.GetOk("description"); ok {
+		input.Description = val.(string)
+	}
+	if val, ok := d.GetOk("ip_network"); ok {
+		input.IPNetwork = val.(string)
+	}
+	if val, ok := d.GetOk("provision_otd"); ok {
+		input.ProvisionOTD = val.(bool)
+	}
+	if val, ok := d.GetOk("public_network"); ok {
+		input.PublicNetwork = val.(string)
+	}
+	if val, ok := d.GetOk("region"); ok {
+		input.Region = val.(string)
 	}
 	expandJavaCloudStorage(d, &input)
 
@@ -261,19 +418,36 @@ func resourceOPCJavaServiceInstanceDelete(d *schema.ResourceData, meta interface
 }
 
 func expandJavaParameter(client *java.ServiceInstanceClient, d *schema.ResourceData) []java.Parameter {
-
 	parameter := java.Parameter{
 		Type:    java.ServiceInstanceType(d.Get("type").(string)),
 		Shape:   java.ServiceInstanceShape(d.Get("shape").(string)),
 		Version: java.ServiceInstanceVersion(d.Get("version").(string)),
+		ContentPort: d.Get("content_port").(int)
 	}
 
 	if val, ok := d.GetOk("public_key"); ok {
 		parameter.VMsPublicKey = val.(string)
 	}
+	if val, ok := d.GetOk("backup_volume_size"); ok {
+		parameter.BackupVolumeSize = val.(string)
+	}
+	if val, ok := d.GetOk("cluster_name"); ok {
+		parameter.ClusterName = val.(string)
+	}
+	if val, ok := d.GetOk("connect_string"); ok {
+		parameter.ConnectString = val.(string)
+	}
+	if val, ok := d.GetOk("deployment_channel_port"); ok {
+		parameter.DeploymentChannelPort = val.(int)
+	}
+	if val, ok := d.GetOk("edition"); ok {
+		parameter.Edition = val.(string)
+	}
 
-	expandDBA(d, &parameter)
+	expandDB(d, &parameter)
 	expandAdmin(d, &parameter)
+	expandAppDBs(d, &parameter)
+	expandDomain(d, &parameter)
 	return []java.Parameter{parameter}
 }
 
@@ -292,13 +466,16 @@ func expandJavaCloudStorage(d *schema.ResourceData, input *java.CreateServiceIns
 	}
 }
 
-func expandDBA(d *schema.ResourceData, parameter *java.Parameter) {
-	dbaInfo := d.Get("dba").(*schema.Set)
+func expandDB(d *schema.ResourceData, parameter *java.Parameter) {
+	dbaInfo := d.Get("db").(*schema.Set)
 	for _, i := range dbaInfo.List() {
 		attrs := i.(map[string]interface{})
 		parameter.DBServiceName = attrs["name"].(string)
 		parameter.DBAName = attrs["username"].(string)
 		parameter.DBAPassword = attrs["password"].(string)
+		if val, ok := attrs["network"].(string); ok && val != "" {
+			parameter.DBNetwork = val
+		}
 	}
 }
 
@@ -308,5 +485,40 @@ func expandAdmin(d *schema.ResourceData, parameter *java.Parameter) {
 		attrs := i.(map[string]interface{})
 		parameter.AdminUsername = attrs["username"].(string)
 		parameter.AdminPassword = attrs["password"].(string)
+		if val, ok := attrs["port"].(int); ok && val != 0 {
+			parameter.AdminPort = val
+		}
+	}
+}
+
+func expandAppDBs(d *schema.ResourceData, parameter *java.Parameter) {
+	appDBInfo := d.Get("app_db").(*schema.Set)
+	appDBs := make([]java.AppDB, len(appDBInfo))
+	for i, val := range appDBInfo.List() {
+		attrs := val.(map[string]interface{})
+		appDB := java.AppDB {
+			DBAName: attrs["username"].(string)
+			DBAPassword: attrs["password"].(string)
+			DBAServiceName: attrs["name"].(string)
+		}
+		appDBs[i] = appDB
+	}
+}
+
+func expandDomain(d *schema.ResourceData, parameter *java.Parameter) {
+	domainInfo := d.Get("domain").(*schema.Set)
+	for _, i := range domainInfo.List() {
+		attrs := i.(map[string]interface{})
+
+		parameter.DomainMode = java.ServiceInstanceDomainMode(attrs["mode"].(string))
+		if val, ok := attrs["name"].(string); ok && val != "" {
+			parameter.DomainName = val
+		}
+		if val, ok := attrs["partition_count"].(int); ok && val != "" {
+			parameter.DomainPartitionCount = val
+		}
+		if val, ok := attrs["volume_size"].(string); ok && val != "" {
+			parameter.DomainVolumeSize = val
+		}
 	}
 }
