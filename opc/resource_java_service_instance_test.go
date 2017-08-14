@@ -13,7 +13,7 @@ import (
 func TestAccOPCJavaServiceInstance_Basic(t *testing.T) {
 	ri := acctest.RandInt()
 	config := testAccJavaServiceInstanceBasic(ri)
-	// resourceName := "opc_java_service_instance.test"
+	resourceName := "opc_java_service_instance.test"
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -23,6 +23,10 @@ func TestAccOPCJavaServiceInstance_Basic(t *testing.T) {
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckJavaServiceInstanceExists,
+					resource.TestCheckResourceAttr(
+						resourceName, "shape", "oc1m"),
+					resource.TestCheckResourceAttr(
+						resourceName, "level", "PAAS"),
 				),
 			},
 		},
@@ -104,7 +108,7 @@ func testAccJavaServiceInstanceBasic(rInt int) string {
       container = "Storage-canonical/test-terraform-java-instance"
       create_if_missing = true
     }
-    dba {
+    database {
       name = "${opc_database_service_instance.test.name}"
       username = "sys"
       password = "Test_String7"
