@@ -17,7 +17,16 @@ func resourceOPCImageListEntry() *schema.Resource {
 		Read:   resourceOPCImageListEntryRead,
 		Delete: resourceOPCImageListEntryDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			State: func(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+				// Split occurs during the Read function, this purely verifies ID was supplied correctly
+				// during an Import
+				combined := strings.Split(d.Id(), "|")
+				if len(combined) != 2 {
+					return nil, fmt.Errorf(
+						"Invalid ID specified. Must be in the form of `image_list`|`version`. Got: %s", d.Id())
+				}
+				return []*schema.ResourceData{d}, nil
+			},
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -88,6 +97,7 @@ func resourceOPCImageListEntryCreate(d *schema.ResourceData, meta interface{}) e
 func resourceOPCImageListEntryRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*OPCClient).computeClient.ImageListEntries()
 
+	// Only parse image list entry ID if delimiter exists
 	name, version, err := parseOPCImageListEntryID(d.Id())
 	if err != nil {
 		return err
@@ -144,6 +154,10 @@ func resourceOPCImageListEntryDelete(d *schema.ResourceData, meta interface{}) e
 
 func parseOPCImageListEntryID(id string) (*string, *int, error) {
 	s := strings.Split(id, "|")
+	if len(s) != 2 {
+		return nil, nil, fmt.Errorf(
+			"Error parsing supplied ImageListEntryID. Please make sure to supply the ID as <name>|<version>")
+	}
 	name, versionString := s[0], s[1]
 	version, err := strconv.Atoi(versionString)
 	if err != nil {

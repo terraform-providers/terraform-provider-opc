@@ -51,8 +51,9 @@ In addition to the above arguments, the following attributes are exported
 
 ## Import
 
-Image List's can be imported using the `resource name`, e.g.
+Image List's can be imported using the Name of the Image List, along with the Version of the Image List Entry,
+delimited via the `|` character, e.g.
 
 ```shell
-$ terraform import opc_compute_image_list_entry.entry1 example
+$ terraform import opc_compute_image_list_entry.entry1 my_image_list|2
 ```
