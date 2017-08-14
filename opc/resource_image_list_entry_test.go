@@ -12,7 +12,6 @@ import (
 
 func TestAccOPCImageListEntry_Basic(t *testing.T) {
 	ri := acctest.RandInt()
-	config := fmt.Sprintf(testAccImageListEntry_basic, ri)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -20,7 +19,7 @@ func TestAccOPCImageListEntry_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckImageListEntryDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: config,
+				Config: testAccImageListEntry_basic(ri),
 				Check:  testAccCheckImageListEntryExists,
 			},
 		},
@@ -112,7 +111,9 @@ func testAccCheckImageListEntryDestroy(s *terraform.State) error {
 	return nil
 }
 
-var testAccImageListEntry_basic = `
+func testAccImageListEntry_basic(rInt int) string {
+
+	return fmt.Sprintf(`
 resource "opc_compute_image_list" "test" {
   name        = "test-acc-image-list-entry-basic-%d"
   description = "Acceptance Test TestAccOPCImageListEntry_Basic"
@@ -123,8 +124,8 @@ resource "opc_compute_image_list_entry" "test" {
   name           = "${opc_compute_image_list.test.name}"
   machine_images = [ "/oracle/public/oel_6.7_apaas_16.4.5_1610211300" ]
   version        = 1
+}`, rInt)
 }
-`
 
 var testAccImageListEntry_Complete = `
 resource "opc_compute_image_list" "test" {
