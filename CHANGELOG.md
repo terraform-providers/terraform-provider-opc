@@ -8,8 +8,8 @@ FEATURES:
 BUG FIXES: 
 
 * r/vnic_set: Make `virtual_nics` Computed [#52](https://github.com/terraform-providers/terraform-provider-opc/issues/52)
-
 * r/storage_container: Fixed `allowed_origins` [GH-62]
+* r/opc_compute_image_list_entry: Fix resource imports [GH-66]
 
 NOTES: 
 
