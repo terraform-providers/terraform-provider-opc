@@ -70,6 +70,7 @@ func resourceOPCStorageVolume() *schema.Resource {
 			"snapshot_account": {
 				Type:     schema.TypeString,
 				Optional: true,
+				Computed: true,
 				ForceNew: true,
 			},
 

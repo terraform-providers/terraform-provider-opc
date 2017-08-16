@@ -69,7 +69,7 @@ type StorageVolumeInfo struct {
 	Name string `json:"name"`
 
 	// The OS platform this volume is compatible with.
-	Platform string `json:"platform,omitempty`
+	Platform string `json:"platform,omitempty"`
 
 	// The storage-pool property: /oracle/public/storage/latency or /oracle/public/storage/default.
 	Properties []string `json:"properties,omitempty"`
@@ -174,7 +174,19 @@ func (c *StorageVolumeClient) CreateStorageVolume(input *CreateStorageVolumeInpu
 		input.Timeout = WaitForVolumeReadyTimeout
 	}
 
-	return c.waitForStorageVolumeToBecomeAvailable(input.Name, input.Timeout)
+	volume, err := c.waitForStorageVolumeToBecomeAvailable(input.Name, input.Timeout)
+	if err != nil {
+		if volume != nil {
+			deleteInput := &DeleteStorageVolumeInput{
+				Name: volume.Name,
+			}
+
+			if err := c.DeleteStorageVolume(deleteInput); err != nil {
+				return nil, err
+			}
+		}
+	}
+	return volume, err
 }
 
 // DeleteStorageVolumeInput represents the body of an API request to delete a Storage Volume.
@@ -320,6 +332,9 @@ func (c *StorageVolumeClient) waitForStorageVolumeToBecomeAvailable(name string,
 				waitResult = result
 				if strings.ToLower(waitResult.Status) == "online" {
 					return true, nil
+				}
+				if strings.ToLower(waitResult.Status) == "error" {
+					return false, fmt.Errorf("Error Creating Storage Volume: %s", waitResult.StatusDetail)
 				}
 			}
 
