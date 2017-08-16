@@ -2,7 +2,6 @@
 
 FEATURES: 
 
-* **New Resource:** `opc_database_service_instance` [#48](https://github.com/terraform-providers/terraform-provider-opc/issues/48)
 * **New Resource:** `opc_storage_object` [GH-55]
 
 BUG FIXES: 
