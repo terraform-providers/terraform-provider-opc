@@ -22,6 +22,7 @@ func resourceOPCIPNetwork() *schema.Resource {
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 
 			"ip_address_prefix": {
