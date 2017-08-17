@@ -27,7 +27,7 @@ resource "opc_compute_ip_network" "foo" {
 
 The following arguments are supported:
 
-* `name` - (Required) The name of the IP Network.
+* `name` - (Required) The name of the IP Network. Changing this name forces a new resource to be created.
 
 * `ip_address_prefix` - (Required) The IPv4 address prefix, in CIDR format.
 
