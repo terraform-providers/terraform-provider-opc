@@ -6,6 +6,7 @@ FEATURES:
 
 BUG FIXES: 
 
+* r/ip_network: Allow changing the name of an IP Network [GH-73]
 * r/opc_compute_image_list_entry: Fix resource imports [GH-66]
 * r/storage_container: Fixed `allowed_origins` [GH-62]
 * r/storage_volume: Allow errors to surface from Create [GH-69]
