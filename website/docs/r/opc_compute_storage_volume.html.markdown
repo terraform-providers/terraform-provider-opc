@@ -80,9 +80,9 @@ $ terraform import opc_compute_storage_volume.volume1 example
 
 ## Snapshots
 
-Restoring a storage volume from a snapshot can happen via the use of the `snapshot`, `snapshot_id`, and `snapshot_account` arguments.
+Restoring a storage volume from a snapshot can happen via the use of the `snapshot`, `snapshot_id`, and `snapshot_account` attributes.
 
-Note: There isn't a mechanism to restore a snapshot from a different domain, the `snapshot_account` argument needs to reference the same domain.
+**Note**: There isn't a mechanism to restore a snapshot from a different domain, the `snapshot_account` argument needs to reference the same domain.
 
 There are two different ways to identify the snapshot in which to restore the storage volume:
 
