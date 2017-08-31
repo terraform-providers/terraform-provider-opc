@@ -69,13 +69,13 @@ The following arguments are supported:
 
 * `label` - (Optional) The label to apply to the instance.
 
-* `networking_info` - (Optional) Information pertaining to an individual network interface to be created and attached to the instance. See [Networking Info](#networking-info) below for more information.
+* `networking_info` - (Optional) Information pertaining to an individual network interface to be created and attached to the instance. If left unspecified, the instance will be created within the `shared_network`. See [Networking Info](#networking-info) below for more information.
 
 * `storage` - (Optional) Information pertaining to an individual storage attachment to be created during instance creation. Please see [Storage Attachments](#storage-attachments) below for more information.
 
 * `reverse_dns` - (Optional) If set to `true` (default), then reverse DNS records are created. If set to `false`, no reverse DNS records are created.
 
-* `ssh_keys` - (Optional) A list of the names of the SSH Keys that can be used to log into the instance.  
+* `ssh_keys` - (Optional) A list of the names of the SSH Keys that can be used to log into the instance.
 
 * `tags` - (Optional) A list of strings that should be supplied to the instance as tags.
 
@@ -122,6 +122,8 @@ Each `networking_info` config manages a single network interface for the instanc
 The attributes are either required or optional depending on whether or not the interface is
 in the Shared Network, or an IP Network. Some attributes can only be used if the interface is in the Shared
  Network, and same for an interface in an IP Network.
+
+ **Note:** If `networking_info` is left unspecified, the instance will be booted in the `shared_network`.
 
 The following attributes are supported:
 
