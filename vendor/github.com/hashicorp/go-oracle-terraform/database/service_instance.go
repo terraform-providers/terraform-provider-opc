@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"log"
+
 	"github.com/hashicorp/go-oracle-terraform/client"
 )
 
@@ -572,16 +574,16 @@ func (c *ServiceInstanceClient) GetServiceInstance(getInput *GetServiceInstanceI
 type DeleteServiceInstanceInput struct {
 	// Name of the Database Cloud Service instance.
 	// Required.
-	Name string `json:"-"`
+	Name string
 	// Flag that when set to true deletes all backups of the service instance from Oracle Cloud Storage container.
 	// Use caution in specifying this option. If this option is specified, instance can not be recovered as all backups
 	// will be deleted. This option is not currently supported for Cluster Databases.
 	// Default value is false.
 	// Optional
-	DeleteBackup bool `json:"deleteBackup"`
+	DeleteBackup bool
 }
 
-func (c *ServiceInstanceClient) DeleteServiceInstance(deleteInput *DeleteServiceInstanceInput) error {
+func (c *ServiceInstanceClient) DeleteServiceInstance(input *DeleteServiceInstanceInput) error {
 	if c.Timeout == 0 {
 		c.Timeout = WaitForServiceInstanceDeleteTimeout
 	}
@@ -590,7 +592,8 @@ func (c *ServiceInstanceClient) DeleteServiceInstance(deleteInput *DeleteService
 	// An instance takes additional time to setup after it's configured.
 	var deleteErr error
 	for i := 0; i < ServiceInstanceDeleteRetry; i++ {
-		if deleteErr = c.deleteResource(deleteInput.Name, deleteInput); deleteErr != nil {
+		if deleteErr = c.deleteResource(input.Name, input.DeleteBackup); deleteErr != nil {
+			log.Printf("Error during delete, waiting 30s: %+v", deleteErr)
 			time.Sleep(30 * time.Second)
 			continue
 		}
@@ -602,7 +605,7 @@ func (c *ServiceInstanceClient) DeleteServiceInstance(deleteInput *DeleteService
 
 	// Call wait for instance deleted now, as deleting the instance is an eventually consistent operation
 	getInput := &GetServiceInstanceInput{
-		Name: deleteInput.Name,
+		Name: input.Name,
 	}
 
 	// Wait for instance to be deleted
