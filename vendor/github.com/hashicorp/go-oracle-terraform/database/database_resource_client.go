@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/hashicorp/go-oracle-terraform/opc"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -49,15 +50,31 @@ func (c *ResourceClient) getResource(name string, responseBody interface{}) erro
 	return c.unmarshalResponseBody(resp, responseBody)
 }
 
-func (c *ResourceClient) deleteResource(name string, body interface{}) error {
+// This is only used for deleting service instances. DELETE requests have a `nil` body.
+func (c *ResourceClient) deleteResource(name string, backups bool) error {
 	var objectPath string
 	if name != "" {
 		objectPath = c.getObjectPath(c.ResourceRootPath, name)
 	} else {
 		objectPath = c.ResourceRootPath
 	}
-	_, err := c.executeRequest("DELETE", objectPath, body)
+
+	// Set deleteBackup
+	if backups {
+		objectPath = fmt.Sprintf("%s?deleteBackup=true", objectPath)
+	}
+
+	_, err := c.executeRequest("DELETE", objectPath, nil)
 	if err != nil {
+		if v, ok := err.(*opc.OracleError); ok {
+			if v.StatusCode == 404 {
+				// Object can't be found, doesn't exist, no error
+				return nil
+			}
+			return fmt.Errorf("Error on delete (%d): %s", v.StatusCode, v.Message)
+		}
+
+		// Otherwise, something went wrong.
 		return err
 	}
 

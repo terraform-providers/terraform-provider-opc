@@ -38,7 +38,12 @@ func NewComputeClient(c *opc.Config) (*ComputeClient, error) {
 }
 
 func (c *ComputeClient) executeRequest(method, path string, body interface{}) (*http.Response, error) {
-	req, err := c.client.BuildRequest(method, path, body)
+	reqBody, err := c.client.MarshallRequestBody(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := c.client.BuildRequestBody(method, path, reqBody)
 	if err != nil {
 		return nil, err
 	}
@@ -46,9 +51,9 @@ func (c *ComputeClient) executeRequest(method, path string, body interface{}) (*
 	debugReqString := fmt.Sprintf("HTTP %s Req (%s)", method, path)
 	if body != nil {
 		req.Header.Set("Content-Type", "application/oracle-compute-v3+json")
-		// Don't leak creds in STDERR
+		// Don't leak credentials in STDERR
 		if path != "/authenticate/" {
-			debugReqString = fmt.Sprintf("%s:\n %+v", debugReqString, body)
+			debugReqString = fmt.Sprintf("%s:\n %+v", debugReqString, string(reqBody))
 		}
 	}
 	// Log the request before the authentication cookie, so as not to leak credentials

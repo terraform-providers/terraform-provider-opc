@@ -136,6 +136,27 @@ func TestAccOPCStorageVolume_BootableEndToEnd(t *testing.T) {
 	})
 }
 
+func TestAccOPCStorageVolume_FromBootableSnapshot(t *testing.T) {
+	volumeResourceName := "opc_compute_storage_volume.test"
+	ri := acctest.RandInt()
+	config := testAccStorageVolumeFromBootableSnapshot(ri)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: opcResourceCheck(volumeResourceName, testAccCheckStorageVolumeDestroyed),
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					opcResourceCheck(volumeResourceName, testAccCheckStorageVolumeExists),
+					resource.TestCheckResourceAttr(volumeResourceName, "size", "300"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccOPCStorageVolume_ImageListEntry(t *testing.T) {
 	volumeResourceName := "opc_compute_storage_volume.test"
 	ri := acctest.RandInt()
@@ -429,4 +450,41 @@ func testAccStorageVolumeLowLatency(rInt int) string {
     storage_type = "/oracle/public/storage/latency"
     size         = 5
   }`, rInt)
+}
+
+func testAccStorageVolumeFromBootableSnapshot(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_image_list" "test" {
+  name        = "test-acc-image-list-%d"
+  default     = 21
+  description = "description"
+}
+
+resource "opc_compute_image_list_entry" "test" {
+  name           = "${opc_compute_image_list.test.name}"
+  machine_images = [ "/oracle/public/oel_6.7_apaas_16.4.5_1610211300" ]
+  version        = 1
+}
+resource "opc_compute_storage_volume" "foo" {
+  name = "test-acc-stor-vol-%d"
+  description = "testAccStorageVolumeSnapshot_basic"
+  size = 300
+	bootable = true
+  image_list = "${opc_compute_image_list.test.name}"
+  image_list_entry = "${opc_compute_image_list_entry.test.version}"
+}
+
+resource "opc_compute_storage_volume_snapshot" "test" {
+  name = "test-acc-stor-vol-snapshot-%d"
+  description = "storage volume snapshot"
+  volume_name = "${opc_compute_storage_volume.foo.name}"
+	parent_volume_bootable = true
+}
+
+resource "opc_compute_storage_volume" "test" {
+  name = "test-acc-stor-vol-from-snapshot-%d"
+  snapshot_id = "${opc_compute_storage_volume_snapshot.test.snapshot_id}"
+  size = 300
+}
+`, rInt, rInt, rInt, rInt)
 }
