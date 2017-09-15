@@ -1,18 +1,18 @@
-## 0.1.3 (Unreleased)
+## 0.1.3 (September 15, 2017)
 
 FEATURES: 
 
-* **New Resource:** `opc_storage_object` [GH-55]
+* **New Resource:** `opc_storage_object` ([#55](https://github.com/terraform-providers/terraform-provider-opc/issues/55))
 
 BUG FIXES: 
 
-* r/ip_network: Allow changing the name of an IP Network [GH-73]
-* r/opc_compute_image_list_entry: Fix resource imports [GH-66]
-* r/storage_container: Fixed `allowed_origins` [GH-62]
-* r/storage_volume: Allow errors to surface from Create [GH-69]
+* r/ip_network: Allow changing the name of an IP Network ([#73](https://github.com/terraform-providers/terraform-provider-opc/issues/73))
+* r/opc_compute_image_list_entry: Fix resource imports ([#66](https://github.com/terraform-providers/terraform-provider-opc/issues/66))
+* r/storage_container: Fixed `allowed_origins` ([#62](https://github.com/terraform-providers/terraform-provider-opc/issues/62))
+* r/storage_volume: Allow errors to surface from Create ([#69](https://github.com/terraform-providers/terraform-provider-opc/issues/69))
 * r/vnic_set: Make `virtual_nics` Computed [#52](https://github.com/terraform-providers/terraform-provider-opc/issues/52)
-* r/storage_volume_snapshot: Increase timeout for larger snapshots [GH-79]
-* r/storage_volume: Remove validation around storage_type [GH-80]
+* r/storage_volume_snapshot: Increase timeout for larger snapshots ([#79](https://github.com/terraform-providers/terraform-provider-opc/issues/79))
+* r/storage_volume: Remove validation around storage_type ([#80](https://github.com/terraform-providers/terraform-provider-opc/issues/80))
 
 NOTES: 
 
