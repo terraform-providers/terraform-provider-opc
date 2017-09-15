@@ -12,6 +12,7 @@ BUG FIXES:
 * r/storage_volume: Allow errors to surface from Create [GH-69]
 * r/vnic_set: Make `virtual_nics` Computed [#52](https://github.com/terraform-providers/terraform-provider-opc/issues/52)
 * r/storage_volume_snapshot: Increase timeout for larger snapshots [GH-79]
+* r/storage_volume: Remove validation around storage_type [GH-80]
 
 NOTES: 
 
