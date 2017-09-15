@@ -48,7 +48,7 @@ The following arguments are supported:
 * `name` (Required) The name for the Storage Account.
 * `description` (Optional) The description of the storage volume.
 * `size` (Required) The size of this storage volume in GB. The allowed range is from 1 GB to 2 TB (2048 GB).
-* `storage_type` - (Optional) - The Type of Storage to provision. Possible values are `/oracle/public/storage/latency` or `/oracle/public/storage/default`. Defaults to `/oracle/public/storage/default`.
+* `storage_type` - (Optional) - The Type of Storage to provision. Defaults to `/oracle/public/storage/default`.
 * `bootable` - (Optional) Is the Volume Bootable? Defaults to `false`.
 * `image_list` - (Optional) Defines an image list.
 * `image_list_entry` - (Optional) Defines an image list entry.

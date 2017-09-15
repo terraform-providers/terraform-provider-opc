@@ -47,10 +47,6 @@ func resourceOPCStorageVolume() *schema.Resource {
 				Optional: true,
 				ForceNew: true,
 				Default:  compute.StorageVolumeKindDefault,
-				ValidateFunc: validation.StringInSlice([]string{
-					string(compute.StorageVolumeKindDefault),
-					string(compute.StorageVolumeKindLatency),
-				}, true),
 			},
 
 			"snapshot": {
