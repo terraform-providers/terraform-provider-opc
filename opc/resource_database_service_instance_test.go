@@ -2,6 +2,7 @@ package opc
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/hashicorp/go-oracle-terraform/database"
@@ -11,7 +12,6 @@ import (
 )
 
 func TestAccOPCDatabaseServiceInstance_Basic(t *testing.T) {
-	t.Skip("Skipping test until we release this resource")
 	ri := acctest.RandInt()
 	config := testAccDatabaseServiceInstanceBasic(ri)
 	resourceName := "opc_database_service_instance.test"
@@ -39,7 +39,6 @@ func TestAccOPCDatabaseServiceInstance_Basic(t *testing.T) {
 }
 
 func TestAccOPCDatabaseServiceInstance_CloudStorage(t *testing.T) {
-	t.Skip("Skipping test until we release this resource")
 	ri := acctest.RandInt()
 	config := testAccDatabaseServiceInstanceCloudStorage(ri)
 	resourceName := "opc_database_service_instance.test"
@@ -53,7 +52,7 @@ func TestAccOPCDatabaseServiceInstance_CloudStorage(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDatabaseServiceInstanceExists,
 					resource.TestCheckResourceAttr(
-						resourceName, "cloud_storage_container", fmt.Sprintf("Storage-canonical/matthew-test-%d", ri)),
+						resourceName, "cloud_storage_container", fmt.Sprintf("Storage-%s/matthew-test-%d", os.Getenv("OPC_IDENTITY_DOMAIN"), ri)),
 				),
 			},
 		},
@@ -138,8 +137,8 @@ func testAccDatabaseServiceInstanceCloudStorage(rInt int) string {
       usable_storage = 15
     }
     cloud_storage {
-      container = "Storage-canonical/matthew-test-%d"
+      container = "Storage-%s/matthew-test-%d"
       create_if_missing = true
     }
-	}`, rInt, rInt)
+	}`, rInt, os.Getenv("OPC_IDENTITY_DOMAIN"), rInt)
 }

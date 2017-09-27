@@ -100,8 +100,7 @@ func Provider() terraform.ResourceProvider {
 			"opc_compute_snapshot":                resourceOPCSnapshot(),
 			"opc_storage_container":               resourceOPCStorageContainer(),
 			"opc_storage_object":                  resourceOPCStorageObject(),
-			// Unable to test
-			// "opc_database_service_instance":       resourceOPCDatabaseServiceInstance(),
+			"opc_database_service_instance":       resourceOPCDatabaseServiceInstance(),
 		},
 
 		ConfigureFunc: providerConfigure,
