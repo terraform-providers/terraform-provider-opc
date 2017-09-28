@@ -2,6 +2,7 @@ package opc
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/hashicorp/go-oracle-terraform/database"
@@ -51,7 +52,7 @@ func TestAccOPCDatabaseServiceInstance_CloudStorage(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDatabaseServiceInstanceExists,
 					resource.TestCheckResourceAttr(
-						resourceName, "cloud_storage_container", fmt.Sprintf("Storage-canonical/matthew-test-%d", ri)),
+						resourceName, "cloud_storage_container", fmt.Sprintf("Storage-%s/acctest-%d", os.Getenv("OPC_IDENTITY_DOMAIN"), ri)),
 				),
 			},
 		},
@@ -136,8 +137,8 @@ func testAccDatabaseServiceInstanceCloudStorage(rInt int) string {
       usable_storage = 15
     }
     cloud_storage {
-      container = "Storage-canonical/matthew-test-%d"
+      container = "Storage-%s/acctest-%d"
       create_if_missing = true
     }
-	}`, rInt, rInt)
+	}`, rInt, os.Getenv("OPC_IDENTITY_DOMAIN"), rInt)
 }

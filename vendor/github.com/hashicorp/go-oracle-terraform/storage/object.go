@@ -11,6 +11,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type ObjectClient struct {
@@ -47,10 +48,12 @@ const (
 	h_TransferEncoding   = "Transfer-Encoding"
 )
 
-// Object Info describes an existing object
+// ObjectInfo describes an existing object
 // Optional values may not be passed in as response headers
 // TODO: Add query parameters if needed
 type ObjectInfo struct {
+	// ID is the container name + "/" object name for convenience
+	ID string
 	// Name of the object
 	Name string
 	// Type of ranges the object accepts
@@ -88,7 +91,7 @@ type ObjectInfo struct {
 	TransactionID string
 }
 
-// Input struct for a Create Method to create a storage object
+// CreateObjectInput struct for a Create Method to create a storage object
 // TODO: Add query parameters if needed
 type CreateObjectInput struct {
 	// Name of the object.
@@ -174,17 +177,21 @@ func (c *ObjectClient) CreateObject(input *CreateObjectInput) (*ObjectInfo, erro
 	return c.GetObject(getInput)
 }
 
-// Get details on a storage object
+// GetObjectInput details on a storage object
 // TODO: Add query parameters if needed
 type GetObjectInput struct {
 	// TODO If-Match, If-Modified-Since, If-None-Match, If-Unmodified-Since
 	// If we actually want to support these
 
+	// ID of the object (container/object)
+	// Optional - Either ID or Name + Container are required
+	ID string
+
 	// Name of the object to get details on
-	// Required
+	// Optional - Either ID or Name + Container are required
 	Name string
 	// Name of the container
-	// Required
+	// Optional - Either ID or Name + Container are required
 	Container string
 	// Range of data to receive. Must be specified via a byte range:
 	// bytes=-5; bytes=10-15. Accept the entire string here, as multiple ranges
@@ -199,12 +206,15 @@ type GetObjectInput struct {
 	Newest bool
 }
 
-// Accepts a input struct, returns an info struct
+// GetObject accepts a input struct, returns an info struct
 func (c *ObjectClient) GetObject(input *GetObjectInput) (*ObjectInfo, error) {
 	var object ObjectInfo
 	headers := make(map[string]string)
 
-	name := c.getQualifiedName(fmt.Sprintf("%s/%s", input.Container, input.Name))
+	name, err := c.getIdentifier(input.ID, input.Container, input.Name)
+	if err != nil {
+		return nil, err
+	}
 
 	// Build request headers
 	headers[h_Range] = input.Range
@@ -215,26 +225,46 @@ func (c *ObjectClient) GetObject(input *GetObjectInput) (*ObjectInfo, error) {
 		return nil, err
 	}
 
-	// Set Name and container, not returned from API
-	object.Name = input.Name
-	object.Container = input.Container
+	// Set Name, container, and ID. Not returned from API
+	if input.ID != "" {
+		parts := strings.Split(input.ID, "/")
+		if len(parts) != 2 {
+			return nil, fmt.Errorf("Unknown ID specified: %s", input.ID)
+		}
+		object.ID = input.ID
+		object.Container = parts[0]
+		object.Name = parts[1]
+	} else {
+		// Already checked for Nil container and name above
+		object.ID = fmt.Sprintf("%s/%s", input.Container, input.Name)
+		object.Name = input.Name
+		object.Container = input.Container
+	}
 
 	return c.success(resp, &object)
 }
 
-// Input struct for deleting objects
+// DeleteObjectInput struct for deleting objects
 // TODO: Add query parameters if needed
 type DeleteObjectInput struct {
+	// ID is the container name + "/" + object name
+	// Optional - Either ID or Name + Container are required
+	ID string
 	// Name of the Object to delete
-	// Required
+	// Optional - Either ID or Name + Container are required
 	Name string
 	// Name of the container
-	// Required
+	// Optional - Either ID or Name + Container are required
 	Container string
 }
 
+// DeleteObject will delete the supplied object
 func (c *ObjectClient) DeleteObject(input *DeleteObjectInput) error {
-	name := fmt.Sprintf("%s/%s", input.Container, input.Name)
+	name, err := c.getIdentifier(input.ID, input.Container, input.Name)
+	if err != nil {
+		return err
+	}
+
 	return c.deleteResource(c.getQualifiedName(name))
 }
 
@@ -267,4 +297,18 @@ func (c *ObjectClient) success(resp *http.Response, object *ObjectInfo) (*Object
 	}
 
 	return object, nil
+}
+
+func (c *ObjectClient) getIdentifier(id, container, name string) (string, error) {
+	var result string
+	if id != "" {
+		result = id
+	} else {
+		if container == "" && name == "" {
+			return "", fmt.Errorf("Either ID or Name and Container must be set during DELETE")
+		}
+		result = fmt.Sprintf("%s/%s", container, name)
+	}
+
+	return c.getQualifiedName(result), nil
 }

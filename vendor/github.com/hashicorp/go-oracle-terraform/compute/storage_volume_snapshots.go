@@ -13,7 +13,7 @@ const (
 	StorageVolumeSnapshotContainerPath = "/storage/snapshot/"
 	StorageVolumeSnapshotResourcePath  = "/storage/snapshot"
 
-	WaitForSnapshotCreateTimeout = time.Duration(1200 * time.Second)
+	WaitForSnapshotCreateTimeout = time.Duration(2400 * time.Second)
 	WaitForSnapshotDeleteTimeout = time.Duration(1500 * time.Second)
 
 	// Collocated Snapshot Property

@@ -41,6 +41,12 @@ func resourceOPCStorageContainer() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			"exposed_headers": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
 			"primary_key": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -74,6 +80,9 @@ func resourceOPCStorageContainerCreate(d *schema.ResourceData, meta interface{})
 	}
 	if allowedOrigins := getStringList(d, "allowed_origins"); len(allowedOrigins) > 0 {
 		input.AllowedOrigins = allowedOrigins
+	}
+	if exposedHeaders := getStringList(d, "exposed_headers"); len(exposedHeaders) > 0 {
+		input.ExposedHeaders = exposedHeaders
 	}
 	if primaryKey, ok := d.GetOk("primary_key"); ok {
 		input.PrimaryKey = primaryKey.(string)
@@ -134,6 +143,9 @@ func resourceOPCStorageContainerRead(d *schema.ResourceData, meta interface{}) e
 	if err := setStringList(d, "allowed_origins", result.AllowedOrigins); err != nil {
 		return err
 	}
+	if err := setStringList(d, "exposed_headers", result.ExposedHeaders); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -172,6 +184,9 @@ func resourceOPCStorageContainerUpdate(d *schema.ResourceData, meta interface{})
 	}
 	if allowedOrigins := getStringList(d, "allowed_origins"); len(allowedOrigins) > 0 {
 		input.AllowedOrigins = allowedOrigins
+	}
+	if exposedHeaders := getStringList(d, "exposed_headers"); len(exposedHeaders) > 0 {
+		input.ExposedHeaders = exposedHeaders
 	}
 	if primaryKey, ok := d.GetOk("primary_key"); ok {
 		input.PrimaryKey = primaryKey.(string)

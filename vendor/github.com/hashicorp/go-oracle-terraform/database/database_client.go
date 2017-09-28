@@ -35,7 +35,12 @@ func NewDatabaseClient(c *opc.Config) (*DatabaseClient, error) {
 }
 
 func (c *DatabaseClient) executeRequest(method, path string, body interface{}) (*http.Response, error) {
-	req, err := c.client.BuildRequest(method, path, body)
+	reqBody, err := c.client.MarshallRequestBody(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := c.client.BuildRequestBody(method, path, reqBody)
 	if err != nil {
 		return nil, err
 	}
@@ -43,17 +48,18 @@ func (c *DatabaseClient) executeRequest(method, path string, body interface{}) (
 	debugReqString := fmt.Sprintf("HTTP %s Req (%s)", method, path)
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")
+		// Debug the body for database services
+		debugReqString = fmt.Sprintf("%s:\n %+v", debugReqString, string(reqBody))
 	}
 	// Log the request before the authentication header, so as not to leak credentials
 	c.client.DebugLogString(debugReqString)
 
-	// Set the authentiation headers
+	// Set the authentication headers
 	req.Header.Add(AUTH_HEADER, *c.authHeader)
 	req.Header.Add(TENANT_HEADER, *c.client.IdentityDomain)
-	c.client.DebugLogString(fmt.Sprintf("Req (%+v)", req))
 	resp, err := c.client.ExecuteRequest(req)
 	if err != nil {
-		return nil, err
+		return resp, err
 	}
 	return resp, nil
 }

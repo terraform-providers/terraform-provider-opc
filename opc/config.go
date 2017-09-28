@@ -126,5 +126,6 @@ func (l opcLogger) Log(args ...interface{}) {
 			tokens = append(tokens, token)
 		}
 	}
-	log.Printf("[DEBUG] [go-oracle-terraform]: %s", strings.Join(tokens, " "))
+	log.SetFlags(0)
+	log.Print(fmt.Sprintf("go-oracle-terraform: %s", strings.Join(tokens, " ")))
 }

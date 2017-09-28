@@ -68,6 +68,40 @@ func TestAccOPCIPNetwork_Update(t *testing.T) {
 	})
 }
 
+func TestAccOPCIPNetwork_UpdateName(t *testing.T) {
+	rInt := acctest.RandInt()
+	resName := "opc_compute_ip_network.test"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: opcResourceCheck(resName, testAccOPCCheckIPNetworkDestroyed),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccOPCIPNetworkConfig_Basic(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					opcResourceCheck(resName, testAccOPCCheckIPNetworkExists),
+					resource.TestCheckResourceAttr(resName, "ip_address_prefix", "10.0.12.0/24"),
+					resource.TestCheckResourceAttr(resName, "public_napt_enabled", "false"),
+					resource.TestCheckResourceAttr(resName, "description", fmt.Sprintf("testing-desc-%d", rInt)),
+					resource.TestCheckResourceAttr(resName, "name", fmt.Sprintf("testing-ip-network-%d", rInt)),
+					resource.TestMatchResourceAttr(resName, "uri", regexp.MustCompile("testing-ip-network")),
+				),
+			},
+			{
+				Config: testAccOPCIPNetworkConfig_BasicUpdateName(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					opcResourceCheck(resName, testAccOPCCheckIPNetworkExists),
+					resource.TestCheckResourceAttr(resName, "ip_address_prefix", "10.0.12.0/24"),
+					resource.TestCheckResourceAttr(resName, "public_napt_enabled", "true"),
+					resource.TestCheckResourceAttr(resName, "description", fmt.Sprintf("testing-desc-%d", rInt)),
+					resource.TestCheckResourceAttr(resName, "name", fmt.Sprintf("testing-new-ip-network-%d", rInt)),
+				),
+			},
+		},
+	})
+}
+
 func testAccOPCIPNetworkConfig_Basic(rInt int) string {
 	return fmt.Sprintf(`
 resource "opc_compute_ip_network" "test" {
@@ -81,6 +115,16 @@ func testAccOPCIPNetworkConfig_BasicUpdate(rInt int) string {
 	return fmt.Sprintf(`
 resource "opc_compute_ip_network" "test" {
   name = "testing-ip-network-%d"
+  description = "testing-desc-%d"
+  ip_address_prefix = "10.0.12.0/24"
+  public_napt_enabled = true
+}`, rInt, rInt)
+}
+
+func testAccOPCIPNetworkConfig_BasicUpdateName(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_ip_network" "test" {
+  name = "testing-new-ip-network-%d"
   description = "testing-desc-%d"
   ip_address_prefix = "10.0.12.0/24"
   public_napt_enabled = true
