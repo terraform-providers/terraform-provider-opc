@@ -52,7 +52,7 @@ func TestAccOPCDatabaseServiceInstance_CloudStorage(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDatabaseServiceInstanceExists,
 					resource.TestCheckResourceAttr(
-						resourceName, "cloud_storage_container", fmt.Sprintf("Storage-%s/matthew-test-%d", os.Getenv("OPC_IDENTITY_DOMAIN"), ri)),
+						resourceName, "cloud_storage_container", fmt.Sprintf("Storage-%s/acctest-%d", os.Getenv("OPC_IDENTITY_DOMAIN"), ri)),
 				),
 			},
 		},
@@ -137,7 +137,7 @@ func testAccDatabaseServiceInstanceCloudStorage(rInt int) string {
       usable_storage = 15
     }
     cloud_storage {
-      container = "Storage-%s/matthew-test-%d"
+      container = "Storage-%s/acctest-%d"
       create_if_missing = true
     }
 	}`, rInt, os.Getenv("OPC_IDENTITY_DOMAIN"), rInt)

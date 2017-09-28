@@ -32,23 +32,21 @@ func TestProvider_impl(t *testing.T) {
 }
 
 func testAccPreCheck(t *testing.T) {
-	// TODO: Add OPC_DATABASE_ENDPOINT when we release service instance
-	required := []string{"OPC_USERNAME", "OPC_PASSWORD", "OPC_IDENTITY_DOMAIN", "OPC_ENDPOINT", "OPC_STORAGE_ENDPOINT"}
+	required := []string{"OPC_USERNAME", "OPC_PASSWORD", "OPC_IDENTITY_DOMAIN", "OPC_ENDPOINT", "OPC_STORAGE_ENDPOINT", "OPC_DATABASE_ENDPOINT"}
 	for _, prop := range required {
 		if os.Getenv(prop) == "" {
 			t.Fatalf("%s must be set for acceptance test", prop)
 		}
 	}
 	config := Config{
-		User:            os.Getenv("OPC_USERNAME"),
-		Password:        os.Getenv("OPC_PASSWORD"),
-		IdentityDomain:  os.Getenv("OPC_IDENTITY_DOMAIN"),
-		Endpoint:        os.Getenv("OPC_ENDPOINT"),
-		MaxRetries:      1,
-		Insecure:        false,
-		StorageEndpoint: os.Getenv("OPC_STORAGE_ENDPOINT"),
-		// TODO Remove comment once we add database service instance back
-		// DatabaseEndpoint: os.Getenv("OPC_DATABASE_ENDPOINT"),
+		User:             os.Getenv("OPC_USERNAME"),
+		Password:         os.Getenv("OPC_PASSWORD"),
+		IdentityDomain:   os.Getenv("OPC_IDENTITY_DOMAIN"),
+		Endpoint:         os.Getenv("OPC_ENDPOINT"),
+		MaxRetries:       1,
+		Insecure:         false,
+		StorageEndpoint:  os.Getenv("OPC_STORAGE_ENDPOINT"),
+		DatabaseEndpoint: os.Getenv("OPC_DATABASE_ENDPOINT"),
 	}
 	client, err := config.Client()
 	if err != nil {
