@@ -32,7 +32,7 @@ func TestProvider_impl(t *testing.T) {
 }
 
 func testAccPreCheck(t *testing.T) {
-	required := []string{"OPC_USERNAME", "OPC_PASSWORD", "OPC_IDENTITY_DOMAIN", "OPC_ENDPOINT", "OPC_STORAGE_ENDPOINT", "OPC_DATABASE_ENDPOINT"}
+	required := []string{"OPC_USERNAME", "OPC_PASSWORD", "OPC_IDENTITY_DOMAIN", "OPC_ENDPOINT", "OPC_STORAGE_ENDPOINT", "OPC_DATABASE_ENDPOINT", "OPC_JAVA_ENDPOINT"}
 	for _, prop := range required {
 		if os.Getenv(prop) == "" {
 			t.Fatalf("%s must be set for acceptance test", prop)
@@ -47,6 +47,7 @@ func testAccPreCheck(t *testing.T) {
 		Insecure:         false,
 		StorageEndpoint:  os.Getenv("OPC_STORAGE_ENDPOINT"),
 		DatabaseEndpoint: os.Getenv("OPC_DATABASE_ENDPOINT"),
+		JavaEndpoint:     os.Getenv("OPC_JAVA_ENDPOINT"),
 	}
 	client, err := config.Client()
 	if err != nil {

@@ -94,9 +94,10 @@ func resourceOPCDatabaseServiceInstance() *schema.Resource {
 							ForceNew: true,
 						},
 						"admin_password": {
-							Type:     schema.TypeString,
-							Required: true,
-							ForceNew: true,
+							Type:      schema.TypeString,
+							Required:  true,
+							ForceNew:  true,
+							Sensitive: true,
 						},
 						"backup_destination": {
 							Type:     schema.TypeString,
@@ -402,10 +403,12 @@ func resourceOPCDatabaseServiceInstanceCreate(d *schema.ResourceData, meta inter
 
 	log.Print("[DEBUG] Creating database service instance")
 
-	client := meta.(*OPCClient).databaseClient.ServiceInstanceClient()
-	if client == nil {
-		return fmt.Errorf("Database Client is not initialized. Make sure to use `database_endpoint` variable or `OPC_DATABASE_ENDPOINT` env variable")
+	dbClient, err := getDatabaseClient(meta)
+	if err != nil {
+		return err
 	}
+	client := dbClient.ServiceInstanceClient()
+
 	input := database.CreateServiceInstanceInput{
 		Name:             d.Get("name").(string),
 		Edition:          database.ServiceInstanceEdition(d.Get("edition").(string)),
@@ -435,10 +438,11 @@ func resourceOPCDatabaseServiceInstanceCreate(d *schema.ResourceData, meta inter
 
 func resourceOPCDatabaseServiceInstanceRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	client := meta.(*OPCClient).databaseClient.ServiceInstanceClient()
-	if client == nil {
-		return fmt.Errorf("Database Client is not initialized. Make sure to use `database_endpoint` variable or `OPC_DATABASE_ENDPOINT` env variable")
+	dbClient, err := getDatabaseClient(meta)
+	if err != nil {
+		return err
 	}
+	client := dbClient.ServiceInstanceClient()
 
 	log.Printf("[DEBUG] Reading state of ip reservation %s", d.Id())
 	getInput := database.GetServiceInstanceInput{
@@ -507,10 +511,11 @@ func resourceOPCDatabaseServiceInstanceRead(d *schema.ResourceData, meta interfa
 
 func resourceOPCDatabaseServiceInstanceDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	client := meta.(*OPCClient).databaseClient.ServiceInstanceClient()
-	if client == nil {
-		return fmt.Errorf("Database Client is not initialized. Make sure to use `database_endpoint` variable or `OPC_DATABASE_ENDPOINT` env variable")
+	dbClient, err := getDatabaseClient(meta)
+	if err != nil {
+		return err
 	}
+	client := dbClient.ServiceInstanceClient()
 	name := d.Id()
 
 	log.Printf("[DEBUG] Deleting DatabaseServiceInstance: %v", name)

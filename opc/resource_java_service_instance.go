@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	opcClient "github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/java"
@@ -16,8 +17,10 @@ func resourceOPCJavaServiceInstance() *schema.Resource {
 		Create: resourceOPCJavaServiceInstanceCreate,
 		Read:   resourceOPCJavaServiceInstanceRead,
 		Delete: resourceOPCJavaServiceInstanceDelete,
-		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(120 * time.Minute),
+			Delete: schema.DefaultTimeout(120 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -25,17 +28,6 @@ func resourceOPCJavaServiceInstance() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
-			},
-			"edition": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-				Default:  java.ServiceInstanceEditionEE,
-				ValidateFunc: validation.StringInSlice([]string{
-					string(java.ServiceInstanceEditionSE),
-					string(java.ServiceInstanceEditionEE),
-					string(java.ServiceInstanceEditionSuite),
-				}, false),
 			},
 			"level": {
 				Type:     schema.TypeString,
@@ -91,96 +83,521 @@ func resourceOPCJavaServiceInstance() *schema.Resource {
 					string(java.ServiceInstanceSubscriptionTypeMonthly),
 				}, false),
 			},
-			"type": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-				ValidateFunc: validation.StringInSlice([]string{
-					string(java.ServiceInstanceTypeWebLogic),
-					string(java.ServiceInstanceTypeDataGrid),
-					string(java.ServiceInstanceTypeOTD),
-				}, false),
-			},
-			"database": {
+			"weblogic": {
 				Type:     schema.TypeSet,
 				Required: true,
 				ForceNew: true,
 				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"username": {
-							Type:     schema.TypeString,
+						"admin": {
+							Type:     schema.TypeSet,
 							Required: true,
 							ForceNew: true,
+							MaxItems: 1,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"username": {
+										Type:     schema.TypeString,
+										Required: true,
+										ForceNew: true,
+									},
+									"password": {
+										Type:      schema.TypeString,
+										Required:  true,
+										ForceNew:  true,
+										Sensitive: true,
+									},
+									"port": {
+										Type:     schema.TypeInt,
+										Optional: true,
+										Computed: true,
+										ForceNew: true,
+									},
+								},
+							},
 						},
-						"password": {
-							Type:      schema.TypeString,
-							Required:  true,
-							ForceNew:  true,
-							Sensitive: true,
+						"app_db": {
+							Type:     schema.TypeSet,
+							Optional: true,
+							ForceNew: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"username": {
+										Type:     schema.TypeString,
+										Required: true,
+										ForceNew: true,
+									},
+									"password": {
+										Type:     schema.TypeString,
+										Required: true,
+										ForceNew: true,
+									},
+									"name": {
+										Type:     schema.TypeString,
+										Required: true,
+										ForceNew: true,
+									},
+									"pdb_name": {
+										Type:     schema.TypeString,
+										Optional: true,
+										Computed: true,
+										ForceNew: true,
+									},
+								},
+							},
 						},
-						"name": {
+						"backup_volume_size": {
 							Type:     schema.TypeString,
-							Required: true,
+							Optional: true,
+							Computed: true,
 							ForceNew: true,
 						},
-						"network": {
+						"cluster_name": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+							Computed: true,
+						},
+						"connect_string": {
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
-						"uri": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-					},
-				},
-			},
-			"shape": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"version": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"admin": {
-				Type:     schema.TypeSet,
-				Required: true,
-				ForceNew: true,
-				MaxItems: 1,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"username": {
-							Type:     schema.TypeString,
-							Required: true,
-							ForceNew: true,
-						},
-						"password": {
-							Type:      schema.TypeString,
-							Required:  true,
-							ForceNew:  true,
-							Sensitive: true,
-						},
-						"port": {
+						"content_port": {
 							Type:     schema.TypeInt,
 							Optional: true,
 							ForceNew: true,
+							Default:  8001,
+						},
+						"database": {
+							Type:     schema.TypeSet,
+							Required: true,
+							ForceNew: true,
+							MaxItems: 1,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"username": {
+										Type:     schema.TypeString,
+										Required: true,
+										ForceNew: true,
+									},
+									"password": {
+										Type:      schema.TypeString,
+										Required:  true,
+										ForceNew:  true,
+										Sensitive: true,
+									},
+									"name": {
+										Type:     schema.TypeString,
+										Required: true,
+										ForceNew: true,
+									},
+									"network": {
+										Type:     schema.TypeString,
+										Optional: true,
+										ForceNew: true,
+									},
+									"uri": {
+										Type:     schema.TypeString,
+										Computed: true,
+									},
+								},
+							},
+						},
+						"deployment_channel_port": {
+							Type:     schema.TypeInt,
+							Optional: true,
+							ForceNew: true,
+							Default:  9001,
+						},
+						"domain": {
+							Type:     schema.TypeSet,
+							Optional: true,
+							ForceNew: true,
+							MaxItems: 1,
+							Computed: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"mode": {
+										Type:     schema.TypeString,
+										Optional: true,
+										ForceNew: true,
+										Default:  "PRODUCTION",
+										ValidateFunc: validation.StringInSlice([]string{
+											string(java.ServiceInstanceDomainModeDev),
+											string(java.ServiceInstanceDomainModePro),
+										}, false),
+									},
+									"name": {
+										Type:     schema.TypeString,
+										Optional: true,
+										ForceNew: true,
+										Computed: true,
+									},
+									"partition_count": {
+										Type:         schema.TypeInt,
+										Optional:     true,
+										ForceNew:     true,
+										ValidateFunc: validation.IntBetween(0, 4),
+									},
+									"volume_size": {
+										Type:     schema.TypeString,
+										Optional: true,
+										ForceNew: true,
+									},
+								},
+							},
+						},
+						"edition": {
+							Type:     schema.TypeString,
+							Required: true,
+							ForceNew: true,
+							ValidateFunc: validation.StringInSlice([]string{
+								string(java.ServiceInstanceEditionSE),
+								string(java.ServiceInstanceEditionEE),
+								string(java.ServiceInstanceEditionSuite),
+							}, false),
+						},
+						"ip_reservations": {
+							Type:     schema.TypeList,
+							Optional: true,
+							ForceNew: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+						},
+						"managed_servers": {
+							Type:     schema.TypeSet,
+							Optional: true,
+							ForceNew: true,
+							MaxItems: 1,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"server_count": {
+										Type:         schema.TypeInt,
+										Optional:     true,
+										ForceNew:     true,
+										ValidateFunc: validation.IntBetween(1, 8),
+										Default:      1,
+									},
+									"initial_heap_size": {
+										Type:     schema.TypeInt,
+										Optional: true,
+										ForceNew: true,
+									},
+									"max_heap_size": {
+										Type:     schema.TypeInt,
+										Optional: true,
+										ForceNew: true,
+									},
+									"jvm_args": {
+										Type:     schema.TypeString,
+										Optional: true,
+										ForceNew: true,
+									},
+									"initial_permanent_generation": {
+										Type:     schema.TypeInt,
+										Optional: true,
+										ForceNew: true,
+									},
+									"max_permanent_generation": {
+										Type:     schema.TypeInt,
+										Optional: true,
+										ForceNew: true,
+									},
+									"overwrite_jvm_args": {
+										Type:     schema.TypeBool,
+										Optional: true,
+										ForceNew: true,
+										Default:  false,
+									},
+								},
+							},
+						},
+						"mw_volume_size": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+							ForceNew: true,
+						},
+						"node_manager": {
+							Type:     schema.TypeSet,
+							Optional: true,
+							ForceNew: true,
+							MaxItems: 1,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"username": {
+										Type:      schema.TypeString,
+										Optional:  true,
+										ForceNew:  true,
+										Computed:  true,
+										Sensitive: true,
+									},
+									"password": {
+										Type:      schema.TypeString,
+										Optional:  true,
+										ForceNew:  true,
+										Computed:  true,
+										Sensitive: true,
+									},
+									"port": {
+										Type:     schema.TypeInt,
+										Optional: true,
+										ForceNew: true,
+										Default:  5556,
+									},
+								},
+							},
+						},
+						"pdb_service_name": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+							ForceNew: true,
+						},
+						"privileged_ports": {
+							Type:     schema.TypeSet,
+							Optional: true,
+							ForceNew: true,
+							MaxItems: 1,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"content_port": {
+										Type:     schema.TypeInt,
+										Optional: true,
+										ForceNew: true,
+										Default:  80,
+									},
+									"secured_content_port": {
+										Type:     schema.TypeInt,
+										Optional: true,
+										ForceNew: true,
+										Default:  443,
+									},
+								},
+							},
+						},
+						"secured_admin_port": {
+							Type:     schema.TypeInt,
+							Optional: true,
+							ForceNew: true,
+							Default:  7002,
+						},
+						"shape": {
+							Type:     schema.TypeString,
+							Required: true,
+							ForceNew: true,
+						},
+						"upper_stack_product_name": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+							ValidateFunc: validation.StringInSlice([]string{
+								string(java.ServiceInstanceUpperStackProductNameODI),
+								string(java.ServiceInstanceUpperStackProductNameWCP),
+							}, false),
+						},
+						"version": {
+							Type:     schema.TypeString,
+							Required: true,
+							ForceNew: true,
+						},
+						"public_key": {
+							Type:     schema.TypeString,
+							Required: true,
+							ForceNew: true,
 						},
 					},
 				},
 			},
-			"public_key": {
-				Type:     schema.TypeString,
+			"otd": {
+				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"admin": {
+							Type:     schema.TypeSet,
+							Required: true,
+							ForceNew: true,
+							MaxItems: 1,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"username": {
+										Type:     schema.TypeString,
+										Required: true,
+										ForceNew: true,
+									},
+									"password": {
+										Type:      schema.TypeString,
+										Required:  true,
+										ForceNew:  true,
+										Sensitive: true,
+									},
+									"port": {
+										Type:     schema.TypeInt,
+										Optional: true,
+										Computed: true,
+										ForceNew: true,
+									},
+								},
+							},
+						},
+						"high_availability": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							ForceNew: true,
+							Default:  false,
+						},
+						"listener": {
+							Type:     schema.TypeSet,
+							Optional: true,
+							ForceNew: true,
+							MaxItems: 1,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"port": {
+										Type:     schema.TypeInt,
+										Optional: true,
+										ForceNew: true,
+										Default:  8080,
+									},
+									"enabled": {
+										Type:     schema.TypeBool,
+										Optional: true,
+										ForceNew: true,
+										Default:  true,
+									},
+									"type": {
+										Type:     schema.TypeString,
+										Optional: true,
+										ForceNew: true,
+										Default:  "http",
+									},
+								},
+							},
+						},
+						"load_balancing_policy": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+							Default:  java.ServiceInstanceLoadBalancingPolicyLCC,
+							ValidateFunc: validation.StringInSlice([]string{
+								string(java.ServiceInstanceLoadBalancingPolicyLCC),
+								string(java.ServiceInstanceLoadBalancingPolicyLRT),
+								string(java.ServiceInstanceLoadBalancingPolicyRR),
+							}, false),
+						},
+						"privileged_ports": {
+							Type:     schema.TypeSet,
+							Optional: true,
+							ForceNew: true,
+							MaxItems: 1,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"listener_port": {
+										Type:     schema.TypeInt,
+										Optional: true,
+										ForceNew: true,
+										Default:  80,
+									},
+									"secured_listener_port": {
+										Type:     schema.TypeInt,
+										Optional: true,
+										ForceNew: true,
+										Default:  443,
+									},
+								},
+							},
+						},
+						"secured_listener_port": {
+							Type:     schema.TypeInt,
+							Optional: true,
+							ForceNew: true,
+							Default:  8081,
+						},
+						"shape": {
+							Type:     schema.TypeString,
+							Required: true,
+							ForceNew: true,
+						},
+						"public_key": {
+							Type:     schema.TypeString,
+							Required: true,
+							ForceNew: true,
+						},
+					},
+				},
 			},
-			"public_key_name": {
-				Type:     schema.TypeString,
+			"datagrid": {
+				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"cluster_name": {
+							Type:     schema.TypeString,
+							Required: true,
+							ForceNew: true,
+							Computed: true,
+						},
+						"scaling_unit_count": {
+							Type:     schema.TypeInt,
+							Required: true,
+							ForceNew: true,
+							Computed: true,
+						},
+						"scaling_unit": {
+							Type:     schema.TypeSet,
+							Optional: true,
+							ForceNew: true,
+							MaxItems: 1,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"name": {
+										Type:     schema.TypeString,
+										Required: true,
+										ForceNew: true,
+									},
+									"unit": {
+										Type:     schema.TypeSet,
+										Optional: true,
+										ForceNew: true,
+										Elem: &schema.Resource{
+											Schema: map[string]*schema.Schema{
+												"heap_size": {
+													Type:         schema.TypeInt,
+													Required:     true,
+													ForceNew:     true,
+													ValidateFunc: validation.IntBetween(1, 16),
+												},
+												"jvm_count": {
+													Type:         schema.TypeInt,
+													Required:     true,
+													ForceNew:     true,
+													ValidateFunc: validation.IntBetween(1, 8),
+												},
+												"shape": {
+													Type:     schema.TypeString,
+													Required: true,
+													ForceNew: true,
+												},
+												"vm_count": {
+													Type:         schema.TypeInt,
+													Required:     true,
+													ForceNew:     true,
+													ValidateFunc: validation.IntBetween(1, 3),
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 			"backup_destination": {
 				Type:     schema.TypeString,
@@ -209,11 +626,6 @@ func resourceOPCJavaServiceInstance() *schema.Resource {
 				Optional: true,
 				ForceNew: true,
 			},
-			"provision_otd": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				ForceNew: true,
-			},
 			"public_network": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -229,357 +641,6 @@ func resourceOPCJavaServiceInstance() *schema.Resource {
 				Optional: true,
 				ForceNew: true,
 				Default:  false,
-			},
-			"app_db": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"username": {
-							Type:     schema.TypeString,
-							Required: true,
-							ForceNew: true,
-						},
-						"password": {
-							Type:     schema.TypeString,
-							Required: true,
-							ForceNew: true,
-						},
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-							ForceNew: true,
-						},
-						"pdb_name": {
-							Type:     schema.TypeString,
-							Optional: true,
-							ForceNew: true,
-						},
-					},
-				},
-			},
-			"backup_volume_size": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-			},
-			"cluster_name": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-				Computed: true,
-			},
-			"connect_string": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-			},
-			"content_port": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				ForceNew: true,
-				Default:  8001,
-			},
-			"deployment_channel_port": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				ForceNew: true,
-			},
-			"domain": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				MaxItems: 1,
-				Computed: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"mode": {
-							Type:     schema.TypeString,
-							Optional: true,
-							ForceNew: true,
-							Default:  "PRODUCTION",
-							ValidateFunc: validation.StringInSlice([]string{
-								string(java.ServiceInstanceDomainModeDev),
-								string(java.ServiceInstanceDomainModePro),
-							}, false),
-						},
-						"name": {
-							Type:     schema.TypeString,
-							Optional: true,
-							ForceNew: true,
-							Computed: true,
-						},
-						"partition_count": {
-							Type:         schema.TypeInt,
-							Optional:     true,
-							ForceNew:     true,
-							ValidateFunc: validation.IntBetween(0, 4),
-						},
-						"volume_size": {
-							Type:     schema.TypeString,
-							Optional: true,
-							ForceNew: true,
-						},
-					},
-				},
-			},
-			"high_availability": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				ForceNew: true,
-				Default:  false,
-			},
-			"ip_reservations": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"listener": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				MaxItems: 1,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"port": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							ForceNew: true,
-							Default:  8080,
-						},
-						"enabled": {
-							Type:     schema.TypeBool,
-							Optional: true,
-							ForceNew: true,
-							Default:  true,
-						},
-						"type": {
-							Type:     schema.TypeString,
-							Optional: true,
-							ForceNew: true,
-							Default:  "http",
-						},
-					},
-				},
-			},
-			"load_balancing_policy": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-				ValidateFunc: validation.StringInSlice([]string{
-					string(java.ServiceInstanceLoadBalancingPolicyLCC),
-					string(java.ServiceInstanceLoadBalancingPolicyLRT),
-					string(java.ServiceInstanceLoadBalancingPolicyRR),
-				}, false),
-			},
-			"managed_servers": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				MaxItems: 1,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"count": {
-							Type:         schema.TypeInt,
-							Optional:     true,
-							ForceNew:     true,
-							ValidateFunc: validation.IntBetween(1, 8),
-							Default:      1,
-						},
-						"initial_heap_size": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							ForceNew: true,
-						},
-						"max_heap_size": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							ForceNew: true,
-						},
-						"jvm_args": {
-							Type:     schema.TypeString,
-							Optional: true,
-							ForceNew: true,
-						},
-						"initial_permanent_generation": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							ForceNew: true,
-						},
-						"max_permanent_generation": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							ForceNew: true,
-						},
-						"overwrite_jvm_args": {
-							Type:     schema.TypeBool,
-							Optional: true,
-							ForceNew: true,
-							Default:  false,
-						},
-					},
-				},
-			},
-			"mw_volume_size": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-				ForceNew: true,
-			},
-			"node_manager": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				MaxItems: 1,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"username": {
-							Type:      schema.TypeString,
-							Optional:  true,
-							ForceNew:  true,
-							Computed:  true,
-							Sensitive: true,
-						},
-						"password": {
-							Type:      schema.TypeString,
-							Optional:  true,
-							ForceNew:  true,
-							Computed:  true,
-							Sensitive: true,
-						},
-						"port": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							ForceNew: true,
-							Default:  5556,
-						},
-					},
-				},
-			},
-			"pdb_service_name": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-			},
-			"privileged_ports": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				MaxItems: 1,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"content_port": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							ForceNew: true,
-							Default:  80,
-						},
-						"listener_port": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							ForceNew: true,
-							Default:  80,
-						},
-						"secured_content_port": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							ForceNew: true,
-							Default:  443,
-						},
-						"secured_listener_port": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							ForceNew: true,
-							Default:  443,
-						},
-					},
-				},
-			},
-			"scaling_units": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				MaxItems: 1,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Optional: true,
-							ForceNew: true,
-						},
-						"unit": {
-							Type:     schema.TypeSet,
-							Required: true,
-							ForceNew: true,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"heap_size": {
-										Type:         schema.TypeInt,
-										Required:     true,
-										ForceNew:     true,
-										ValidateFunc: validation.IntBetween(1, 16),
-									},
-									"jvm_count": {
-										Type:         schema.TypeInt,
-										Required:     true,
-										ForceNew:     true,
-										ValidateFunc: validation.IntBetween(1, 8),
-									},
-									"shape": {
-										Type:     schema.TypeString,
-										Required: true,
-										ForceNew: true,
-									},
-									"vm_count": {
-										Type:         schema.TypeInt,
-										Required:     true,
-										ForceNew:     true,
-										ValidateFunc: validation.IntBetween(1, 3),
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			"secured_ports": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				MaxItems: 1,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"admin_port": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							ForceNew: true,
-							Default:  7002,
-						},
-						"content_port": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							ForceNew: true,
-							Default:  8002,
-						},
-						"listener_port": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							ForceNew: true,
-							Default:  8081,
-						},
-					},
-				},
-			},
-			"upper_stack_product_name": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-				ValidateFunc: validation.StringInSlice([]string{
-					string(java.ServiceInstanceUpperStackProductNameODI),
-					string(java.ServiceInstanceUpperStackProductNameWCP),
-				}, false),
 			},
 			// Values below are passed back from the GET API call
 			"auto_update": {
@@ -678,82 +739,6 @@ func resourceOPCJavaServiceInstance() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"options": {
-				Type:     schema.TypeSet,
-				Computed: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"type": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"cluster": {
-							Type:     schema.TypeSet,
-							Computed: true,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"name": {
-										Type:     schema.TypeString,
-										Computed: true,
-									},
-									"heap_increments": {
-										Type:     schema.TypeString,
-										Computed: true,
-									},
-									"heap_size": {
-										Type:     schema.TypeString,
-										Computed: true,
-									},
-									"jvm_count": {
-										Type:     schema.TypeString,
-										Computed: true,
-									},
-									"max_heap": {
-										Type:     schema.TypeString,
-										Computed: true,
-									},
-									"max_primary": {
-										Type:     schema.TypeString,
-										Computed: true,
-									},
-									"max_scaling_unit": {
-										Type:     schema.TypeInt,
-										Computed: true,
-									},
-									"primary_increments": {
-										Type:     schema.TypeString,
-										Computed: true,
-									},
-									"scaling_unit_count": {
-										Type:     schema.TypeInt,
-										Computed: true,
-									},
-									"scaling_unit_name": {
-										Type:     schema.TypeString,
-										Computed: true,
-									},
-									"shape": {
-										Type:     schema.TypeString,
-										Computed: true,
-									},
-									"total_heap": {
-										Type:     schema.TypeString,
-										Computed: true,
-									},
-									"total_primary": {
-										Type:     schema.TypeString,
-										Computed: true,
-									},
-									"vm_count": {
-										Type:     schema.TypeInt,
-										Computed: true,
-									},
-								},
-							},
-						},
-					},
-				},
-			},
 			"otd_admin_url": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -818,7 +803,7 @@ func resourceOPCJavaServiceInstance() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"oracle_version": {
+			"oracle_middleware_version": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -831,10 +816,12 @@ func resourceOPCJavaServiceInstanceCreate(d *schema.ResourceData, meta interface
 
 	log.Print("[DEBUG] Creating JavaServiceInstance")
 
-	client := meta.(*OPCClient).javaClient.ServiceInstanceClient()
-	if client == nil {
-		return fmt.Errorf("Java Client is not initialized. Make sure to use `java_endpoint` variable or `OPC_JAVA_ENDPOINT` env variable")
+	jClient, err := getJavaClient(meta)
+	if err != nil {
+		return err
 	}
+	client := jClient.ServiceInstanceClient()
+
 	input := java.CreateServiceInstanceInput{
 		ServiceName:                  d.Get("name").(string),
 		Level:                        java.ServiceInstanceLevel(d.Get("level").(string)),
@@ -850,9 +837,6 @@ func resourceOPCJavaServiceInstanceCreate(d *schema.ResourceData, meta interface
 	if val, ok := d.GetOk("ip_network"); ok {
 		input.IPNetwork = val.(string)
 	}
-	if val, ok := d.GetOk("provision_otd"); ok {
-		input.ProvisionOTD = val.(bool)
-	}
 	if val, ok := d.GetOk("public_network"); ok {
 		input.PublicNetwork = val.(string)
 	}
@@ -861,7 +845,7 @@ func resourceOPCJavaServiceInstanceCreate(d *schema.ResourceData, meta interface
 	}
 	expandJavaCloudStorage(d, &input)
 
-	input.Parameters = expandJavaParameter(client, d)
+	expandJavaParameter(d, &input)
 
 	info, err := client.CreateServiceInstance(&input)
 	if err != nil {
@@ -874,7 +858,11 @@ func resourceOPCJavaServiceInstanceCreate(d *schema.ResourceData, meta interface
 
 func resourceOPCJavaServiceInstanceRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	client := meta.(*OPCClient).javaClient.ServiceInstanceClient()
+	jClient, err := getJavaClient(meta)
+	if err != nil {
+		return err
+	}
+	client := jClient.ServiceInstanceClient()
 
 	log.Printf("[DEBUG] Reading state of ip reservation %s", d.Id())
 	getInput := java.GetServiceInstanceInput{
@@ -926,29 +914,16 @@ func resourceOPCJavaServiceInstanceRead(d *schema.ResourceData, meta interface{}
 	d.Set("uri", result.ServiceURI)
 	d.Set("shape", result.Shape)
 	d.Set("storage_size", result.StorageSize)
-	// TODO Changed subscriptionType to subscription_type in the golang sdk
-	// d.Set("subscription_type", result.SubscriptionType)
+	d.Set("subscription_type", result.SubscriptionType)
 	d.Set("upper_stack_product_name", result.UpperStackProductName)
 	// The version you recieve is different than the version you pass in
 	// so a different variable name is needed
-	d.Set("oracle_version", result.Version)
+	d.Set("oracle_middleware_version", result.Version)
 	d.Set("wls_admin_url", result.WLSAdminURL)
 	d.Set("wls_deployment_channel_port", result.WLSDeploymentChannelPort)
 	d.Set("wls_version", result.WLSVersion)
 
 	if err := readDBAssociations(d, result.DBAssociations); err != nil {
-		return err
-	}
-	if err := readDatabase(d, result.DBServiceName, result.DBServiceURI); err != nil {
-		return err
-	}
-	if err := readDomain(d, result.DomainName, result.DomainMode); err != nil {
-		return err
-	}
-	if err := readIPReservations(d, result.IPReservations); err != nil {
-		return err
-	}
-	if err := readOptions(d, result.Options); err != nil {
 		return err
 	}
 	if err := readServiceComponents(d, result.ServiceComponents); err != nil {
@@ -960,13 +935,20 @@ func resourceOPCJavaServiceInstanceRead(d *schema.ResourceData, meta interface{}
 
 func resourceOPCJavaServiceInstanceDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	client := meta.(*OPCClient).javaClient.ServiceInstanceClient()
+	jClient, err := getJavaClient(meta)
+	if err != nil {
+		return err
+	}
+	client := jClient.ServiceInstanceClient()
 	name := d.Id()
 
 	log.Printf("[DEBUG] Deleting JavaServiceInstance: %v", name)
 
 	// Need to get the dba username and password to delete the service instance
-	dbaInfo := d.Get("database").(*schema.Set)
+	webLogicInfo := d.Get("weblogic").(*schema.Set).List()
+	webLogicConfig := webLogicInfo[0].(map[string]interface{})
+	dbaInfo := webLogicConfig["database"].(*schema.Set)
+
 	var username, password string
 	for _, i := range dbaInfo.List() {
 		attrs := i.(map[string]interface{})
@@ -979,70 +961,118 @@ func resourceOPCJavaServiceInstanceDelete(d *schema.ResourceData, meta interface
 		DBAUsername: username,
 		DBAPassword: password,
 	}
+
 	if err := client.DeleteServiceInstance(&input); err != nil {
 		return fmt.Errorf("Error deleting JavaServiceInstance")
 	}
 	return nil
 }
 
-func expandJavaParameter(client *java.ServiceInstanceClient, d *schema.ResourceData) []java.Parameter {
-	parameter := java.Parameter{
-		Type:        java.ServiceInstanceType(d.Get("type").(string)),
-		Shape:       java.ServiceInstanceShape(d.Get("shape").(string)),
-		Version:     java.ServiceInstanceVersion(d.Get("version").(string)),
-		ContentPort: d.Get("content_port").(int),
-		HAEnabled:   d.Get("high_availability").(bool),
+func expandJavaParameter(d *schema.ResourceData, input *java.CreateServiceInstanceInput) {
+	parameters := []java.Parameter{expandWebLogicParameter(d)}
+
+	if _, ok := d.GetOk("otd"); ok {
+		input.ProvisionOTD = true
+		parameters = append(parameters, expandOTDParameter(d))
 	}
 
-	if val, ok := d.GetOk("public_key"); ok {
-		parameter.VMsPublicKey = val.(string)
-	}
-	if val, ok := d.GetOk("public_key_name"); ok {
-		parameter.VMsPublicKeyName = val.(string)
-	}
-	if val, ok := d.GetOk("backup_volume_size"); ok {
-		parameter.BackupVolumeSize = val.(string)
-	}
-	if val, ok := d.GetOk("cluster_name"); ok {
-		parameter.ClusterName = val.(string)
-	}
-	if val, ok := d.GetOk("connect_string"); ok {
-		parameter.ConnectString = val.(string)
-	}
-	if val, ok := d.GetOk("deployment_channel_port"); ok {
-		parameter.DeploymentChannelPort = val.(int)
-	}
-	if val, ok := d.GetOk("edition"); ok {
-		parameter.Edition = java.ServiceInstanceEdition(val.(string))
-	}
-	if val, ok := d.GetOk("load_balancing_policy"); ok {
-		parameter.LoadBalancingPolicy = java.ServiceInstanceLoadBalancingPolicy(val.(string))
-	}
-	if val, ok := d.GetOk("mw_volume_size"); ok {
-		parameter.MWVolumeSize = val.(string)
-	}
-	if val, ok := d.GetOk("pdb_service_name"); ok {
-		parameter.PDBServiceName = val.(string)
-	}
-	if val, ok := d.GetOk("upper_stack_product_name"); ok {
-		parameter.UpperStackProductName = java.ServiceInstanceUpperStackProductName(val.(string))
+	if _, ok := d.GetOk("datagrid"); ok {
+		parameters = append(parameters, expandDatagridParameter(d))
 	}
 
-	if ipReservations := getStringList(d, "ip_reservations"); len(ipReservations) > 0 {
-		parameter.IPReservations = strings.Join(ipReservations, ",")
+	input.Parameters = parameters
+
+}
+
+func expandWebLogicParameter(d *schema.ResourceData) java.Parameter {
+	webLogicParam := java.Parameter{}
+	webLogicInfo := d.Get("weblogic").(*schema.Set).List()
+	webLogicConfig := webLogicInfo[0].(map[string]interface{})
+
+	webLogicParam.Type = java.ServiceInstanceTypeWebLogic
+	webLogicParam.Edition = java.ServiceInstanceEdition(webLogicConfig["edition"].(string))
+	webLogicParam.Shape = java.ServiceInstanceShape(webLogicConfig["shape"].(string))
+	webLogicParam.Version = java.ServiceInstanceVersion(webLogicConfig["version"].(string))
+	webLogicParam.VMsPublicKey = webLogicConfig["public_key"].(string)
+
+	expandAdmin(&webLogicParam, webLogicConfig)
+	expandDB(&webLogicParam, webLogicConfig)
+	expandDomain(&webLogicParam, webLogicConfig)
+	expandManagedServers(&webLogicParam, webLogicConfig)
+	expandNodeManager(&webLogicParam, webLogicConfig)
+	expandPrivilegedPorts(&webLogicParam, webLogicConfig)
+
+	if v := webLogicConfig["app_db"]; v != nil {
+		expandAppDBs(&webLogicParam, webLogicConfig)
 	}
 
-	expandDB(d, &parameter)
-	expandAdmin(d, &parameter)
-	expandAppDBs(d, &parameter)
-	expandDomain(d, &parameter)
-	expandListener(d, &parameter)
-	expandManagedServers(d, &parameter)
-	expandNodeManager(d, &parameter)
-	expandPrivilegedPorts(d, &parameter)
-	expandScalingUnit(d, &parameter)
-	expandSecuredPorts(d, &parameter)
-	return []java.Parameter{parameter}
+	if v := webLogicConfig["backup_volume_size"]; v != nil {
+		webLogicParam.BackupVolumeSize = v.(string)
+	}
+	if v := webLogicConfig["cluster_name"]; v != nil {
+		webLogicParam.ClusterName = v.(string)
+	}
+	if v := webLogicConfig["connect_string"]; v != nil {
+		webLogicParam.ConnectString = v.(string)
+	}
+	if v := webLogicConfig["content_port"]; v != nil {
+		webLogicParam.ContentPort = v.(int)
+	}
+	if v := webLogicConfig["deployment_channel_port"]; v != nil {
+		webLogicParam.DeploymentChannelPort = v.(int)
+	}
+	if ipReservations := getStringList(d, "weblogic.0.ip_reservations"); len(ipReservations) > 0 {
+		webLogicParam.IPReservations = strings.Join(ipReservations, ",")
+	}
+	if v := webLogicConfig["mw_volume_size"]; v != nil {
+		webLogicParam.MWVolumeSize = v.(string)
+	}
+	if v := webLogicConfig["pdb_service_name"]; v != nil {
+		webLogicParam.PDBServiceName = v.(string)
+	}
+	if v := webLogicConfig["secured_admin_port"]; v != nil {
+		webLogicParam.SecuredAdminPort = v.(int)
+	}
+	if v := webLogicConfig["upper_stack_product_name"]; v != nil {
+		webLogicParam.UpperStackProductName = java.ServiceInstanceUpperStackProductName(v.(string))
+	}
+
+	return webLogicParam
+}
+
+func expandOTDParameter(d *schema.ResourceData) java.Parameter {
+	otdParam := java.Parameter{}
+	otdInfo := d.Get("otd").(*schema.Set).List()
+	otdConfig := otdInfo[0].(map[string]interface{})
+
+	otdParam.Type = java.ServiceInstanceTypeOTD
+	otdParam.HAEnabled = otdConfig["high_availability"].(bool)
+	otdParam.LoadBalancingPolicy = java.ServiceInstanceLoadBalancingPolicy(otdConfig["load_balancing_policy"].(string))
+	otdParam.SecuredListenerPort = otdConfig["secured_listener_port"].(int)
+	otdParam.Shape = java.ServiceInstanceShape(otdConfig["shape"].(string))
+	otdParam.VMsPublicKey = otdConfig["public_key"].(string)
+
+	expandListener(&otdParam, otdConfig)
+
+	return otdParam
+}
+
+func expandDatagridParameter(d *schema.ResourceData) java.Parameter {
+	datagridParam := java.Parameter{}
+	datagridInfo := d.Get("datagrid").(*schema.Set).List()
+	datagridConfig := datagridInfo[0].(map[string]interface{})
+
+	datagridParam.Type = java.ServiceInstanceTypeDataGrid
+	if v := datagridConfig["scaling_unit_count"]; v != nil {
+		datagridParam.ScalingUnitCount = v.(int)
+	}
+	if v := datagridConfig["cluster_name"]; v != nil {
+		datagridParam.ClusterName = v.(string)
+	}
+
+	expandScalingUnit(&datagridParam, datagridConfig)
+
+	return datagridParam
 }
 
 func expandJavaCloudStorage(d *schema.ResourceData, input *java.CreateServiceInstanceInput) {
@@ -1060,33 +1090,32 @@ func expandJavaCloudStorage(d *schema.ResourceData, input *java.CreateServiceIns
 	}
 }
 
-func expandDB(d *schema.ResourceData, parameter *java.Parameter) {
-	dbaInfo := d.Get("database").(*schema.Set)
+func expandDB(parameter *java.Parameter, config map[string]interface{}) {
+	dbaInfo := config["database"].(*schema.Set)
 	for _, i := range dbaInfo.List() {
 		attrs := i.(map[string]interface{})
 		parameter.DBServiceName = attrs["name"].(string)
 		parameter.DBAName = attrs["username"].(string)
 		parameter.DBAPassword = attrs["password"].(string)
-		if val, ok := attrs["network"].(string); ok && val != "" {
-			parameter.DBNetwork = val
+		if v := attrs["network"]; v != nil {
+			parameter.DBNetwork = v.(string)
 		}
 	}
 }
 
-func expandAdmin(d *schema.ResourceData, parameter *java.Parameter) {
-	adminInfo := d.Get("admin").(*schema.Set)
-	for _, i := range adminInfo.List() {
-		attrs := i.(map[string]interface{})
-		parameter.AdminUsername = attrs["username"].(string)
-		parameter.AdminPassword = attrs["password"].(string)
-		if val, ok := attrs["port"].(int); ok && val != 0 {
-			parameter.AdminPort = val
-		}
+func expandAdmin(parameter *java.Parameter, config map[string]interface{}) {
+	adminInfo := config["admin"].(*schema.Set).List()
+	attrs := adminInfo[0].(map[string]interface{})
+
+	parameter.AdminUsername = attrs["username"].(string)
+	parameter.AdminPassword = attrs["password"].(string)
+	if v := attrs["port"]; v != nil {
+		parameter.AdminPort = v.(int)
 	}
 }
 
-func expandAppDBs(d *schema.ResourceData, parameter *java.Parameter) {
-	appDBInfo := d.Get("app_db").(*schema.Set)
+func expandAppDBs(parameter *java.Parameter, config map[string]interface{}) {
+	appDBInfo := config["app_db"].(*schema.Set)
 	appDBs := make([]java.AppDB, appDBInfo.Len())
 	for i, val := range appDBInfo.List() {
 		attrs := val.(map[string]interface{})
@@ -1100,8 +1129,8 @@ func expandAppDBs(d *schema.ResourceData, parameter *java.Parameter) {
 	parameter.AppDBs = appDBs
 }
 
-func expandDomain(d *schema.ResourceData, parameter *java.Parameter) {
-	domainInfo := d.Get("domain").(*schema.Set)
+func expandDomain(parameter *java.Parameter, config map[string]interface{}) {
+	domainInfo := config["domain"].(*schema.Set)
 	for _, i := range domainInfo.List() {
 		attrs := i.(map[string]interface{})
 
@@ -1118,8 +1147,8 @@ func expandDomain(d *schema.ResourceData, parameter *java.Parameter) {
 	}
 }
 
-func expandListener(d *schema.ResourceData, parameter *java.Parameter) {
-	listenerInfo := d.Get("listener").(*schema.Set)
+func expandListener(parameter *java.Parameter, config map[string]interface{}) {
+	listenerInfo := config["listener"].(*schema.Set)
 	for _, i := range listenerInfo.List() {
 		attrs := i.(map[string]interface{})
 		parameter.ListenerPort = attrs["port"].(int)
@@ -1128,11 +1157,11 @@ func expandListener(d *schema.ResourceData, parameter *java.Parameter) {
 	}
 }
 
-func expandManagedServers(d *schema.ResourceData, parameter *java.Parameter) {
-	msInfo := d.Get("managed_servers").(*schema.Set)
+func expandManagedServers(parameter *java.Parameter, config map[string]interface{}) {
+	msInfo := config["managed_servers"].(*schema.Set)
 	for _, i := range msInfo.List() {
 		attrs := i.(map[string]interface{})
-		if val, ok := attrs["count"].(int); ok {
+		if val, ok := attrs["server_count"].(int); ok {
 			parameter.ManagedServerCount = val
 		}
 		if val, ok := attrs["initial_heap_size"].(int); ok {
@@ -1156,8 +1185,8 @@ func expandManagedServers(d *schema.ResourceData, parameter *java.Parameter) {
 	}
 }
 
-func expandNodeManager(d *schema.ResourceData, parameter *java.Parameter) {
-	nmInfo := d.Get("node_manager").(*schema.Set)
+func expandNodeManager(parameter *java.Parameter, config map[string]interface{}) {
+	nmInfo := config["node_manager"].(*schema.Set)
 	for _, i := range nmInfo.List() {
 		attrs := i.(map[string]interface{})
 		parameter.NodeManagerPort = attrs["port"].(int)
@@ -1170,36 +1199,45 @@ func expandNodeManager(d *schema.ResourceData, parameter *java.Parameter) {
 	}
 }
 
-func expandPrivilegedPorts(d *schema.ResourceData, parameter *java.Parameter) {
-	portInfo := d.Get("privileged_ports").(*schema.Set)
+func expandPrivilegedPorts(parameter *java.Parameter, config map[string]interface{}) {
+	portInfo := config["privileged_ports"].(*schema.Set)
 	for _, i := range portInfo.List() {
 		attrs := i.(map[string]interface{})
-		parameter.PrivilegedContentPort = attrs["content_port"].(int)
-		parameter.PrivilegedListenerPort = attrs["listener_port"].(int)
-		parameter.PrivilegedSecuredContentPort = attrs["secured_content_port"].(int)
-		parameter.PrivilegedSecuredListenerPort = attrs["secured_listener_port"].(int)
+		if v := attrs["content_port"]; v != nil {
+			parameter.PrivilegedContentPort = v.(int)
+		}
+		if v := attrs["listener_port"]; v != nil {
+			parameter.PrivilegedListenerPort = v.(int)
+		}
+		if v := attrs["secured_content_port"]; v != nil {
+			parameter.PrivilegedSecuredContentPort = v.(int)
+		}
+		if v := attrs["secured_listener_port"]; v != nil {
+			parameter.PrivilegedSecuredListenerPort = v.(int)
+		}
 	}
 }
 
-func expandScalingUnit(d *schema.ResourceData, parameter *java.Parameter) {
-	scalingUnitInfo := d.Get("scaling_units").(*schema.Set)
+func expandScalingUnit(parameter *java.Parameter, config map[string]interface{}) {
+	scalingUnitInfo := config["scaling_unit"].(*schema.Set)
 	for _, i := range scalingUnitInfo.List() {
 		attrs := i.(map[string]interface{})
 		if val, ok := attrs["name"].(string); ok && val != "" {
 			parameter.ScalingUnitName = java.ServiceInstanceScalingUnitName(val)
 		}
-		expandUnits(d, parameter)
+		if val := attrs["units"]; val != nil {
+			expandUnits(parameter, val.(*schema.Set))
+		}
 	}
 }
 
-func expandUnits(d *schema.ResourceData, parameter *java.Parameter) {
-	unitInfo := d.Get("scaling_units.0.unit").(*schema.Set)
+func expandUnits(parameter *java.Parameter, unitInfo *schema.Set) {
 	parameter.ScalingUnitCount = unitInfo.Len()
 	units := make([]java.ScalingUnit, unitInfo.Len())
 	for i, val := range unitInfo.List() {
 		attrs := val.(map[string]interface{})
 		unit := java.ScalingUnit{
-			HeapSize: attrs["heap_size"].(int),
+			HeapSize: attrs["heap_size"].(string),
 			JVMCount: attrs["jvm_count"].(int),
 			Shape:    java.ServiceInstanceShape(attrs["shape"].(string)),
 			VMCount:  attrs["vm_count"].(int),
@@ -1207,9 +1245,7 @@ func expandUnits(d *schema.ResourceData, parameter *java.Parameter) {
 		units[i] = unit
 	}
 
-	// TODO Fix java service instance `ScalingUnit` to []ScalingUnit
-	// TODO Change units[0] to units
-	parameter.ScalingUnit = units[0]
+	parameter.ScalingUnits = units
 }
 
 func expandSecuredPorts(d *schema.ResourceData, parameter *java.Parameter) {
@@ -1252,18 +1288,6 @@ func readDatabase(d *schema.ResourceData, name string, uri string) error {
 	db["name"] = name
 	db["uri"] = uri
 
-	// TODO ask about whether or not to seperate the db uri and name into their own
-	// seperate attributes or lumping them in and reading the username and password
-	dbaInfo := d.Get("database").(*schema.Set)
-	for _, i := range dbaInfo.List() {
-		attrs := i.(map[string]interface{})
-		db["username"] = attrs["username"].(string)
-		db["password"] = attrs["password"].(string)
-		if val, ok := attrs["network"].(string); ok && val != "" {
-			db["network"] = val
-		}
-	}
-
 	result = append(result, db)
 	return d.Set("database", result)
 }
@@ -1275,7 +1299,6 @@ func readDomain(d *schema.ResourceData, name string, mode string) error {
 	domain["name"] = name
 	domain["mode"] = mode
 
-	// TODO: Check this question from readDatabase method too
 	domainInfo := d.Get("domain").(*schema.Set)
 	for _, i := range domainInfo.List() {
 		attrs := i.(map[string]interface{})
