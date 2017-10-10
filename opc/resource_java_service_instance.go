@@ -539,7 +539,7 @@ func resourceOPCJavaServiceInstance() *schema.Resource {
 					Schema: map[string]*schema.Schema{
 						"cluster_name": {
 							Type:     schema.TypeString,
-							Required: true,
+							Optional: true,
 							ForceNew: true,
 							Computed: true,
 						},
