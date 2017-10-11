@@ -16,7 +16,7 @@ an OPC identity domain, for the Shared Network.
 ```hcl
 resource "opc_compute_ip_association" "instance1_reservation1" {
   vcable     = "${opc_compute_instance.test_instance.vcable}"
-  parentpool = "ipreservation:${opc_compute_ip_reservation.reservation1.name}"
+  parent_pool = "ipreservation:${opc_compute_ip_reservation.reservation1.name}"
 }
 ```
 
@@ -26,7 +26,7 @@ The following arguments are supported:
 
 * `vcable` - (Required) The vcable of the instance to associate the IP address with.
 
-* `parentpool` - (Required) The pool from which to take an IP address. To associate a specific reserved IP address, use
+* `parent_pool` - (Required) The pool from which to take an IP address. To associate a specific reserved IP address, use
 the prefix `ipreservation:` followed by the name of the IP reservation. To allocate an IP address from a pool, use the
 prefix `ippool:`, e.g. `ippool:/oracle/public/ippool`.
 
