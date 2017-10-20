@@ -110,6 +110,7 @@ func TestAccOPCInstance_ipNetwork(t *testing.T) {
 					resource.TestCheckResourceAttr(dataName, "ip_network", fmt.Sprintf("testing-ip-network-%d", rInt)),
 					resource.TestCheckResourceAttr(dataName, "vnic", fmt.Sprintf("ip-network-test-%d", rInt)),
 					resource.TestCheckResourceAttr(dataName, "shared_network", "false"),
+					resource.TestCheckResourceAttr(dataName, "is_default_gateway", "true"),
 				),
 			},
 		},
@@ -336,6 +337,7 @@ resource "opc_compute_instance" "test" {
     ip_network = "${opc_compute_ip_network.foo.id}"
     vnic = "ip-network-test-%d"
     shared_network = false
+		is_default_gateway = true
   }
 }
 
