@@ -136,6 +136,13 @@ func resourceInstance() *schema.Resource {
 							Optional: true,
 						},
 
+						"is_default_gateway": {
+							// Optional, IP Network only
+							Type:     schema.TypeBool,
+							ForceNew: true,
+							Optional: true,
+						},
+
 						"mac_address": {
 							// Optional, IP Network Only
 							Type:     schema.TypeString,
@@ -769,6 +776,7 @@ func validateSharedNetwork(ni map[string]interface{}) error {
 	// The following attributes _cannot_ be set for a shared network:
 	// - "ip_address"
 	// - "ip_network"
+	// - "is_default_gateway"
 	// - "mac_address"
 	// - "vnic"
 	// - "vnic_sets"
@@ -781,6 +789,7 @@ func validateSharedNetwork(ni map[string]interface{}) error {
 	nilAttrs := []string{
 		"ip_address",
 		"ip_network",
+		"is_default_gateway",
 		"mac_address",
 		"vnic",
 	}
@@ -821,6 +830,10 @@ func readIPNetworkFromConfig(ni map[string]interface{}) (compute.NetworkingInfo,
 
 	if v, ok := ni["ip_address"].(string); ok && v != "" {
 		info.IPAddress = v
+	}
+
+	if v, ok := ni["is_default_gateway"].(bool); ok {
+		info.IsDefaultGateway = v
 	}
 
 	if v, ok := ni["mac_address"].(string); ok && v != "" {
@@ -908,6 +921,7 @@ func readNetworkInterfaces(d *schema.ResourceData, ifaces map[string]compute.Net
 			return err
 		}
 		res["index"] = indexInt
+		res["is_default_gateway"] = iface.IsDefaultGateway
 
 		// Set the proper attributes for this specific network interface
 		if iface.DNS != nil {

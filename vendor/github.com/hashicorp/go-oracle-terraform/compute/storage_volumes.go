@@ -35,7 +35,7 @@ type StorageVolumeKind string
 const (
 	StorageVolumeKindDefault StorageVolumeKind = "/oracle/public/storage/default"
 	StorageVolumeKindLatency StorageVolumeKind = "/oracle/public/storage/latency"
-	StorageVolumeKindSSD     StorageVolumeKind = "/oracle/public/storage/ssd/gp1"
+	StorageVolumeKindSSD     StorageVolumeKind = "/oracle/public/storage/ssd/gpl"
 )
 
 // StorageVolumeInfo represents information retrieved from the service about a Storage Volume.

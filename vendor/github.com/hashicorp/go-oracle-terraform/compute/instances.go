@@ -252,6 +252,10 @@ type NetworkingInfo struct {
 	// Required
 	IPNetwork string `json:"ipnetwork,omitempty"`
 	// IP Network only.
+	// Set interface as default gateway for all traffic
+	// Optional
+	IsDefaultGateway bool `json:"is_default_gateway,omitempty"`
+	// IP Network only.
 	// The hexadecimal MAC Address of the interface
 	// Optional
 	MACAddress string `json:"address,omitempty"`

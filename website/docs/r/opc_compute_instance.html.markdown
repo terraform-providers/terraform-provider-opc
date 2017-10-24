@@ -132,6 +132,7 @@ The following attributes are supported:
 * `ip_address` - (Optional, IP Network Only) IP Address assigned to the interface.
 * `ip_network` - (Optional, IP Network Only) The IP Network assigned to the interface.
 * `mac_address` - (Optional, IP Network Only) The MAC address of the interface.
+* `is_default_gateway` - (Optional, IP Network Only) Specify the interface is to be used as the default gateway for all traffic. Only one interface on an instance can be specified as the default gateway. If the instance has an interface on the shared network, that interface is always used as the default gateway.
 * `model` - (Required, Shared Network Only) The model of the NIC card used. Must be set to `e1000`.
 * `name_servers` - (Optional) Array of name servers for the interface.
 * `nat` - (Optional for IP Networks, Required for the Shared Network) The IP Reservations associated with the interface (IP Network).
