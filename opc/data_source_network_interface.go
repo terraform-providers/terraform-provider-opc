@@ -46,6 +46,11 @@ func dataSourceNetworkInterface() *schema.Resource {
 				Computed: true,
 			},
 
+			"is_default_gateway": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
+
 			"mac_address": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -151,6 +156,7 @@ func dataSourceNetworkInterfaceRead(d *schema.ResourceData, meta interface{}) er
 	d.Set("ip_address", result.IPAddress)
 	d.Set("ip_network", result.IPNetwork)
 	d.Set("mac_address", result.MACAddress)
+	d.Set("is_default_gateway", result.IsDefaultGateway)
 	d.Set("model", result.Model)
 	d.Set("vnic", result.Vnic)
 

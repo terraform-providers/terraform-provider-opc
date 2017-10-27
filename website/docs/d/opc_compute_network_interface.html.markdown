@@ -38,6 +38,7 @@ output "vnic" {
 * `dns` - Array of DNS servers for the interface.
 * `ip_address` - IP Address assigned to the interface.
 * `ip_network` - The IP Network assigned to the interface.
+* `is_default_gateway` - Whether or not the the interface is the default gateway.
 * `mac_address` - The MAC address of the interface.
 * `model` - The model of the NIC card used.
 * `name_servers` - Array of name servers for the interface.

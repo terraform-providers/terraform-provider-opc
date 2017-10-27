@@ -1,4 +1,11 @@
 ## 0.1.4 (Unreleased)
+
+IMPROVEMENTS:
+
+* r/opc_compute_instance: Add `is_default_gatway` variable [#87]
+
+* d/network_interface: Add `is_default_gateway` variable [#87]
+
 ## 0.1.3 (September 15, 2017)
 
 FEATURES: 
