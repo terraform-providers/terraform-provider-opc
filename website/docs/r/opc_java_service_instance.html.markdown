@@ -445,11 +445,3 @@ instance was provisioned.
 * `oracle_middleware_version` - Oracle Fusion Middleware software version.
 
 * `uri` - The Uniform Resource Identifier for the Service Instance
-
-## Import
-
-Service Instance's can be imported using the `resource name`, e.g.
-
-```shell
-$ terraform import opc_java_service_instance.instance1 example
-```
