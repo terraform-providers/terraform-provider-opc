@@ -1,8 +1,11 @@
 package opc
 
 import (
+	"fmt"
 	"sort"
 
+	"github.com/hashicorp/go-oracle-terraform/database"
+	"github.com/hashicorp/go-oracle-terraform/java"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
@@ -44,4 +47,24 @@ func getIntList(d *schema.ResourceData, key string) []int {
 func setIntList(d *schema.ResourceData, key string, value []int) error {
 	sort.Ints(value)
 	return d.Set(key, value)
+}
+
+// A user may inadvertently call the database service without passing in the required parameters (because it's optional)
+// so we check to make sure that the database client has been initialized
+func getDatabaseClient(meta interface{}) (*database.DatabaseClient, error) {
+	client := meta.(*OPCClient).databaseClient
+	if client == nil {
+		return nil, fmt.Errorf("Database Client is not initialized. Make sure to use `database_endpoint` variable or `OPC_DATABASE_ENDPOINT` env variable")
+	}
+	return client, nil
+}
+
+// A user may inadvertently call the java without passing in the required parameters to use that service
+// (because it's optional) so we check to make sure that the database client has been initialized
+func getJavaClient(meta interface{}) (*java.JavaClient, error) {
+	client := meta.(*OPCClient).javaClient
+	if client == nil {
+		return nil, fmt.Errorf("Java Client is not initialized. Make sure to use `java_endpoint` variable or `OPC_JAVA_ENDPOINT` env variable")
+	}
+	return client, nil
 }
