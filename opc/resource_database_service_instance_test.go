@@ -12,6 +12,8 @@ import (
 )
 
 func TestAccOPCDatabaseServiceInstance_Basic(t *testing.T) {
+	t.Skip("Skipping test until we release this resource")
+
 	ri := acctest.RandInt()
 	config := testAccDatabaseServiceInstanceBasic(ri)
 	resourceName := "opc_database_service_instance.test"
@@ -39,6 +41,8 @@ func TestAccOPCDatabaseServiceInstance_Basic(t *testing.T) {
 }
 
 func TestAccOPCDatabaseServiceInstance_CloudStorage(t *testing.T) {
+	t.Skip("Skipping test until we release this resource")
+
 	ri := acctest.RandInt()
 	config := testAccDatabaseServiceInstanceCloudStorage(ri)
 	resourceName := "opc_database_service_instance.test"
