@@ -51,6 +51,47 @@ resource "opc_compute_instance" "test" {
 
 ```
 
+## Example Orchestration Usage
+
+```hcl
+resource "opc_compute_ip_network" "test" {
+  name                = "internal-network"
+  description         = "Terraform Provisioned Internal Network"
+  ip_address_prefix   = "10.0.1.0/24"
+  public_napt_enabled = false
+}
+
+resource "opc_compute_storage_volume" "test" {
+  name = "internal"
+  size = 100
+}
+
+resource "opc_compute_instance" "test" {
+  name       = "instance1"
+  label      = "Terraform Provisioned Instance"
+  shape      = "oc3"
+  image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+
+  orchestration {
+    name = "orchestration1"
+    desired_state = "active"
+    object_label = "Terraform Provisioned Instance"
+  }
+
+  storage {
+    volume = "${opc_compute_storage_volume.test.name}"
+    index  = 1
+  }
+
+  networking_info {
+    index          = 0
+    nat            = ["ippool:/oracle/public/ippool"]
+    shared_network = true
+  }
+}
+
+```
+
 ## Argument Reference
 
 The following arguments are supported:
@@ -58,6 +99,9 @@ The following arguments are supported:
 * `name` - (Required) The name of the instance.
 
 * `shape` - (Required) The shape of the instance, e.g. `oc4`.
+
+* `orchestration` - (Optional) The information pertaining to creating an instance through the orchestration API.
+See [Orchestration](#orchestration) below for more information.
 
 * `instance_attributes` - (Optional) A JSON string of custom attributes. See [Attributes](#attributes) below for more information.
 
@@ -115,6 +159,24 @@ when creating a new instance _with terraform_. This requires us to ignore any st
 Thus, any configuration changes in the `instance_attributes` field, will not register a diff during a `plan` or `apply`.
  If a user wishes to make a change solely to the supplied instance attributes, and recreate the instance resource, `terraform taint` is the best solution.
  You can read more about the `taint` command [here](https://www.terraform.io/docs/commands/taint.html)
+
+## Orchestration
+
+The `orchestration` config manages the instance through the orchestration API.
+
+* `name` - (Required) The name of the orchestration.
+
+* `desired_state` - (Required) The desired state of the orchestration. Permitted values are `active`, `inactive`, and
+`suspend`.
+
+* `object_label` - (Required) The label to apply for the object.
+
+* `persistent` - (Optional) Determines whether the instance will persist when the orchestration is suspended.
+Defaults to false.
+
+* `description` - (Optional) The description of the orchestration.
+
+* `version` - (Optional) The version of the orchestration. This value is computed if left unspecified.
 
 ## Networking Info
 

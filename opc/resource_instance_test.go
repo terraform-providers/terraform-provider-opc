@@ -31,6 +31,28 @@ func TestAccOPCInstance_basic(t *testing.T) {
 	})
 }
 
+func TestAccOPCInstance_basicOrchestration(t *testing.T) {
+	resName := "opc_compute_instance.test"
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccOPCCheckInstanceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccInstanceBasicOrchestration(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccOPCCheckInstanceExists,
+					resource.TestCheckResourceAttr(resName, "name", fmt.Sprintf("acc-test-instance-%d", rInt)),
+					resource.TestCheckResourceAttr(resName, "label", "TestAccOPCInstance_basic"),
+					resource.TestCheckResourceAttr(resName, "orchestration.0.name", fmt.Sprintf("acc-test-orchestration-%d", rInt)),
+				),
+			},
+		},
+	})
+}
+
 func TestAccOPCInstance_sharedNetworking(t *testing.T) {
 	rInt := acctest.RandInt()
 	resName := "opc_compute_instance.test"
@@ -70,6 +92,53 @@ func TestAccOPCInstance_sharedNetworking(t *testing.T) {
 					resource.TestCheckResourceAttr(dataName, "sec_lists.#", "1"),
 					resource.TestCheckResourceAttr(dataName, "name_servers.#", "0"),
 					resource.TestCheckResourceAttr(dataName, "vnic_sets.#", "0"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccOPCInstance_sharedNetworkingOrchestration(t *testing.T) {
+	rInt := acctest.RandInt()
+	resName := "opc_compute_instance.test"
+	dataName := "data.opc_compute_network_interface.test"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccOPCCheckInstanceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccInstanceSharedNetworkingOrchestration(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccOPCCheckInstanceExists,
+					resource.TestCheckResourceAttrSet(resName, "id"),
+					resource.TestCheckResourceAttrSet(resName, "availability_domain"),
+					resource.TestCheckResourceAttrSet(resName, "domain"),
+					resource.TestCheckResourceAttrSet(resName, "hostname"),
+					resource.TestCheckResourceAttrSet(resName, "ip_address"),
+					resource.TestCheckResourceAttr(resName, "name", fmt.Sprintf("acc-test-instance-%d", rInt)),
+					resource.TestCheckResourceAttr(resName, "networking_info.#", "1"),
+					// Default Placement Reqs
+					resource.TestCheckResourceAttr(resName, "placement_requirements.#", "2"),
+					resource.TestCheckResourceAttr(resName, "placement_requirements.0", "/system/compute/allow_instances"),
+					resource.TestCheckResourceAttr(resName, "placement_requirements.1", "/system/compute/placement/default"),
+					resource.TestCheckResourceAttr(resName, "platform", "linux"),
+					resource.TestCheckResourceAttr(resName, "priority", "/oracle/public/default"),
+					resource.TestCheckResourceAttr(resName, "reverse_dns", "true"),
+					resource.TestCheckResourceAttr(resName, "state", "running"),
+					resource.TestCheckResourceAttr(resName, "tags.#", "2"),
+					resource.TestCheckResourceAttrSet(resName, "vcable"),
+					resource.TestCheckResourceAttr(resName, "virtio", "false"),
+
+					// Check Data Source to validate networking attributes
+					resource.TestCheckResourceAttr(dataName, "shared_network", "true"),
+					resource.TestCheckResourceAttr(dataName, "nat.#", "1"),
+					resource.TestCheckResourceAttr(dataName, "sec_lists.#", "1"),
+					resource.TestCheckResourceAttr(dataName, "name_servers.#", "0"),
+					resource.TestCheckResourceAttr(dataName, "vnic_sets.#", "0"),
+
+					resource.TestCheckResourceAttr(resName, "orchestration.0.name", fmt.Sprintf("acc-test-orchestration-%d", rInt)),
 				),
 			},
 		},
@@ -116,6 +185,47 @@ func TestAccOPCInstance_ipNetwork(t *testing.T) {
 	})
 }
 
+func TestAccOPCInstance_ipNetworkOrchestration(t *testing.T) {
+	rInt := acctest.RandInt()
+	resName := "opc_compute_instance.test"
+	dataName := "data.opc_compute_network_interface.test"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccOPCCheckInstanceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccInstanceIPNetworkingOrchestration(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccOPCCheckInstanceExists,
+					resource.TestCheckResourceAttrSet(resName, "id"),
+					resource.TestCheckResourceAttrSet(resName, "availability_domain"),
+					resource.TestCheckResourceAttrSet(resName, "domain"),
+					resource.TestCheckResourceAttrSet(resName, "ip_address"),
+					resource.TestCheckResourceAttr(resName, "name", fmt.Sprintf("acc-test-instance-%d", rInt)),
+					resource.TestCheckResourceAttr(resName, "networking_info.#", "1"),
+					// Default Placement Reqs
+					resource.TestCheckResourceAttr(resName, "placement_requirements.#", "2"),
+					resource.TestCheckResourceAttr(resName, "placement_requirements.0", "/system/compute/allow_instances"),
+					resource.TestCheckResourceAttr(resName, "placement_requirements.1", "/system/compute/placement/default"),
+					resource.TestCheckResourceAttr(resName, "platform", "linux"),
+					resource.TestCheckResourceAttr(resName, "priority", "/oracle/public/default"),
+					resource.TestCheckResourceAttr(resName, "reverse_dns", "true"),
+					resource.TestCheckResourceAttr(resName, "state", "running"),
+					resource.TestCheckResourceAttr(resName, "virtio", "false"),
+					resource.TestCheckResourceAttr(resName, "orchestration.0.name", fmt.Sprintf("acc-test-orchestration-%d", rInt)),
+
+					// Check Data Source to validate networking attributes
+					resource.TestCheckResourceAttr(dataName, "ip_network", fmt.Sprintf("testing-ip-network-%d", rInt)),
+					resource.TestCheckResourceAttr(dataName, "vnic", fmt.Sprintf("ip-network-test-%d", rInt)),
+					resource.TestCheckResourceAttr(dataName, "shared_network", "false"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccOPCInstance_storage(t *testing.T) {
 	resName := "opc_compute_instance.test"
 	rInt := acctest.RandInt()
@@ -130,6 +240,27 @@ func TestAccOPCInstance_storage(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccOPCCheckInstanceExists,
 					resource.TestCheckResourceAttr(resName, "storage.#", "2"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccOPCInstance_storageOrchestration(t *testing.T) {
+	resName := "opc_compute_instance.test"
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccOPCCheckInstanceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccInstanceStorageOrchestration(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccOPCCheckInstanceExists,
+					resource.TestCheckResourceAttr(resName, "storage.#", "2"),
+					resource.TestCheckResourceAttr(resName, "orchestration.0.name", fmt.Sprintf("acc-test-orchestration-%d", rInt)),
 				),
 			},
 		},
@@ -157,6 +288,28 @@ func TestAccOPCInstance_emptyLabel(t *testing.T) {
 	})
 }
 
+func TestAccOPCInstance_emptyLabelOrchestration(t *testing.T) {
+	resName := "opc_compute_instance.test"
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccOPCCheckInstanceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccInstanceEmptyLabelOrchestration(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccOPCCheckInstanceExists,
+					resource.TestCheckResourceAttr(resName, "name", fmt.Sprintf("acc-test-instance-%d", rInt)),
+					resource.TestCheckResourceAttrSet(resName, "label"),
+					resource.TestCheckResourceAttr(resName, "orchestration.0.name", fmt.Sprintf("acc-test-orchestration-%d", rInt)),
+				),
+			},
+		},
+	})
+}
+
 func TestAccOPCInstance_hostname(t *testing.T) {
 	resName := "opc_compute_instance.test"
 	rInt := acctest.RandInt()
@@ -172,6 +325,28 @@ func TestAccOPCInstance_hostname(t *testing.T) {
 					testAccOPCCheckInstanceExists,
 					resource.TestCheckResourceAttr(resName, "name", fmt.Sprintf("acc-test-instance-%d", rInt)),
 					resource.TestCheckResourceAttr(resName, "hostname", fmt.Sprintf("testhostname-%d", rInt)),
+				),
+			},
+		},
+	})
+}
+
+func TestAccOPCInstance_hostnameOrchestration(t *testing.T) {
+	resName := "opc_compute_instance.test"
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccOPCCheckInstanceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccInstanceHostnameOrchestration(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccOPCCheckInstanceExists,
+					resource.TestCheckResourceAttr(resName, "name", fmt.Sprintf("acc-test-instance-%d", rInt)),
+					resource.TestCheckResourceAttr(resName, "hostname", fmt.Sprintf("testhostname-%d", rInt)),
+					resource.TestCheckResourceAttr(resName, "orchestration.0.name", fmt.Sprintf("acc-test-orchestration-%d", rInt)),
 				),
 			},
 		},
@@ -196,6 +371,33 @@ func TestAccOPCInstance_updateTags(t *testing.T) {
 			},
 			{
 				Config: testAccInstanceUpdateTags(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccOPCCheckInstanceExists,
+					resource.TestCheckResourceAttr(resName, "tags.#", "2"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccOPCInstance_updateTagsOrchestration(t *testing.T) {
+	resName := "opc_compute_instance.test"
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccOPCCheckInstanceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccInstanceBasicOrchestration(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccOPCCheckInstanceExists,
+					resource.TestCheckResourceAttr(resName, "name", fmt.Sprintf("acc-test-instance-%d", rInt)),
+				),
+			},
+			{
+				Config: testAccInstanceUpdateTagsOrchestration(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccOPCCheckInstanceExists,
 					resource.TestCheckResourceAttr(resName, "tags.#", "2"),
@@ -295,6 +497,26 @@ JSON
 }`, rInt)
 }
 
+func testAccInstanceBasicOrchestration(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_instance" "test" {
+	name = "acc-test-instance-%d"
+	label = "TestAccOPCInstance_basic"
+	shape = "oc3"
+	image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+	orchestration{
+		name = "acc-test-orchestration-%d"
+		desired_state = "active"
+		object_label = "acc-test-instance-label-%d"
+	}
+	instance_attributes = <<JSON
+{
+  "foo": "bar"
+}
+JSON
+}`, rInt, rInt, rInt)
+}
+
 func testAccInstanceSharedNetworking(rInt int) string {
 	return fmt.Sprintf(`
 resource "opc_compute_instance" "test" {
@@ -316,6 +538,34 @@ data "opc_compute_network_interface" "test" {
   interface = "eth0"
 }
 `, rInt)
+}
+
+func testAccInstanceSharedNetworkingOrchestration(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_instance" "test" {
+  name = "acc-test-instance-%d"
+  label = "TestAccOPCInstance_sharedNetworking"
+  shape = "oc3"
+  image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+  tags = ["tag1", "tag2"]
+	orchestration{
+		name = "acc-test-orchestration-%d"
+		desired_state = "active"
+		object_label = "acc-test-instance-label-%d"
+	}
+  networking_info {
+    index = 0
+    nat = ["ippool:/oracle/public/ippool"]
+    shared_network = true
+  }
+}
+
+data "opc_compute_network_interface" "test" {
+  instance_name = "${opc_compute_instance.test.name}"
+  instance_id = "${opc_compute_instance.test.id}"
+  interface = "eth0"
+}
+`, rInt, rInt, rInt)
 }
 
 func testAccInstanceIPNetworking(rInt int) string {
@@ -347,6 +597,40 @@ data "opc_compute_network_interface" "test" {
 `, rInt, rInt, rInt)
 }
 
+func testAccInstanceIPNetworkingOrchestration(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_ip_network" "foo" {
+  name = "testing-ip-network-%d"
+  description = "testing-ip-network-instance"
+  ip_address_prefix = "10.1.12.0/24"
+}
+
+resource "opc_compute_instance" "test" {
+  name = "acc-test-instance-%d"
+  label = "TestAccOPCInstance_ipNetwork"
+  shape = "oc3"
+  image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+	orchestration{
+		name = "acc-test-orchestration-%d"
+		desired_state = "active"
+		object_label = "acc-test-instance-label-%d"
+	}
+  networking_info {
+    index = 0
+    ip_network = "${opc_compute_ip_network.foo.id}"
+    vnic = "ip-network-test-%d"
+    shared_network = false
+  }
+}
+
+data "opc_compute_network_interface" "test" {
+  instance_id = "${opc_compute_instance.test.id}"
+  instance_name = "${opc_compute_instance.test.name}"
+  interface = "eth0"
+}
+`, rInt, rInt, rInt, rInt, rInt)
+}
+
 func testAccInstanceStorage(rInt int) string {
 	return fmt.Sprintf(`
 resource "opc_compute_storage_volume" "foo" {
@@ -375,6 +659,39 @@ resource "opc_compute_instance" "test" {
 }`, rInt, rInt, rInt)
 }
 
+func testAccInstanceStorageOrchestration(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_storage_volume" "foo" {
+  name = "acc-test-instance-%d"
+  size = 1
+}
+
+resource "opc_compute_storage_volume" "bar" {
+  name = "acc-test-instance-2-%d"
+  size = 1
+}
+
+resource "opc_compute_instance" "test" {
+	name = "acc-test-instance-%d"
+	label = "TestAccOPCInstance_basic"
+	shape = "oc3"
+	image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+	storage {
+		volume = "${opc_compute_storage_volume.foo.name}"
+		index = 1
+	}
+	storage {
+	  volume = "${opc_compute_storage_volume.bar.name}"
+	  index = 2
+	}
+	orchestration{
+		name = "acc-test-orchestration-%d"
+		desired_state = "active"
+		object_label = "acc-test-instance-label-%d"
+	}
+}`, rInt, rInt, rInt, rInt, rInt)
+}
+
 func testAccInstanceEmptyLabel(rInt int) string {
 	return fmt.Sprintf(`
 resource "opc_compute_instance" "test" {
@@ -387,6 +704,25 @@ resource "opc_compute_instance" "test" {
 }
 JSON
 }`, rInt)
+}
+
+func testAccInstanceEmptyLabelOrchestration(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_instance" "test" {
+	name = "acc-test-instance-%d"
+	shape = "oc3"
+	image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+	orchestration{
+		name = "acc-test-orchestration-%d"
+		desired_state = "active"
+		object_label = "acc-test-instance-label-%d"
+	}
+	instance_attributes = <<JSON
+{
+  "foo": "bar"
+}
+JSON
+}`, rInt, rInt, rInt)
 }
 
 func testAccInstanceUpdateTags(rInt int) string {
@@ -403,6 +739,27 @@ resource "opc_compute_instance" "test" {
 }
 JSON
 }`, rInt)
+}
+
+func testAccInstanceUpdateTagsOrchestration(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_instance" "test" {
+	name = "acc-test-instance-%d"
+	label = "TestAccOPCInstance_basic"
+	shape = "oc3"
+	image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+	tags = ["tag1", "tag2"]
+	orchestration{
+		name = "acc-test-orchestration-%d"
+		desired_state = "active"
+		object_label = "acc-test-instance-label-%d"
+	}
+	instance_attributes = <<JSON
+{
+  "foo": "bar"
+}
+JSON
+}`, rInt, rInt, rInt)
 }
 
 func testAccInstanceBootVolume(rInt int) string {
@@ -514,4 +871,19 @@ resource "opc_compute_instance" "test" {
 	image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
 	hostname = "testhostname-%d"
 }`, rInt, rInt)
+}
+
+func testAccInstanceHostnameOrchestration(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_instance" "test" {
+	name = "acc-test-instance-%d"
+	shape = "oc3"
+	image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+	hostname = "testhostname-%d"
+	orchestration{
+		name = "acc-test-orchestration-%d"
+		desired_state = "active"
+		object_label = "acc-test-instance-label-%d"
+	}
+}`, rInt, rInt, rInt, rInt)
 }
