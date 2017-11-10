@@ -262,20 +262,20 @@
 			"versionExact": "v0.4.0"
 		},
 		{
-			"checksumSHA1": "L6NeEU8piRVKbSuzd7U7mYDFUgo=",
+			"checksumSHA1": "ysOT94G53v7JEhkI6l9OaOeBa/c=",
 			"path": "github.com/hashicorp/go-oracle-terraform/compute",
-			"revision": "d1b0e9affb138d06c32c582d4882ffbfc6497ea2",
-			"revisionTime": "2017-09-14T16:37:18Z",
-			"version": "=v0.4.0",
-			"versionExact": "v0.4.0"
+			"revision": "daf1027d1e45dea37b50b0fb2868a6b004d674a9",
+			"revisionTime": "2017-11-10T22:06:23Z",
+			"version": "v0.6.0",
+			"versionExact": "v0.6.0"
 		},
 		{
 			"checksumSHA1": "E7dGmtLqjJnfc+Wz3paDimFVI8I=",
 			"path": "github.com/hashicorp/go-oracle-terraform/database",
-			"revision": "d1b0e9affb138d06c32c582d4882ffbfc6497ea2",
-			"revisionTime": "2017-09-14T16:37:18Z",
-			"version": "=v0.4.0",
-			"versionExact": "v0.4.0"
+			"revision": "daf1027d1e45dea37b50b0fb2868a6b004d674a9",
+			"revisionTime": "2017-11-10T22:06:23Z",
+			"version": "v0.6.0",
+			"versionExact": "v0.6.0"
 		},
 		{
 			"checksumSHA1": "JbuYtbJkx3r1BLuCMymkri0Q1BI=",
@@ -288,10 +288,10 @@
 		{
 			"checksumSHA1": "H8V9Z6p2ezWTQmDkKrcnlIYg8q4=",
 			"path": "github.com/hashicorp/go-oracle-terraform/storage",
-			"revision": "d1b0e9affb138d06c32c582d4882ffbfc6497ea2",
-			"revisionTime": "2017-09-14T16:37:18Z",
-			"version": "=v0.4.0",
-			"versionExact": "v0.4.0"
+			"revision": "daf1027d1e45dea37b50b0fb2868a6b004d674a9",
+			"revisionTime": "2017-11-10T22:06:23Z",
+			"version": "v0.6.0",
+			"versionExact": "v0.6.0"
 		},
 		{
 			"checksumSHA1": "b0nQutPMJHeUmz4SjpreotAo6Yk=",
