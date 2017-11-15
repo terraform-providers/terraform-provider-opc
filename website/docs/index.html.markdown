@@ -40,8 +40,7 @@ The following arguments are supported:
 * `password` - (Optional) The password associated with the username to use. It can also be sourced from
   the `OPC_PASSWORD` environment variable.
 
-* `identity_domain` - (Optional) The identity domain to use. It can also be sourced from
-  the `OPC_IDENTITY_DOMAIN` environment variable.
+* `identity_domain` - (Optional) The Identity Domain or Service Instance ID of the environment to use. It can also be sourced from the `OPC_IDENTITY_DOMAIN` environment variable.  
 
 * `endpoint` - (Optional) The API endpoint to use, associated with your Oracle Public Cloud account. This is known as the `REST Endpoint` within the Oracle portal. It can also be sourced from the `OPC_ENDPOINT` environment variable.
 

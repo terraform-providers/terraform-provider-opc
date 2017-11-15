@@ -69,6 +69,8 @@ The following arguments are supported:
 
 * `label` - (Optional) The label to apply to the instance.
 
+* `desired_state` - (Optional) Set the desire state of the instance to `running` (default) or `shutdown`. You can use this request to shut down and restart individual instances which use a persistent bootable storage volume.
+
 * `networking_info` - (Optional) Information pertaining to an individual network interface to be created and attached to the instance. If left unspecified, the instance will be created within the `shared_network`. See [Networking Info](#networking-info) below for more information.
 
 * `storage` - (Optional) Information pertaining to an individual storage attachment to be created during instance creation. Please see [Storage Attachments](#storage-attachments) below for more information.
@@ -133,7 +135,7 @@ The following attributes are supported:
 * `ip_network` - (Optional, IP Network Only) The IP Network assigned to the interface.
 * `mac_address` - (Optional, IP Network Only) The MAC address of the interface.
 * `is_default_gateway` - (Optional, IP Network Only) Specify the interface is to be used as the default gateway for all traffic. Only one interface on an instance can be specified as the default gateway. If the instance has an interface on the shared network, that interface is always used as the default gateway.
-* `model` - (Required, Shared Network Only) The model of the NIC card used. Must be set to `e1000`.
+* `model` - (Optional, Shared Network Only) The model of the NIC card used. Must be set to `e1000`.
 * `name_servers` - (Optional) Array of name servers for the interface.
 * `nat` - (Optional for IP Networks, Required for the Shared Network) The IP Reservations associated with the interface (IP Network).
  Indicates whether a temporary or permanent public IP address should be assigned to the instance (Shared Network).
