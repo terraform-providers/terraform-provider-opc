@@ -86,7 +86,7 @@ func resourceOPCStorageObject() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 				ForceNew:    true,
-				Description: "Specify the number of seconds after which the system deletes the object",
+				Description: "The date and time in UNIX Epoch time stamp format when the system removes the object",
 			},
 			"etag": {
 				Type:        schema.TypeString,
