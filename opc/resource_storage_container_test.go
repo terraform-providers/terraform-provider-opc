@@ -114,9 +114,14 @@ const testAccOPCStorageContainerBasic = `
 resource "opc_storage_container" "test" {
   name = "acc-storage-container-%d"
   max_age = 50
+	quota_bytes = 1000000000
+	quota_count = 1000
   primary_key = "test-key"
   allowed_origins = ["origin-1"]
 	exposed_headers = ["exposed-header-1"]
+	metadate {
+		"Foo": "bar"
+	}
 }
 `
 
@@ -124,9 +129,16 @@ const testAccOPCStorageContainerUpdated = `
 resource "opc_storage_container" "test" {
   name = "acc-storage-container-%d"
   max_age = 60
+	quota_bytes = 2000000000
+	quota_count = 2000
   primary_key = "test-key-updated"
   secondary_key = "test-key"
   allowed_origins = ["origin-1", "origin-2"]
 	exposed_headers = ["exposed-header-1", "exposed-header-2"]
+	metadate {
+		"Foo": "bar",
+		"Abc-Def": "xyz"
+	}
+
 }
 `
