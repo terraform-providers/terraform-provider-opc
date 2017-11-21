@@ -99,6 +99,30 @@ func TestAccOPCStorageObject_fileSource(t *testing.T) {
 	})
 }
 
+func TestAccOPCStorageObject_objectMetadata(t *testing.T) {
+	resName := "opc_storage_object.test"
+	rInt := acctest.RandInt()
+
+	body := _SourceInput
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckStorageObjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccOPCStorageObject_objectMetadata(rInt, body),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckStorageObjectExists,
+					resource.TestCheckResourceAttr(resName, "name", fmt.Sprintf("test-acc-%d", rInt)),
+					resource.TestCheckResourceAttr(resName, "container", fmt.Sprintf("acc-test-%d", rInt)),
+					resource.TestCheckResourceAttrSet(resName, "metadata"),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckStorageObjectExists(s *terraform.State) error {
 	client := testAccProvider.Meta().(*OPCClient).storageClient.Objects()
 
@@ -144,6 +168,27 @@ resource "opc_storage_container" "foo" {
   primary_key = "test-key"
   allowed_origins = ["origin-1"]
 }`, rInt)
+}
+
+func testAccOPCStorageObject_objectMetadata(rInt int, body string) string {
+	return fmt.Sprintf(`
+%s
+
+resource "opc_storage_object" "test" {
+  name = "test-acc-%d"
+  container = "${opc_storage_container.foo.name}"
+  content_type = "text/plain;charset=UTF-8"
+	metadata {
+		"Foo": "bar",
+		"Abc-Def": "XYZ"
+	}
+  content = <<EOF
+%s
+EOF
+}`,
+		testAccOPCStorageObject_testContainer(rInt),
+		rInt,
+		body)
 }
 
 func testAccOPCStorageObject_contentSource(rInt int, body string) string {
