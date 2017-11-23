@@ -41,6 +41,11 @@ The following arguments are supported:
 
 * `max_age` - (Optional) Maximum age in seconds for the origin to hold the preflight results.
 
+* `quota_bytes` - (Optional) Maximum size of the container, in bytes
+
+* `quota_count` - (Optional) Maximum object count of the container
+
+
 ## Import
 
 Container's can be imported using the `resource name`, e.g.
