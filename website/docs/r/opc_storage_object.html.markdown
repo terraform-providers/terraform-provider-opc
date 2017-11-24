@@ -14,10 +14,10 @@ Creates and manages a Object in the OPC Storage Container. `storage_endpoint` mu
 
 ```hcl
 resource "opc_storage_object" "default" {
-  name = "storage-object-1"
-  container = "${opc_storage_container.container.name}"
-  file = "${"./source_file.txt"}"
-  etag = "${md5(file("./source_file.txt"))}"
+  name         = "storage-object-1"
+  container    = "${opc_storage_container.container.name}"
+  file         = "${"./source_file.txt"}"
+  etag         = "${md5(file("./source_file.txt"))}"
   content_type = "text/plain;charset=utf-8"
 }
 ```
@@ -64,7 +64,7 @@ In addition to the attributes listed above, the following attributes are exporte
 
 ## Object Metadata
 
-The `metadata` config defines a map of additional meta data header name value pairs.
+The `metadata` config defines a map of additional meta data header name value pairs. The additional meta data items are set HTTP Headers on the object in the form `X-Object-Meta-{name}: {value}`, where `{name}` is the name of the metadata item  `{value}` is the header content. For example:
 
 ```hcl
 metadata {
@@ -72,8 +72,6 @@ metadata {
   "Sha256" = "e91ed4f93637379a7539cb5d8d0b5bca3972755de4f9371ab2e123e7b4c53680"
 }
 ```
-
-The additional meta data items set on the object in the form `X-Object-Meta-{name}: {value}`, where `{name}` is the name of the metadata item  `{value}` is the header content.
 
 ## Import
 
