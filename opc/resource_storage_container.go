@@ -240,6 +240,19 @@ func resourceOPCStorageContainerUpdate(d *schema.ResourceData, meta interface{})
 		input.QuotaCount = quotaCount.(int)
 	}
 
+	// Create list of metadata headers to be removed
+	old, new := d.GetChange("metadata")
+	newHeaders := getKeys(new.(map[string]interface{}))
+	oldHeaders := getKeys(old.(map[string]interface{}))
+	removeHeaders := []string{}
+	for i := range oldHeaders {
+		if !contains(newHeaders, oldHeaders[i]) {
+			removeHeaders = append(removeHeaders, oldHeaders[i])
+		}
+	}
+	input.RemoveCustomMetadata = removeHeaders
+
+	// metadata headers to add or update
 	if v, ok := d.GetOk("metadata"); ok {
 		metadata := make(map[string]string)
 		for name, value := range v.(map[string]interface{}) {
@@ -256,4 +269,23 @@ func resourceOPCStorageContainerUpdate(d *schema.ResourceData, meta interface{})
 	d.SetId(info.Name)
 
 	return resourceOPCStorageContainerRead(d, meta)
+}
+
+// get keys from a map
+func getKeys(m map[string]interface{}) []string {
+	keys := []string{}
+	for k, _ := range m {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
+// check if value is in slice
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }

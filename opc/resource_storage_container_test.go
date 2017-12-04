@@ -119,8 +119,9 @@ resource "opc_storage_container" "test" {
   primary_key = "test-key"
   allowed_origins = ["origin-1"]
 	exposed_headers = ["exposed-header-1"]
-	metadate {
-		"Foo": "bar"
+	metadata {
+		"Foo" = "bar",
+		"Abc-Def" = "xyz"
 	}
 }
 `
@@ -135,10 +136,9 @@ resource "opc_storage_container" "test" {
   secondary_key = "test-key"
   allowed_origins = ["origin-1", "origin-2"]
 	exposed_headers = ["exposed-header-1", "exposed-header-2"]
-	metadate {
-		"Foo": "bar",
-		"Abc-Def": "xyz"
+	metadata {
+		"Bar" = "foo",
+		"Abc-Def" = "xyz"
 	}
-
 }
 `
