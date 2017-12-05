@@ -128,6 +128,15 @@ func resourceOPCOrchestratedInstanceRead(d *schema.ResourceData, meta interface{
 	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err
 	}
+
+	instances, err := flattenOrchestratedInstances(meta, result.Objects)
+	if err != nil {
+		return err
+	}
+	if err := d.Set("instance", instances); err != nil {
+		return fmt.Errorf("[DEBUG] Error setting Instances error: %#v", err)
+	}
+
 	return nil
 }
 

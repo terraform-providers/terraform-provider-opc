@@ -11,6 +11,7 @@ import (
 )
 
 func TestAccOPCOrchestratedInstance_Basic(t *testing.T) {
+	resName := "opc_compute_orchestrated_instance.test"
 	ri := acctest.RandInt()
 	config := testAccOrchestrationBasic(ri)
 	resource.Test(t, resource.TestCase{
@@ -22,6 +23,7 @@ func TestAccOPCOrchestratedInstance_Basic(t *testing.T) {
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckOrchestrationExists,
+					resource.TestCheckResourceAttrSet(resName, "instance.0.id"),
 				),
 			},
 		},
@@ -70,12 +72,12 @@ func testAccOrchestrationBasic(rInt int) string {
 	return fmt.Sprintf(`
   resource "opc_compute_orchestrated_instance" "test" {
     name        = "test_orchestration-%d"
-    desired_state = "inactive"
+    desired_state = "active"
 		instance {
 			name = "acc-test-instance-%d"
 			label = "TestAccOPCInstance_basic"
 			shape = "oc3"
-			image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+			image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
 			instance_attributes = <<JSON
 {
 	"foo": "bar"
