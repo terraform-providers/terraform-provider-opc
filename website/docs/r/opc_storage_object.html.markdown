@@ -30,6 +30,8 @@ The following arguments are supported:
 
 * `container` - (Required) The name of Storage Container the store the object in.
 
+**Note:** One of `content`, `file`, or `copy_from` must be specified
+
 * `content` - (Optional) Raw content in string-form of the data.
 
 * `file` - (Optional) File path for the content to use for data.
@@ -80,3 +82,5 @@ Object's can be imported using the `resource id`, e.g.
 ```shell
 $ terraform import opc_storage_object.default container/example
 ```
+
+Please note though, importing a Storage Object does _not_ allow a user to modify the content, or attributes for the Storage Object. It is, however, possible to import a Storage Object, and replace the object with new content, or a copy of another Storage Object. It is also possible to import a Storage Object into Terraform in order to delete the object.
