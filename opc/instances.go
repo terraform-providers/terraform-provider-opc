@@ -1,7 +1,6 @@
 package opc
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"sort"
@@ -9,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/hashicorp/go-oracle-terraform/compute"
-	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 )
@@ -47,10 +45,8 @@ func orchestrationInstanceSchema() *schema.Schema {
 				},
 
 				"instance_attributes": {
-					Type:         schema.TypeString,
-					Optional:     true,
-					ForceNew:     true,
-					ValidateFunc: validation.ValidateJsonString,
+					Type:     schema.TypeString,
+					Computed: true,
 				},
 
 				"boot_order": {
@@ -87,7 +83,7 @@ func orchestrationInstanceSchema() *schema.Schema {
 				},
 
 				"networking_info": {
-					Type:     schema.TypeSet,
+					Type:     schema.TypeList,
 					Optional: true,
 					Computed: true,
 					ForceNew: true,
@@ -188,14 +184,6 @@ func orchestrationInstanceSchema() *schema.Schema {
 							},
 						},
 					},
-					Set: func(v interface{}) int {
-						var buf bytes.Buffer
-						m := v.(map[string]interface{})
-						buf.WriteString(fmt.Sprintf("%d-", m["index"].(int)))
-						buf.WriteString(fmt.Sprintf("%s-", m["vnic"].(string)))
-						buf.WriteString(fmt.Sprintf("%s-", m["nat"]))
-						return hashcode.String(buf.String())
-					},
 				},
 
 				"reverse_dns": {
@@ -213,7 +201,7 @@ func orchestrationInstanceSchema() *schema.Schema {
 				},
 
 				"storage": {
-					Type:     schema.TypeSet,
+					Type:     schema.TypeList,
 					Optional: true,
 					DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
 						desired := compute.InstanceDesiredState(d.Get("desired_state").(string))
@@ -366,16 +354,6 @@ func getCreateInstanceInput(prefix string, d *schema.ResourceData) (*compute.Cre
 		Shape: d.Get(fmt.Sprintf("%s.shape", prefix)).(string),
 	}
 
-	// Get optional instance attributes
-	attributes, attrErr := getInstanceAttributesWithPrefix(prefix, d)
-	if attrErr != nil {
-		return nil, attrErr
-	}
-
-	if attributes != nil {
-		input.Attributes = attributes
-	}
-
 	if bootOrder := getIntList(d, fmt.Sprintf("%s.boot_order", prefix)); len(bootOrder) > 0 {
 		input.BootOrder = bootOrder
 	}
@@ -392,35 +370,101 @@ func getCreateInstanceInput(prefix string, d *schema.ResourceData) (*compute.Cre
 		input.Label = v.(string)
 	}
 
+	interfaces, err := expandNetworkInterfacesFromConfig(d, prefix)
+	if err != nil {
+		return nil, err
+	}
+	if interfaces != nil {
+		input.Networking = interfaces
+	}
+
+	if v, ok := d.GetOk(fmt.Sprintf("%s.reverse_dns", prefix)); ok {
+		input.ReverseDNS = v.(bool)
+	}
+
+	if sshKeys := getStringList(d, fmt.Sprintf("%s.ssh_keys", prefix)); len(sshKeys) > 0 {
+		input.SSHKeys = sshKeys
+	}
+
+	storage := expandStorageAttachments(d, prefix)
+	if len(storage) > 0 {
+		input.Storage = storage
+	}
+
+	if tags := getStringList(d, fmt.Sprintf("%s.tags", prefix)); len(tags) > 0 {
+		input.Tags = tags
+	}
+
 	return input, nil
 }
 
-// Parses instance_attributes from a string to a map[string]interface and returns any errors.
-func getInstanceAttributesWithPrefix(prefix string, d *schema.ResourceData) (map[string]interface{}, error) {
-	var attrs map[string]interface{}
+// Populates and validates shared network and ip network interfaces to return the of map
+// objects needed to create/update an instance's networking_info
+func expandNetworkInterfacesFromConfig(d *schema.ResourceData, prefix string) (map[string]compute.NetworkingInfo, error) {
+	interfaces := make(map[string]compute.NetworkingInfo)
 
-	// Empty instance attributes
-	attributes, ok := d.GetOk(fmt.Sprintf("%s.instance_attributes", prefix))
-	if !ok {
-		return attrs, nil
+	if v, ok := d.GetOk(fmt.Sprintf("%s.networking_info", prefix)); ok {
+		vL := v.([]interface{})
+		for _, v := range vL {
+			ni := v.(map[string]interface{})
+			index, ok := ni["index"].(int)
+			if !ok {
+				return nil, fmt.Errorf("Index not specified for network interface: %v", ni)
+			}
+
+			deviceIndex := fmt.Sprintf("eth%d", index)
+
+			// Verify that the network interface doesn't already exist
+			if _, ok := interfaces[deviceIndex]; ok {
+				return nil, fmt.Errorf("Duplicate Network interface at eth%d already specified", index)
+			}
+
+			// Determine if we're creating a shared network interface or an IP Network interface
+			info := compute.NetworkingInfo{}
+			var err error
+			if ni["shared_network"].(bool) {
+				// Populate shared network parameters
+				info, err = readSharedNetworkFromConfig(ni)
+				// Set 'model' since we're configuring a shared network interface
+				info.Model = compute.NICDefaultModel
+			} else {
+				// Populate IP Network Parameters
+				info, err = readIPNetworkFromConfig(ni)
+			}
+			if err != nil {
+				return nil, err
+			}
+			// And you may find yourself in a beautiful house, with a beautiful wife
+			// And you may ask yourself, well, how did I get here?
+			interfaces[deviceIndex] = info
+		}
 	}
 
-	if err := json.Unmarshal([]byte(attributes.(string)), &attrs); err != nil {
-		return attrs, fmt.Errorf("Cannot parse attributes as json: %s", err)
-	}
-
-	return attrs, nil
+	return interfaces, nil
 }
 
-func flattenOrchestratedInstances(meta interface{}, objects []compute.Object) (interface{}, error) {
+func expandStorageAttachments(d *schema.ResourceData, prefix string) []compute.StorageAttachmentInput {
+	storageAttachments := []compute.StorageAttachmentInput{}
+	storage := d.Get(fmt.Sprintf("%s.storage", prefix)).([]interface{})
+	for _, i := range storage {
+		attrs := i.(map[string]interface{})
+		storageAttachments = append(storageAttachments, compute.StorageAttachmentInput{
+			Index:  attrs["index"].(int),
+			Volume: attrs["volume"].(string),
+		})
+	}
+	return storageAttachments
+}
+
+func flattenOrchestratedInstances(d *schema.ResourceData, meta interface{}, objects []compute.Object) (interface{}, error) {
 	instanceClient := meta.(*OPCClient).computeClient.Instances()
 
 	result := make([]interface{}, len(objects))
-	for i, object := range objects {
+	for i := range objects {
 		v := make(map[string]interface{})
-		instanceInfo := object.Template.(map[string]interface{})
 		getIdInput := &compute.GetInstanceIdInput{
-			Name: instanceInfo["name"].(string),
+			// Oracle's api returns an unordered list so we'll find out instances through the config file name
+			Name: d.Get(fmt.Sprintf("instance.%d.name", i)).(string),
 		}
 		instance, err := instanceClient.GetInstanceFromName(getIdInput)
 		if err != nil {
@@ -463,6 +507,40 @@ func flattenOrchestratedInstances(meta interface{}, objects []compute.Object) (i
 		v["ssh_keys"] = instance.SSHKeys
 
 		v["reverse_dns"] = instance.ReverseDNS
+
+		v["storage"] = flattenInstanceStorageAttachments(instance.Storage)
+
+		sort.Strings(instance.Tags)
+		v["tags"] = instance.Tags
+
+		v["availability_domain"] = instance.AvailabilityDomain
+		v["domain"] = instance.Domain
+		v["entry"] = instance.Entry
+		v["fingerprint"] = instance.Fingerprint
+		v["image_format"] = instance.ImageFormat
+		v["ip_address"] = instance.IPAddress
+		v["desired_state"] = instance.DesiredState
+
+		sort.Strings(instance.PlacementRequirements)
+		v["placement_requirements"] = instance.PlacementRequirements
+
+		v["platform"] = instance.Platform
+		v["priority"] = instance.Priority
+		v["quota_reservation"] = instance.QuotaReservation
+
+		sort.Strings(instance.Relationships)
+		v["relationships"] = instance.Relationships
+
+		sort.Strings(instance.Resolvers)
+		v["resolvers"] = instance.Resolvers
+
+		v["site"] = instance.Site
+		v["start_time"] = instance.StartTime
+		v["state"] = instance.State
+
+		v["vcable"] = instance.VCableID
+		v["virtio"] = instance.Virtio
+		v["vnc_address"] = instance.VNC
 
 		result[i] = v
 	}
@@ -550,4 +628,22 @@ func flattenNetworkInterfaces(ifaces map[string]compute.NetworkingInfo) ([]map[s
 	}
 
 	return result, nil
+}
+
+// Flattens the returned slice of storage attachments to a map
+func flattenInstanceStorageAttachments(attachments []compute.StorageAttachment) []map[string]interface{} {
+	result := make([]map[string]interface{}, 0)
+
+	if attachments == nil || len(attachments) == 0 {
+		return nil
+	}
+
+	for _, attachment := range attachments {
+		res := make(map[string]interface{})
+		res["index"] = attachment.Index
+		res["volume"] = attachment.StorageVolumeName
+		res["name"] = attachment.Name
+		result = append(result, res)
+	}
+	return result
 }

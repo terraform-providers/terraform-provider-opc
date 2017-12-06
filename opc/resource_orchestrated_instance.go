@@ -129,7 +129,7 @@ func resourceOPCOrchestratedInstanceRead(d *schema.ResourceData, meta interface{
 		return err
 	}
 
-	instances, err := flattenOrchestratedInstances(meta, result.Objects)
+	instances, err := flattenOrchestratedInstances(d, meta, result.Objects)
 	if err != nil {
 		return err
 	}
@@ -164,6 +164,7 @@ func expandOrchestrationInstances(d *schema.ResourceData) ([]compute.Object, err
 	for i := range instances_info {
 		// The value for orchestration is the name of the orchestration
 		orchestrationName := d.Get("name").(string)
+		objectLabel := d.Get(fmt.Sprintf("instance.%d.name", i)).(string)
 
 		instanceCreateInput, instanceErr := getCreateInstanceInput(fmt.Sprintf("instance.%d", i), d)
 		if instanceErr != nil {
@@ -171,7 +172,7 @@ func expandOrchestrationInstances(d *schema.ResourceData) ([]compute.Object, err
 		}
 
 		instance := compute.Object{
-			Label:         orchestrationName,
+			Label:         objectLabel,
 			Orchestration: orchestrationName,
 			Type:          compute.OrchestrationTypeInstance,
 			Template:      instanceCreateInput,
