@@ -34,10 +34,6 @@ type OPCClient struct {
 }
 
 func (c *Config) Client() (*OPCClient, error) {
-	u, err := url.ParseRequestURI(c.Endpoint)
-	if err != nil {
-		return nil, fmt.Errorf("Invalid endpoint URI: %s", err)
-	}
 
 	userAgentString := fmt.Sprintf("HashiCorp-Terraform-v%s", terraform.VersionString())
 
@@ -45,7 +41,6 @@ func (c *Config) Client() (*OPCClient, error) {
 		IdentityDomain: &c.IdentityDomain,
 		Username:       &c.User,
 		Password:       &c.Password,
-		APIEndpoint:    u,
 		MaxRetries:     &c.MaxRetries,
 		UserAgent:      &userAgentString,
 	}
@@ -67,13 +62,19 @@ func (c *Config) Client() (*OPCClient, error) {
 
 	config.HTTPClient = httpClient
 
-	computeClient, err := compute.NewComputeClient(&config)
-	if err != nil {
-		return nil, err
-	}
+	opcClient := &OPCClient{}
 
-	opcClient := &OPCClient{
-		computeClient: computeClient,
+	if c.Endpoint != "" {
+		computeEndpoint, err := url.ParseRequestURI(c.Endpoint)
+		if err != nil {
+			return nil, fmt.Errorf("Invalid endpoint URI: %s", err)
+		}
+		config.APIEndpoint = computeEndpoint
+		computeClient, err := compute.NewComputeClient(&config)
+		if err != nil {
+			return nil, err
+		}
+		opcClient.computeClient = computeClient
 	}
 
 	if c.StorageEndpoint != "" {

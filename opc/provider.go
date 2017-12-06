@@ -33,7 +33,7 @@ func Provider() terraform.ResourceProvider {
 
 			"endpoint": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OPC_ENDPOINT", nil),
 				Description: "The HTTP endpoint for OPC API operations.",
 			},
