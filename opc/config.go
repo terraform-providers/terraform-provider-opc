@@ -24,6 +24,7 @@ type Config struct {
 	MaxRetries       int
 	Insecure         bool
 	StorageEndpoint  string
+	StorageServiceId string
 	DatabaseEndpoint string
 }
 
@@ -83,6 +84,9 @@ func (c *Config) Client() (*OPCClient, error) {
 			return nil, fmt.Errorf("Invalid storage endpoint URI: %+v", err)
 		}
 		config.APIEndpoint = storageEndpoint
+		if (c.StorageServiceId) != "" {
+			config.IdentityDomain = &c.StorageServiceId
+		}
 		storageClient, err := storage.NewStorageClient(&config)
 		if err != nil {
 			return nil, err
