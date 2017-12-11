@@ -1,7 +1,6 @@
 package opc
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/acctest"
@@ -12,7 +11,7 @@ func TestAccOPCSecurityAssociation_importBasic(t *testing.T) {
 	resourceName := "opc_compute_security_association.test"
 
 	ri := acctest.RandInt()
-	config := fmt.Sprintf(testAccSecurityAssociationBasic, ri, ri)
+	config := testAccSecurityAssociationBasic(ri)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -37,7 +36,7 @@ func TestAccOPCSecurityAssociation_importComplete(t *testing.T) {
 	resourceName := "opc_compute_security_association.test"
 
 	ri := acctest.RandInt()
-	config := fmt.Sprintf(testAccSecurityAssociationComplete, ri, ri, ri)
+	config := testAccSecurityAssociationComplete(ri)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

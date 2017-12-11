@@ -52,7 +52,7 @@ resource "opc_compute_instance" "foo" {
   name = "test-route-%d"
   label = "testing"
   shape = "oc3"
-  image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+  image_list = "%s"
   networking_info {
     index = 0
     ip_network = "${opc_compute_ip_network.foo.id}"
@@ -79,7 +79,7 @@ resource "opc_compute_route" "test" {
   admin_distance = 1
   ip_address_prefix = "10.0.12.0/24"
   next_hop_vnic_set = "${opc_compute_vnic_set.test.name}"
-}`, rInt, rInt, rInt, rInt, rInt, rInt, rInt)
+}`, rInt, rInt, TEST_IMAGE_LIST, rInt, rInt, rInt, rInt, rInt)
 }
 
 func testAccOPCRouteConfig_BasicUpdate(rInt int) string {
@@ -94,7 +94,7 @@ resource "opc_compute_instance" "foo" {
   name = "test-route-%d"
   label = "testing"
   shape = "oc3"
-  image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+  image_list = "%s"
   networking_info {
     index = 0
     ip_network = "${opc_compute_ip_network.foo.id}"
@@ -121,7 +121,7 @@ resource "opc_compute_route" "test" {
   admin_distance = 2
   ip_address_prefix = "10.0.14.0/24"
   next_hop_vnic_set = "${opc_compute_vnic_set.test.name}"
-}`, rInt, rInt, rInt, rInt, rInt, rInt, rInt)
+}`, rInt, rInt, TEST_IMAGE_LIST, rInt, rInt, rInt, rInt, rInt)
 }
 
 func testAccOPCCheckRouteExists(s *terraform.State) error {

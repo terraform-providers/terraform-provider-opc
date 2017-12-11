@@ -126,7 +126,7 @@ resource "opc_compute_instance" "test" {
   name = "test-%d"
   label = "test"
   shape = "oc3"
-  image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+  image_list = "%s"
   networking_info {
     index = 0
     ip_network = "${opc_compute_ip_network.foo.id}"
@@ -151,5 +151,5 @@ resource "opc_compute_ip_address_association" "test" {
   vnic = "${data.opc_compute_network_interface.eth0.vnic}"
   description = "acctesting ip address association test %d"
   tags = ["tag1", "tag2"]
-}`, rInt, rInt, rInt, rInt, rInt, rInt, rInt)
+}`, rInt, rInt, TEST_IMAGE_LIST, rInt, rInt, rInt, rInt, rInt)
 }
