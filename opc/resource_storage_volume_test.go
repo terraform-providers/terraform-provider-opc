@@ -99,7 +99,7 @@ func TestAccOPCStorageVolume_Update(t *testing.T) {
 func TestAccOPCStorageVolume_Bootable(t *testing.T) {
 	volumeResourceName := "opc_compute_storage_volume.test"
 	ri := acctest.RandInt()
-	config := fmt.Sprintf(testAccStorageVolumeBootable, ri, ri)
+	config := testAccStorageVolumeBootable(ri)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -160,7 +160,7 @@ func TestAccOPCStorageVolume_FromBootableSnapshot(t *testing.T) {
 func TestAccOPCStorageVolume_ImageListEntry(t *testing.T) {
 	volumeResourceName := "opc_compute_storage_volume.test"
 	ri := acctest.RandInt()
-	config := fmt.Sprintf(testAccStorageVolumeImageListEntry, ri, ri)
+	config := testAccStorageVolumeImageListEntry(ri)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -286,28 +286,30 @@ resource "opc_compute_storage_volume" "test" {
 }
 `
 
-const testAccStorageVolumeBootable = `
-resource "opc_compute_image_list" "test" {
-  name        = "test-acc-stor-vol-bootable-image-list-%d"
-  description = "Provider Acceptance Tests Storage Volume Bootable"
-}
+func testAccStorageVolumeBootable(rInt int) string {
+	return fmt.Sprintf(`
+	resource "opc_compute_image_list" "test" {
+	  name        = "test-acc-stor-vol-bootable-image-list-%d"
+	  description = "Provider Acceptance Tests Storage Volume Bootable"
+	}
 
-resource "opc_compute_image_list_entry" "test" {
-  name           = "${opc_compute_image_list.test.name}"
-  machine_images = [ "/oracle/public/oel_6.7_apaas_16.4.5_1610211300" ]
-  version        = 1
-}
+	resource "opc_compute_image_list_entry" "test" {
+	  name           = "${opc_compute_image_list.test.name}"
+	  machine_images = [ "/oracle/public/oel_6.7_apaas_16.4.5_1610211300" ]
+	  version        = 1
+	}
 
-resource "opc_compute_storage_volume" "test" {
-  name             = "test-acc-stor-vol-bootable-%d"
-  description      = "Provider Acceptance Tests Storage Volume Bootable"
-  size             = 20
-  tags             = ["bar", "foo"]
-  bootable         = true
-  image_list       = "${opc_compute_image_list.test.name}"
-  image_list_entry = "${opc_compute_image_list_entry.test.version}"
+	resource "opc_compute_storage_volume" "test" {
+	  name             = "test-acc-stor-vol-bootable-%d"
+	  description      = "Provider Acceptance Tests Storage Volume Bootable"
+	  size             = 20
+	  tags             = ["bar", "foo"]
+	  bootable         = true
+	  image_list       = "${opc_compute_image_list.test.name}"
+	  image_list_entry = "${opc_compute_image_list_entry.test.version}"
+	}
+	`, rInt, rInt)
 }
-`
 
 func testAccStorageVolumeBootableEndToEnd(rInt int) string {
 	return fmt.Sprintf(`
@@ -388,26 +390,28 @@ resource "opc_compute_instance" "restored" {
 }`, rInt, rInt, rInt, rInt, rInt, rInt)
 }
 
-const testAccStorageVolumeImageListEntry = `
-resource "opc_compute_image_list" "test" {
-  name        = "test-acc-stor-vol-bootable-image-list-%d"
-  description = "Provider Acceptance Tests Storage Volume Image List Entry"
-}
+func testAccStorageVolumeImageListEntry(rInt int) string {
+	return fmt.Sprintf(`
+	resource "opc_compute_image_list" "test" {
+	  name        = "test-acc-stor-vol-bootable-image-list-%d"
+	  description = "Provider Acceptance Tests Storage Volume Image List Entry"
+	}
 
-resource "opc_compute_image_list_entry" "test" {
-  name           = "${opc_compute_image_list.test.name}"
-  machine_images = [ "/oracle/public/oel_6.7_apaas_16.4.5_1610211300" ]
-  version        = 1
-}
+	resource "opc_compute_image_list_entry" "test" {
+	  name           = "${opc_compute_image_list.test.name}"
+	  machine_images = [ "/oracle/public/oel_6.7_apaas_16.4.5_1610211300" ]
+	  version        = 1
+	}
 
-resource "opc_compute_storage_volume" "test" {
-  name             = "test-acc-stor-vol-image-list-entry-%d"
-  description      = "Provider Acceptance Tests Storage Volume Image List Entry"
-  size             = 20
-  tags             = ["bar", "foo"]
-  image_list_entry = "${opc_compute_image_list_entry.test.version}"
+	resource "opc_compute_storage_volume" "test" {
+	  name             = "test-acc-stor-vol-image-list-entry-%d"
+	  description      = "Provider Acceptance Tests Storage Volume Image List Entry"
+	  size             = 20
+	  tags             = ["bar", "foo"]
+	  image_list_entry = "${opc_compute_image_list_entry.test.version}"
+	}
+	`, rInt, rInt)
 }
-`
 
 const testAccStorageVolumeBasicMaxSize = `
 resource "opc_compute_storage_volume" "test" {

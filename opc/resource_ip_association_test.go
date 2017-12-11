@@ -12,7 +12,7 @@ import (
 
 func TestAccOPCIPAssociation_Basic(t *testing.T) {
 	ri := acctest.RandInt()
-	config := fmt.Sprintf(testAccIPAssociationBasic, ri, ri)
+	config := testAccIPAssociationBasic(ri)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -67,22 +67,24 @@ func testAccOPCCheckIPAssociationDestroy(s *terraform.State) error {
 	return nil
 }
 
-var testAccIPAssociationBasic = `
-resource "opc_compute_instance" "test" {
-  name      = "test-acc-ip-ass-instance-%d"
-  label     = "testAccIPAssociationBasic"
-  shape     = "oc3"
-  image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
-}
+func testAccIPAssociationBasic(rInt int) string {
+	return fmt.Sprintf(`
+	resource "opc_compute_instance" "test" {
+	  name      = "test-acc-ip-ass-instance-%d"
+	  label     = "testAccIPAssociationBasic"
+	  shape     = "oc3"
+	  image_list = "%s"
+	}
 
-resource "opc_compute_ip_reservation" "test" {
-  name        = "test-acc-ip-ass-reservation-%d"
-  parent_pool = "/oracle/public/ippool"
-  permanent   = true
-}
+	resource "opc_compute_ip_reservation" "test" {
+	  name        = "test-acc-ip-ass-reservation-%d"
+	  parent_pool = "/oracle/public/ippool"
+	  permanent   = true
+	}
 
-resource "opc_compute_ip_association" "test" {
-  vcable      = "${opc_compute_instance.test.vcable}"
-  parent_pool = "ipreservation:${opc_compute_ip_reservation.test.name}"
+	resource "opc_compute_ip_association" "test" {
+	  vcable      = "${opc_compute_instance.test.vcable}"
+	  parent_pool = "ipreservation:${opc_compute_ip_reservation.test.name}"
+	}
+	`, rInt, TEST_IMAGE_LIST, rInt)
 }
-`

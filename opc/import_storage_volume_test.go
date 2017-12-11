@@ -77,7 +77,7 @@ func TestAccOPCStorageVolume_importMaxSize(t *testing.T) {
 func TestAccOPCStorageVolume_importBootable(t *testing.T) {
 	resourceName := "opc_compute_storage_volume.test"
 	rInt := acctest.RandInt()
-	config := fmt.Sprintf(testAccStorageVolumeBootable, rInt, rInt)
+	config := testAccStorageVolumeBootable(rInt)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -99,7 +99,7 @@ func TestAccOPCStorageVolume_importBootable(t *testing.T) {
 func TestAccOPCStorageVolume_importImageListEntry(t *testing.T) {
 	resourceName := "opc_compute_storage_volume.test"
 	rInt := acctest.RandInt()
-	config := fmt.Sprintf(testAccStorageVolumeImageListEntry, rInt, rInt)
+	config := testAccStorageVolumeImageListEntry(rInt)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

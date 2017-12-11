@@ -1,7 +1,6 @@
 package opc
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/acctest"
@@ -12,7 +11,7 @@ func TestAccOPCIPAssociation_importBasic(t *testing.T) {
 	resourceName := "opc_compute_ip_association.test"
 
 	ri := acctest.RandInt()
-	config := fmt.Sprintf(testAccIPAssociationBasic, ri, ri)
+	config := testAccIPAssociationBasic(ri)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
