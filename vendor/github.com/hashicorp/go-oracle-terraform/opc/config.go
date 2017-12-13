@@ -14,6 +14,7 @@ type Config struct {
 	LogLevel       LogLevelType
 	Logger         Logger
 	HTTPClient     *http.Client
+	UserAgent      *string
 }
 
 func NewConfig() *Config {
