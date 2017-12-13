@@ -142,7 +142,6 @@ func TestAccOPCOrchestratedInstance_ipNetworkIsDefaultGateway(t *testing.T) {
 	rInt := acctest.RandInt()
 	resName := "opc_compute_orchestrated_instance.test"
 	instancePath := "instance.0"
-	dataName := "data.opc_compute_network_interface.test"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -211,6 +210,96 @@ func TestAccOPCOrchestratedInstance_noBoot(t *testing.T) {
 	})
 }
 
+func TestAccOPCOrchestratedInstance_inactive(t *testing.T) {
+	ri := acctest.RandInt()
+	config := testAccOrchestrationInactive(ri)
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckOrchestrationDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckOrchestrationExists,
+				),
+			},
+		},
+	})
+}
+
+func TestAccOPCOrchestratedInstance_activeToInactive(t *testing.T) {
+	ri := acctest.RandInt()
+	resName := "opc_compute_orchestrated_instance.test"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckOrchestrationDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccOrchestrationBasic(ri),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckOrchestrationExists,
+					resource.TestCheckResourceAttrSet(resName, "instance.0.id"),
+				),
+			},
+			{
+				Config: testAccOrchestrationInactive(ri),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckOrchestrationExists,
+				),
+			},
+		},
+	})
+}
+
+func TestAccOPCOrchestratedInstance_inactiveToActive(t *testing.T) {
+	ri := acctest.RandInt()
+	resName := "opc_compute_orchestrated_instance.test"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckOrchestrationDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccOrchestrationInactive(ri),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckOrchestrationExists,
+				),
+			},
+			{
+				Config: testAccOrchestrationBasic(ri),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckOrchestrationExists,
+					resource.TestCheckResourceAttrSet(resName, "instance.0.id"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccOPCOrchestratedInstance_activeToSuspend(t *testing.T) {
+	ri := acctest.RandInt()
+	resName := "opc_compute_orchestrated_instance.test"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckOrchestrationDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccOrchestrationBasic(ri),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckOrchestrationExists,
+					resource.TestCheckResourceAttrSet(resName, "instance.0.id"),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckOrchestrationExists(s *terraform.State) error {
 	client := testAccProvider.Meta().(*OPCClient).computeClient.Orchestrations()
 
@@ -258,6 +347,21 @@ func testAccOrchestrationBasic(rInt int) string {
   resource "opc_compute_orchestrated_instance" "test" {
     name        = "test_orchestration-%d"
     desired_state = "active"
+		instance {
+			name = "acc-test-instance-%d"
+			label = "TestAccOPCInstance_basic"
+			shape = "oc3"
+			image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
+		}
+  }
+  `, rInt, rInt)
+}
+
+func testAccOrchestrationInactive(rInt int) string {
+	return fmt.Sprintf(`
+  resource "opc_compute_orchestrated_instance" "test" {
+    name        = "test_orchestration-%d"
+    desired_state = "inactive"
 		instance {
 			name = "acc-test-instance-%d"
 			label = "TestAccOPCInstance_basic"
