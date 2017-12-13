@@ -267,50 +267,6 @@ func resourceInstance() *schema.Resource {
 
 			"tags": tagsForceNewSchema(),
 
-			"orchestration": {
-				Type:     schema.TypeList,
-				Optional: true,
-				MaxItems: 1,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-							ForceNew: true,
-						},
-						"description": {
-							Type:     schema.TypeString,
-							Optional: true,
-						},
-						"desired_state": {
-							Type:     schema.TypeString,
-							Required: true,
-							ValidateFunc: validation.StringInSlice([]string{
-								"active",
-								"inactive",
-								"suspend",
-							}, true),
-						},
-						"object_label": {
-							Type:     schema.TypeString,
-							Required: true,
-							ForceNew: true,
-						},
-						"persistent": {
-							Type:     schema.TypeBool,
-							Optional: true,
-							Default:  false,
-						},
-						"version": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							Computed: true,
-						},
-					},
-				},
-			},
-
 			/////////////////////////
 			// Computed Attributes //
 			/////////////////////////
@@ -481,34 +437,14 @@ func resourceInstanceCreate(d *schema.ResourceData, meta interface{}) error {
 		input.Tags = tags
 	}
 
-	if _, ok := d.GetOk("orchestration"); ok {
-		oClient := meta.(*OPCClient).computeClient.Orchestrations()
-
-		orchestrationInput := expandOrchestration(d, input)
-		result, err := oClient.CreateOrchestration(&orchestrationInput)
-		if err != nil {
-			return fmt.Errorf("Error creating orchestration for instance %s: %s", d.Get("name").(string), err)
-		}
-		// Have to dig into the orchestration to find the resource name
-		orchestrationInstance := result.Objects[0].Template.(map[string]interface{})
-		getIdInput := &compute.GetInstanceIdInput{
-			Name: orchestrationInstance["name"].(string),
-		}
-		instance, err := client.GetInstanceFromName(getIdInput)
-		if err != nil {
-			return err
-		}
-		d.SetId(instance.ID)
-	} else {
-		result, err := client.CreateInstance(input)
-		if err != nil {
-			return fmt.Errorf("Error creating instance %s: %s", input.Name, err)
-		}
-
-		log.Printf("[DEBUG] Created instance %s: %#v", input.Name, result.ID)
-
-		d.SetId(result.ID)
+	result, err := client.CreateInstance(input)
+	if err != nil {
+		return fmt.Errorf("Error creating instance %s: %s", input.Name, err)
 	}
+
+	log.Printf("[DEBUG] Created instance %s: %#v", input.Name, result.ID)
+
+	d.SetId(result.ID)
 
 	return resourceInstanceRead(d, meta)
 }
@@ -543,41 +479,8 @@ func resourceInstanceRead(d *schema.ResourceData, meta interface{}) error {
 
 	log.Printf("[DEBUG] Instance '%s' found", name)
 
-	if _, ok := d.GetOk("orchestration"); ok {
-		flattenOrchestration(d, meta)
-	}
-
 	// Update attributes
 	return updateInstanceAttributes(d, result)
-}
-
-func flattenOrchestration(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.Orchestrations()
-
-	orchestrationName := d.Get("orchestration.0.name").(string)
-
-	input := &compute.GetOrchestrationInput{
-		Name: orchestrationName,
-	}
-
-	orchestration, err := client.GetOrchestration(input)
-	if err != nil {
-		return fmt.Errorf("Error obtaining orchestration %s", err)
-	}
-
-	result := make([]map[string]interface{}, 0)
-	res := make(map[string]interface{})
-
-	res["name"] = orchestration.Name
-	res["version"] = orchestration.Version
-	res["description"] = orchestration.Description
-	res["desired_state"] = orchestration.DesiredState
-	res["object_label"] = orchestration.Objects[0].Label
-	res["persistent"] = orchestration.Objects[0].Persistent
-	result = append(result, res)
-	d.Set("orchestration", result)
-
-	return nil
 }
 
 func updateInstanceAttributes(d *schema.ResourceData, instance *compute.InstanceInfo) error {
@@ -694,11 +597,6 @@ func resourceInstanceUpdate(d *schema.ResourceData, meta interface{}) error {
 func resourceInstanceDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*OPCClient).computeClient.Instances()
 
-	// If we have an orchestration than we need to delete it through the Orchestration API
-	if _, ok := d.GetOk("orchestration"); ok {
-		return deleteOrchestration(d, meta)
-	}
-
 	name := d.Get("name").(string)
 
 	input := &compute.DeleteInstanceInput{
@@ -710,24 +608,6 @@ func resourceInstanceDelete(d *schema.ResourceData, meta interface{}) error {
 
 	if err := client.DeleteInstance(input); err != nil {
 		return fmt.Errorf("Error deleting instance %s: %s", name, err)
-	}
-
-	return nil
-}
-
-func deleteOrchestration(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.Orchestrations()
-
-	orchestrationName := d.Get("orchestration.0.name").(string)
-
-	input := &compute.DeleteOrchestrationInput{
-		Name:    orchestrationName,
-		Timeout: d.Timeout(schema.TimeoutDelete),
-	}
-	log.Printf("[DEBUG] Deleting orchestration %s", orchestrationName)
-
-	if err := client.DeleteOrchestration(input); err != nil {
-		return fmt.Errorf("Error deleting orchestration %s for instance %s: %s", orchestrationName, d.Id(), err)
 	}
 
 	return nil
@@ -761,37 +641,6 @@ func getInstanceAttributes(d *schema.ResourceData) (map[string]interface{}, erro
 	}
 
 	return attrs, nil
-}
-
-// Expands the orchestration block and returns a CreateOrchestrationInput struct
-func expandOrchestration(d *schema.ResourceData, instanceInput *compute.CreateInstanceInput) compute.CreateOrchestrationInput {
-	orchestrationConfigs := d.Get("orchestration").([]interface{})
-	orchestrationConfig := orchestrationConfigs[0].(map[string]interface{})
-
-	orchestrationInput := compute.CreateOrchestrationInput{
-		Name:         orchestrationConfig["name"].(string),
-		DesiredState: compute.OrchestrationDesiredState(orchestrationConfig["desired_state"].(string)),
-		Timeout:      d.Timeout(schema.TimeoutCreate),
-	}
-
-	if val := orchestrationConfig["description"]; val != nil {
-		orchestrationInput.Description = val.(string)
-	}
-	if val := orchestrationConfig["version"]; val != nil {
-		orchestrationInput.Version = val.(int)
-	}
-
-	object := compute.Object{
-		Orchestration: orchestrationInput.Name,
-		Label:         orchestrationConfig["object_label"].(string),
-		Type:          compute.OrchestrationTypeInstance,
-		Persistent:    orchestrationConfig["persistent"].(bool),
-		Template:      instanceInput,
-	}
-
-	orchestrationInput.Objects = []compute.Object{object}
-
-	return orchestrationInput
 }
 
 // Reads attributes from the returned instance object, and sets the computed attributes string
