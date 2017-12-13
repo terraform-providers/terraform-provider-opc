@@ -40,7 +40,7 @@ resource "opc_compute_instance" "test" {
   name = "test-%d"
   label = "test"
   shape = "oc3"
-  image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+  image_list = "%s"
   networking_info {
     index = 0
     ip_network = "${opc_compute_ip_network.foo.id}"
@@ -58,5 +58,5 @@ data "opc_compute_network_interface" "eth0" {
 
 data "opc_compute_vnic" "foo" {
   name = "${data.opc_compute_network_interface.eth0.vnic}"
-}`, rInt, rInt, rInt)
+}`, rInt, rInt, TEST_IMAGE_LIST, rInt)
 }
