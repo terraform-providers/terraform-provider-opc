@@ -166,7 +166,7 @@ func expandOrchestrationInstances(d *schema.ResourceData) ([]compute.Object, err
 		orchestrationName := d.Get("name").(string)
 		objectLabel := d.Get(fmt.Sprintf("instance.%d.name", i)).(string)
 
-		instanceCreateInput, instanceErr := getCreateInstanceInput(fmt.Sprintf("instance.%d", i), d)
+		instanceCreateInput, instanceErr := expandCreateInstanceInput(fmt.Sprintf("instance.%d", i), d)
 		if instanceErr != nil {
 			return nil, instanceErr
 		}

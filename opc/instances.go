@@ -76,12 +76,6 @@ func orchestrationInstanceSchema() *schema.Schema {
 					ForceNew: true,
 				},
 
-				"desired_state": {
-					Type:     schema.TypeString,
-					Optional: true,
-					Default:  compute.InstanceDesiredRunning,
-				},
-
 				"networking_info": {
 					Type:     schema.TypeList,
 					Optional: true,
@@ -115,6 +109,13 @@ func orchestrationInstanceSchema() *schema.Schema {
 							"ip_network": {
 								// Required for an IP Network Interface
 								Type:     schema.TypeString,
+								ForceNew: true,
+								Optional: true,
+							},
+
+							"is_default_gateway": {
+								// Optional, IP Network only
+								Type:     schema.TypeBool,
 								ForceNew: true,
 								Optional: true,
 							},
@@ -203,14 +204,6 @@ func orchestrationInstanceSchema() *schema.Schema {
 				"storage": {
 					Type:     schema.TypeList,
 					Optional: true,
-					DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-						desired := compute.InstanceDesiredState(d.Get("desired_state").(string))
-						state := compute.InstanceState(d.Get("state").(string))
-						if desired == compute.InstanceDesiredShutdown || state == compute.InstanceShutdown {
-							return true
-						}
-						return false
-					},
 					ForceNew: true,
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
@@ -347,23 +340,29 @@ func orchestrationInstanceSchema() *schema.Schema {
 
 // We can create multiple instances with an orchestration so we pass a prefix in to obtain
 // the CreateInput for each instance.
-func getCreateInstanceInput(prefix string, d *schema.ResourceData) (*compute.CreateInstanceInput, error) {
+func expandCreateInstanceInput(prefix string, d *schema.ResourceData) (*compute.CreateInstanceInput, error) {
 	// Get Required Attributes
 	input := &compute.CreateInstanceInput{
 		Name:  d.Get(fmt.Sprintf("%s.name", prefix)).(string),
 		Shape: d.Get(fmt.Sprintf("%s.shape", prefix)).(string),
 	}
 
-	if bootOrder := getIntList(d, fmt.Sprintf("%s.boot_order", prefix)); len(bootOrder) > 0 {
+	bootOrder := getIntList(d, fmt.Sprintf("%s.boot_order", prefix))
+	imageList := d.Get(fmt.Sprintf("%s.image_list", prefix))
+	if len(bootOrder) == 0 && imageList.(string) == "" {
+		return nil, fmt.Errorf("One of boot_order or image_list must be set for instance to be created")
+	}
+
+	if len(bootOrder) > 0 {
 		input.BootOrder = bootOrder
+	}
+
+	if imageList != nil {
+		input.ImageList = imageList.(string)
 	}
 
 	if v, ok := d.GetOk(fmt.Sprintf("%s.hostname", prefix)); ok {
 		input.Hostname = v.(string)
-	}
-
-	if v, ok := d.GetOk(fmt.Sprintf("%s.image_list", prefix)); ok {
-		input.ImageList = v.(string)
 	}
 
 	if v, ok := d.GetOk(fmt.Sprintf("%s.label", prefix)); ok {
@@ -494,13 +493,12 @@ func flattenOrchestratedInstances(d *schema.ResourceData, meta interface{}, obje
 		v["image_list"] = instance.ImageList
 		v["label"] = instance.Label
 
-		//TODO Fix or remove
 		networkInterfaces, err := flattenNetworkInterfaces(instance.Networking)
 		if err != nil {
 			return nil, err
 		}
 		if len(networkInterfaces) > 0 {
-			// v["networking_info"] = networkInterfaces
+			v["networking_info"] = networkInterfaces
 		}
 
 		sort.Strings(instance.SSHKeys)
@@ -519,7 +517,6 @@ func flattenOrchestratedInstances(d *schema.ResourceData, meta interface{}, obje
 		v["fingerprint"] = instance.Fingerprint
 		v["image_format"] = instance.ImageFormat
 		v["ip_address"] = instance.IPAddress
-		v["desired_state"] = instance.DesiredState
 
 		sort.Strings(instance.PlacementRequirements)
 		v["placement_requirements"] = instance.PlacementRequirements
