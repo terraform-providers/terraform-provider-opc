@@ -13,6 +13,7 @@ import (
 	"github.com/hashicorp/go-oracle-terraform/opc"
 	"github.com/hashicorp/go-oracle-terraform/storage"
 	"github.com/hashicorp/terraform/helper/logging"
+	"github.com/hashicorp/terraform/terraform"
 )
 
 type Config struct {
@@ -38,12 +39,15 @@ func (c *Config) Client() (*OPCClient, error) {
 		return nil, fmt.Errorf("Invalid endpoint URI: %s", err)
 	}
 
+	userAgentString := fmt.Sprintf("HashiCorp-Terraform-v%s", terraform.VersionString())
+
 	config := opc.Config{
 		IdentityDomain: &c.IdentityDomain,
 		Username:       &c.User,
 		Password:       &c.Password,
 		APIEndpoint:    u,
 		MaxRetries:     &c.MaxRetries,
+		UserAgent:      &userAgentString,
 	}
 
 	if logging.IsDebugOrHigher() {

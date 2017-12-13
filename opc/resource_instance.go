@@ -789,7 +789,6 @@ func validateSharedNetwork(ni map[string]interface{}) error {
 	nilAttrs := []string{
 		"ip_address",
 		"ip_network",
-		"is_default_gateway",
 		"mac_address",
 		"vnic",
 	}
