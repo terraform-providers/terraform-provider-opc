@@ -33,7 +33,7 @@ func Provider() terraform.ResourceProvider {
 
 			"endpoint": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OPC_ENDPOINT", nil),
 				Description: "The HTTP endpoint for OPC API operations.",
 			},
@@ -58,6 +58,14 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("OPC_STORAGE_ENDPOINT", nil),
 				Description: "The HTTP endpoint for Oracle Storage operations.",
 			},
+
+			"storage_service_id": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("OPC_STORAGE_SERVICE_ID", nil),
+				Description: "The Storage Service ID. ",
+			},
+
 			"database_endpoint": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -116,6 +124,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		MaxRetries:       d.Get("max_retries").(int),
 		Insecure:         d.Get("insecure").(bool),
 		StorageEndpoint:  d.Get("storage_endpoint").(string),
+		StorageServiceId: d.Get("storage_service_id").(string),
 		DatabaseEndpoint: d.Get("database_endpoint").(string),
 	}
 
