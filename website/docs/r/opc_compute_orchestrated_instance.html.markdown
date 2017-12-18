@@ -8,7 +8,7 @@ description: |-
 
 # opc\_compute\_orchestrated\_instance
 
-The ``opc_compute_orchestrated_instance`` resource creates and manages an orchestration containing a number of
+The `opc_compute_orchestrated_instance` resource creates and manages an orchestration containing a number of
 instances in an OPC identity domain.
 
 ## Example Usage

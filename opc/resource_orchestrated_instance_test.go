@@ -344,66 +344,66 @@ func testAccGetInstanceAttr(instance, attr string) string {
 
 func testAccOrchestrationBasic(rInt int) string {
 	return fmt.Sprintf(`
-  resource "opc_compute_orchestrated_instance" "test" {
-    name        = "test_orchestration-%d"
-    desired_state = "active"
-		instance {
-			name = "acc-test-instance-%d"
-			label = "TestAccOPCInstance_basic"
-			shape = "oc3"
-			image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
-		}
-  }
+resource "opc_compute_orchestrated_instance" "test" {
+  name        = "test_orchestration-%d"
+  desired_state = "active"
+	instance {
+		name = "acc-test-instance-%d"
+		label = "TestAccOPCInstance_basic"
+		shape = "oc3"
+		image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
+	}
+}
   `, rInt, rInt)
 }
 
 func testAccOrchestrationInactive(rInt int) string {
 	return fmt.Sprintf(`
-  resource "opc_compute_orchestrated_instance" "test" {
-    name        = "test_orchestration-%d"
-    desired_state = "inactive"
-		instance {
-			name = "acc-test-instance-%d"
-			label = "TestAccOPCInstance_basic"
-			shape = "oc3"
-			image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
-		}
-  }
+resource "opc_compute_orchestrated_instance" "test" {
+  name        = "test_orchestration-%d"
+  desired_state = "inactive"
+	instance {
+		name = "acc-test-instance-%d"
+		label = "TestAccOPCInstance_basic"
+		shape = "oc3"
+		image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
+	}
+}
   `, rInt, rInt)
 }
 
 func testAccOrchestrationBasic_noBoot(rInt int) string {
 	return fmt.Sprintf(`
-  resource "opc_compute_orchestrated_instance" "test" {
-    name        = "test_orchestration-%d"
-    desired_state = "active"
-		instance {
-			name = "acc-test-instance-%d"
-			label = "TestAccOPCInstance_basic"
-			shape = "oc3"
-		}
-  }
+resource "opc_compute_orchestrated_instance" "test" {
+  name        = "test_orchestration-%d"
+  desired_state = "active"
+	instance {
+		name = "acc-test-instance-%d"
+		label = "TestAccOPCInstance_basic"
+		shape = "oc3"
+	}
+}
   `, rInt, rInt)
 }
 
 func testAccOrchestrationBasicTwoInstance(rInt int) string {
 	return fmt.Sprintf(`
-  resource "opc_compute_orchestrated_instance" "test" {
-    name        = "test_orchestration-%d"
-    desired_state = "active"
-		instance {
-			name = "acc-test-instance-%d"
-			label = "TestAccOPCInstance_basic"
-			shape = "oc3"
-			image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
-		}
-		instance {
-			name = "acc-test-instance-two-%d"
-			label = "TestAccOPCInstance_basicTwo"
-			shape = "oc3"
-			image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
-		}
-  }
+resource "opc_compute_orchestrated_instance" "test" {
+  name        = "test_orchestration-%d"
+  desired_state = "active"
+	instance {
+		name = "acc-test-instance-%d"
+		label = "TestAccOPCInstance_basic"
+		shape = "oc3"
+		image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
+	}
+	instance {
+		name = "acc-test-instance-two-%d"
+		label = "TestAccOPCInstance_basicTwo"
+		shape = "oc3"
+		image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
+	}
+}
   `, rInt, rInt, rInt)
 }
 
