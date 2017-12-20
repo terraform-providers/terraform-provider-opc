@@ -1,4 +1,9 @@
 ## 1.0.1 (Unreleased)
+
+BUG FIXES
+
+* Fixing broken link [GH-103]
+
 ## 1.0.0 (December 20, 2017)
 
 NEW RESOURCE: 
