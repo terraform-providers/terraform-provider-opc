@@ -27,8 +27,8 @@ type Config struct {
 }
 
 type OPCClient struct {
-	computeClient  *compute.ComputeClient
-	storageClient  *storage.StorageClient
+	computeClient *compute.ComputeClient
+	storageClient *storage.StorageClient
 }
 
 func (c *Config) Client() (*OPCClient, error) {
