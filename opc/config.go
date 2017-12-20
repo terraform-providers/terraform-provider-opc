@@ -9,7 +9,6 @@ import (
 
 	"github.com/hashicorp/go-cleanhttp"
 	"github.com/hashicorp/go-oracle-terraform/compute"
-	"github.com/hashicorp/go-oracle-terraform/database"
 	"github.com/hashicorp/go-oracle-terraform/opc"
 	"github.com/hashicorp/go-oracle-terraform/storage"
 	"github.com/hashicorp/terraform/helper/logging"
@@ -25,13 +24,11 @@ type Config struct {
 	Insecure         bool
 	StorageEndpoint  string
 	StorageServiceId string
-	DatabaseEndpoint string
 }
 
 type OPCClient struct {
 	computeClient  *compute.ComputeClient
 	storageClient  *storage.StorageClient
-	databaseClient *database.DatabaseClient
 }
 
 func (c *Config) Client() (*OPCClient, error) {
@@ -92,19 +89,6 @@ func (c *Config) Client() (*OPCClient, error) {
 			return nil, err
 		}
 		opcClient.storageClient = storageClient
-	}
-
-	if c.DatabaseEndpoint != "" {
-		databaseEndpoint, err := url.ParseRequestURI(c.DatabaseEndpoint)
-		if err != nil {
-			return nil, fmt.Errorf("Invalid database endpoint URI: %+v", err)
-		}
-		config.APIEndpoint = databaseEndpoint
-		databaseClient, err := database.NewDatabaseClient(&config)
-		if err != nil {
-			return nil, err
-		}
-		opcClient.databaseClient = databaseClient
 	}
 
 	return opcClient, nil

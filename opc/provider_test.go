@@ -32,7 +32,7 @@ func TestProvider_impl(t *testing.T) {
 }
 
 func testAccPreCheck(t *testing.T) {
-	required := []string{"OPC_USERNAME", "OPC_PASSWORD", "OPC_IDENTITY_DOMAIN", "OPC_ENDPOINT", "OPC_STORAGE_ENDPOINT", "OPC_DATABASE_ENDPOINT"}
+	required := []string{"OPC_USERNAME", "OPC_PASSWORD", "OPC_IDENTITY_DOMAIN", "OPC_ENDPOINT", "OPC_STORAGE_ENDPOINT"}
 	for _, prop := range required {
 		if os.Getenv(prop) == "" {
 			t.Fatalf("%s must be set for acceptance test", prop)
@@ -46,7 +46,6 @@ func testAccPreCheck(t *testing.T) {
 		MaxRetries:       1,
 		Insecure:         false,
 		StorageEndpoint:  os.Getenv("OPC_STORAGE_ENDPOINT"),
-		DatabaseEndpoint: os.Getenv("OPC_DATABASE_ENDPOINT"),
 	}
 	client, err := config.Client()
 	if err != nil {
@@ -55,10 +54,6 @@ func testAccPreCheck(t *testing.T) {
 	if client.storageClient == nil {
 		t.Fatalf("Storage Client is nil. Make sure your Oracle Cloud Account has access to the Storage Cloud")
 	}
-	/*
-		if client.databaseClient == nil {
-			t.Fatalf("Database Client is nil. Make sure your Oracle Cloud Account has access to the Database Cloud")
-		}*/
 }
 
 type OPCResourceState struct {

@@ -65,13 +65,6 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("OPC_STORAGE_SERVICE_ID", nil),
 				Description: "The Storage Service ID. ",
 			},
-
-			"database_endpoint": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("OPC_DATABASE_ENDPOINT", nil),
-				Description: "The HTTP endpoint for Oracle Database operations.",
-			},
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
@@ -108,7 +101,6 @@ func Provider() terraform.ResourceProvider {
 			"opc_compute_snapshot":                resourceOPCSnapshot(),
 			"opc_storage_container":               resourceOPCStorageContainer(),
 			"opc_storage_object":                  resourceOPCStorageObject(),
-			// "opc_database_service_instance":       resourceOPCDatabaseServiceInstance(),
 		},
 
 		ConfigureFunc: providerConfigure,
@@ -125,7 +117,6 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		Insecure:         d.Get("insecure").(bool),
 		StorageEndpoint:  d.Get("storage_endpoint").(string),
 		StorageServiceId: d.Get("storage_service_id").(string),
-		DatabaseEndpoint: d.Get("database_endpoint").(string),
 	}
 
 	return config.Client()
