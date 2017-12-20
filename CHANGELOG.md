@@ -1,4 +1,4 @@
-## 1.0.0 (Unreleased)
+## 1.0.0 (December 20, 2017)
 
 NEW RESOURCE: 
 
