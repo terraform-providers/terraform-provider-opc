@@ -1,4 +1,8 @@
-## 0.1.4 (Unreleased)
+## 1.0.0 (Unreleased)
+
+NEW RESOURCE: 
+
+* r/opc_compute_orchestrated_instance [#92]
 
 IMPROVEMENTS:
 
