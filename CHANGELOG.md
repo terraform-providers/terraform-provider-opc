@@ -1,8 +1,8 @@
-## 1.0.1 (Unreleased)
+## 1.0.1 (December 20, 2017)
 
 BUG FIXES
 
-* Fixing broken link [GH-103]
+* Fixing broken link ([#103](https://github.com/terraform-providers/terraform-provider-opc/issues/103))
 
 ## 1.0.0 (December 20, 2017)
 
