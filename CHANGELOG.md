@@ -6,6 +6,12 @@ IMPROVEMENTS:
 
 * d/network_interface: Add `is_default_gateway` variable [#87]
 
+* provider: Add `storage_service_id` variable to provider [#99]
+
+* provider: Add useragent [#97]
+
+* docs: Various documentation improvements [#95]
+
 ## 0.1.3 (September 15, 2017)
 
 FEATURES: 
