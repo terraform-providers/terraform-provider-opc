@@ -471,6 +471,7 @@ func flattenOrchestratedInstances(d *schema.ResourceData, meta interface{}, obje
 		}
 
 		v["name"] = instance.Name
+		v["persistent"] = objects[i].Persistent
 		v["shape"] = instance.Shape
 		v["id"] = instance.ID
 

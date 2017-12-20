@@ -63,7 +63,7 @@ resource "opc_compute_orchestrated_instance" "default" {
 	  name = "default-instance"
 	  label = "Default Instance"
 	  shape = "oc3"
-	  image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+	  image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
 	  networking_info {
 	    index = 0
 	    ip_network = "${opc_compute_ip_network.default.id}"
@@ -91,18 +91,18 @@ resource "opc_compute_orchestrated_instance" "default" {
 	name        = "test_orchestration-%d"
 	desired_state = "active"
 	instance {
-		name = "default-instance"
-		label = "Default Instance"
-		shape = "oc3"
-		image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
-		storage {
-			volume = "${opc_compute_storage_volume.foo.name}"
-			index = 1
-		}
-		storage {
-		  volume = "${opc_compute_storage_volume.bar.name}"
-		  index = 2
-		}
+  	name = "default-instance"
+  	label = "Default Instance"
+  	shape = "oc3"
+  	image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
+  	storage {
+  		volume = "${opc_compute_storage_volume.foo.name}"
+  		index = 1
+  	}
+  	storage {
+  	  volume = "${opc_compute_storage_volume.bar.name}"
+  	  index = 2
+  	}
 	}
 }
 ```
@@ -119,15 +119,18 @@ The following arguments are supported:
 * `object_label` - (Required) The label to apply for the object.
 
 * `instance` - (Required) The information pertaining to creating an instance through the orchestration API.
-See [Instance](https://www.terraform.io/docs/providers/opc/r/opc_compute_instance.html) for more information on what
-attributes are available.
-
-* `persistent` - (Optional) Determines whether the instance will persist when the orchestration is suspended.
-Defaults to false.
 
 * `description` - (Optional) The description of the orchestration.
 
 * `version` - (Optional) The version of the orchestration. This value is computed if left unspecified.
+
+## Instance
+
+Instance supports the arguments found in [opc_compute_instance](https://www.terraform.io/docs/providers/opc/r/opc_compute_instance.html)
+and the following:
+
+* `persistent` - (Optional) Determines whether the instance will persist when the orchestration is suspended.
+Defaults to false.
 
 In addition to the above, the following values are exported:
 

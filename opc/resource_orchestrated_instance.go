@@ -220,6 +220,7 @@ func expandOrchestrationInstances(d *schema.ResourceData) ([]compute.Object, err
 		// The value for orchestration is the name of the orchestration
 		orchestrationName := d.Get("name").(string)
 		objectLabel := d.Get(fmt.Sprintf("instance.%d.name", i)).(string)
+		persistent := d.Get(fmt.Sprintf("instance.%d.persistent", i)).(bool)
 
 		instanceCreateInput, instanceErr := expandCreateInstanceInput(fmt.Sprintf("instance.%d", i), d)
 		if instanceErr != nil {
@@ -231,6 +232,7 @@ func expandOrchestrationInstances(d *schema.ResourceData) ([]compute.Object, err
 			Orchestration: orchestrationName,
 			Type:          compute.OrchestrationTypeInstance,
 			Template:      instanceCreateInput,
+			Persistent:    persistent,
 		}
 
 		instances = append(instances, instance)

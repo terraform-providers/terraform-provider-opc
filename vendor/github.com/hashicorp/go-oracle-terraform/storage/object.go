@@ -46,6 +46,8 @@ const (
 	h_Timestamp          = "X-Timestamp"
 	h_TransactionID      = "X-Trans-Id"
 	h_TransferEncoding   = "Transfer-Encoding"
+
+	h_MetadataPrefix = "X-Object-Meta-"
 )
 
 // ObjectInfo describes an existing object
@@ -81,9 +83,8 @@ type ObjectInfo struct {
 	DeleteAt int
 	// Optional: The dynamic large object manifest object.
 	ObjectManifest string
-
-	// TODO: X-Object-Meta-{name}
-
+	// Optional: The map of object metadata name values pairs for X-Object-Meta-{name}
+	ObjectMetadata map[string]string
 	// Date and time in UNIX EPOCH when the account, container, _or_ object
 	// was initially created as a current version.
 	Timestamp string
@@ -117,10 +118,11 @@ type CreateObjectInput struct {
 	// and the name of the container and object must be URL-encoded
 	// Optional
 	CopyFrom string
-	// Specify the number of seconds after which the system deletes the object.
-	// Optional
+	// Specify the date and time in UNIX Epoch time stamp format when the system
+	// removes the object
 	DeleteAt int
-
+	// Specify the map of object metadata name values pairs for X-Object-Meta-{name}
+	ObjectMetadata map[string]string
 	// MD5 checksum value of the request body. Unquoted
 	// Strongly recommended, not required.
 	ETag string
@@ -160,8 +162,16 @@ func (c *ObjectClient) CreateObject(input *CreateObjectInput) (*ObjectInfo, erro
 	if input.DeleteAt != 0 {
 		headers[h_DeleteAt] = fmt.Sprintf("%d", input.DeleteAt)
 	}
+	if len(input.ObjectMetadata) > 0 {
+		// add a header entry for each metadata item
+		// X-Object-Meta-{name}: value
+		for name, value := range input.ObjectMetadata {
+			header := fmt.Sprintf("%s%s", h_MetadataPrefix, name)
+			headers[header] = fmt.Sprintf("%s", value)
+		}
+	}
 
-	if input.Body == nil {
+	if input.Body == nil && input.CopyFrom == "" {
 		return nil, fmt.Errorf("Body cannot be nil")
 	}
 
@@ -293,6 +303,14 @@ func (c *ObjectClient) success(resp *http.Response, object *ObjectInfo) (*Object
 		object.DeleteAt, err = strconv.Atoi(v)
 		if err != nil {
 			return nil, err
+		}
+	}
+
+	object.ObjectMetadata = make(map[string]string)
+	for header, value := range resp.Header {
+		if strings.HasPrefix(header, h_MetadataPrefix) {
+			name := strings.TrimPrefix(header, h_MetadataPrefix)
+			object.ObjectMetadata[name] = strings.Join(value, " ")
 		}
 	}
 

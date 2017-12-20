@@ -31,6 +31,27 @@ func TestAccOPCOrchestratedInstance_Basic(t *testing.T) {
 	})
 }
 
+func TestAccOPCOrchestratedInstance_Persistent(t *testing.T) {
+	resName := "opc_compute_orchestrated_instance.test"
+	ri := acctest.RandInt()
+	config := testAccOrchestrationPersistent(ri)
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckOrchestrationDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckOrchestrationExists,
+					resource.TestCheckResourceAttrSet(resName, "instance.0.id"),
+					resource.TestCheckResourceAttr(resName, "instance.0.persistent", "true"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccOPCOrchestratedInstance_BasicTwoInstance(t *testing.T) {
 	resName := "opc_compute_orchestrated_instance.test"
 	ri := acctest.RandInt()
@@ -296,6 +317,12 @@ func TestAccOPCOrchestratedInstance_activeToSuspend(t *testing.T) {
 					resource.TestCheckResourceAttrSet(resName, "instance.0.id"),
 				),
 			},
+			{
+				Config: testAccOrchestrationSuspend(ri),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckOrchestrationExists,
+				),
+			},
 		},
 	})
 }
@@ -352,6 +379,37 @@ resource "opc_compute_orchestrated_instance" "test" {
 		label = "TestAccOPCInstance_basic"
 		shape = "oc3"
 		image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
+	}
+}
+  `, rInt, rInt)
+}
+
+func testAccOrchestrationSuspend(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_orchestrated_instance" "test" {
+  name        = "test_orchestration-%d"
+  desired_state = "suspend"
+	instance {
+		name = "acc-test-instance-%d"
+		label = "TestAccOPCInstance_basic"
+		shape = "oc3"
+		image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
+	}
+}
+  `, rInt, rInt)
+}
+
+func testAccOrchestrationPersistent(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_orchestrated_instance" "test" {
+  name        = "test_orchestration-%d"
+  desired_state = "active"
+	instance {
+		name = "acc-test-instance-%d"
+		label = "TestAccOPCInstance_basic"
+		shape = "oc3"
+		image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
+		persistent = true
 	}
 }
   `, rInt, rInt)
@@ -482,7 +540,7 @@ resource "opc_compute_orchestrated_instance" "test" {
 	  name = "acc-test-instance-%d"
 	  label = "TestAccOPCInstance_ipNetwork"
 	  shape = "oc3"
-	  image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+	  image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
 	  networking_info {
 	    index = 0
 	    ip_network = "${opc_compute_ip_network.foo.id}"
@@ -514,7 +572,7 @@ resource "opc_compute_orchestrated_instance" "test" {
 		name = "acc-test-instance-%d"
 		label = "TestAccOPCInstance_basic"
 		shape = "oc3"
-		image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+		image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
 		storage {
 			volume = "${opc_compute_storage_volume.foo.name}"
 			index = 1
