@@ -113,16 +113,21 @@ The following arguments are supported:
 
 * `name` - (Required) The name of the orchestration.
 
-* `desired_state` - (Required) The desired state of the orchestration. Permitted values are `active`, `inactive`, and
-`suspend`.
+* `desired_state` - (Required) The desired state of the orchestration. Permitted values are:
+
+  - `active`: all resource (instances) declared in the orchestration are created
+
+  - `suspend`: all resources (instances) declared in the orchestration are removed unless the instances has
+`persistent = true`
+
+  - `inactive`:  all resources (instances) declared in the orchestration are removed including the instances that have
+`persistent = true`
 
 * `object_label` - (Required) The label to apply for the object.
 
 * `instance` - (Required) The information pertaining to creating an instance through the orchestration API.
 
 * `description` - (Optional) The description of the orchestration.
-
-* `version` - (Optional) The version of the orchestration. This value is computed if left unspecified.
 
 ## Instance
 
@@ -135,3 +140,5 @@ Defaults to false.
 In addition to the above, the following values are exported:
 
 * `uri` - The Uniform Resource Identifier for the Orchestration
+
+* `version` - (Optional) The version of the orchestration.
