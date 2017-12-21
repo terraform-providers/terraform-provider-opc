@@ -1,4 +1,24 @@
-## 0.1.4 (Unreleased)
+## 1.0.2 (Unreleased)
+
+BUG FIXES:
+
+IMPROVEMENTS:
+
+* r/opc_storage_container: Add `quota_bytes`, `quota_count` and `metadata` attributes
+
+* r/opc_storage_object: Add `metadata` attributes
+
+## 1.0.1 (December 20, 2017)
+
+BUG FIXES
+
+* Fixing broken link ([#103](https://github.com/terraform-providers/terraform-provider-opc/issues/103))
+
+## 1.0.0 (December 20, 2017)
+
+NEW RESOURCE:
+
+* r/opc_compute_orchestrated_instance [#92]
 
 IMPROVEMENTS:
 
@@ -6,13 +26,19 @@ IMPROVEMENTS:
 
 * d/network_interface: Add `is_default_gateway` variable [#87]
 
+* provider: Add `storage_service_id` variable to provider [#99]
+
+* provider: Add useragent [#97]
+
+* docs: Various documentation improvements [#95]
+
 ## 0.1.3 (September 15, 2017)
 
-FEATURES: 
+FEATURES:
 
 * **New Resource:** `opc_storage_object` ([#55](https://github.com/terraform-providers/terraform-provider-opc/issues/55))
 
-BUG FIXES: 
+BUG FIXES:
 
 * r/ip_network: Allow changing the name of an IP Network ([#73](https://github.com/terraform-providers/terraform-provider-opc/issues/73))
 * r/opc_compute_image_list_entry: Fix resource imports ([#66](https://github.com/terraform-providers/terraform-provider-opc/issues/66))
@@ -22,7 +48,7 @@ BUG FIXES:
 * r/storage_volume_snapshot: Increase timeout for larger snapshots ([#79](https://github.com/terraform-providers/terraform-provider-opc/issues/79))
 * r/storage_volume: Remove validation around storage_type ([#80](https://github.com/terraform-providers/terraform-provider-opc/issues/80))
 
-NOTES: 
+NOTES:
 
 * Various doc fixes/updates
 
@@ -34,7 +60,7 @@ FEATURES:
  * **New Datasource:** `opc_compute_storage_volume_snapshot` ([#46](https://github.com/terraform-providers/terraform-provider-opc/issues/46))
  * **New Resource:** `opc_compute_storage_container` ([#23](https://github.com/terraform-providers/terraform-provider-opc/issues/23))
  * Add timeout configuration: ([#41](https://github.com/terraform-providers/terraform-provider-opc/issues/41))
-  
+
 BUG FIXES:
  * `opc_storage_volume_snapshot`: Fix crash on import ([#10](https://github.com/terraform-providers/terraform-provider-opc/issues/10))
  * `opc_compute_storage_volume`: bootable volumes can be added without an image list/image list entry ([#19](https://github.com/terraform-providers/terraform-provider-opc/issues/19))
@@ -44,7 +70,7 @@ BUG FIXES:
 
 NOTES:
 
-* Bumping the provider version to get around provider caching issues - still same functionality 
+* Bumping the provider version to get around provider caching issues - still same functionality
 
 ## 0.1.0 (June 20, 2017)
 

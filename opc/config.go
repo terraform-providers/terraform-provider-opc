@@ -9,7 +9,6 @@ import (
 
 	"github.com/hashicorp/go-cleanhttp"
 	"github.com/hashicorp/go-oracle-terraform/compute"
-	"github.com/hashicorp/go-oracle-terraform/database"
 	"github.com/hashicorp/go-oracle-terraform/opc"
 	"github.com/hashicorp/go-oracle-terraform/storage"
 	"github.com/hashicorp/terraform/helper/logging"
@@ -24,20 +23,15 @@ type Config struct {
 	MaxRetries       int
 	Insecure         bool
 	StorageEndpoint  string
-	DatabaseEndpoint string
+	StorageServiceId string
 }
 
 type OPCClient struct {
-	computeClient  *compute.ComputeClient
-	storageClient  *storage.StorageClient
-	databaseClient *database.DatabaseClient
+	computeClient *compute.ComputeClient
+	storageClient *storage.StorageClient
 }
 
 func (c *Config) Client() (*OPCClient, error) {
-	u, err := url.ParseRequestURI(c.Endpoint)
-	if err != nil {
-		return nil, fmt.Errorf("Invalid endpoint URI: %s", err)
-	}
 
 	userAgentString := fmt.Sprintf("HashiCorp-Terraform-v%s", terraform.VersionString())
 
@@ -45,7 +39,6 @@ func (c *Config) Client() (*OPCClient, error) {
 		IdentityDomain: &c.IdentityDomain,
 		Username:       &c.User,
 		Password:       &c.Password,
-		APIEndpoint:    u,
 		MaxRetries:     &c.MaxRetries,
 		UserAgent:      &userAgentString,
 	}
@@ -67,13 +60,19 @@ func (c *Config) Client() (*OPCClient, error) {
 
 	config.HTTPClient = httpClient
 
-	computeClient, err := compute.NewComputeClient(&config)
-	if err != nil {
-		return nil, err
-	}
+	opcClient := &OPCClient{}
 
-	opcClient := &OPCClient{
-		computeClient: computeClient,
+	if c.Endpoint != "" {
+		computeEndpoint, err := url.ParseRequestURI(c.Endpoint)
+		if err != nil {
+			return nil, fmt.Errorf("Invalid endpoint URI: %s", err)
+		}
+		config.APIEndpoint = computeEndpoint
+		computeClient, err := compute.NewComputeClient(&config)
+		if err != nil {
+			return nil, err
+		}
+		opcClient.computeClient = computeClient
 	}
 
 	if c.StorageEndpoint != "" {
@@ -82,24 +81,14 @@ func (c *Config) Client() (*OPCClient, error) {
 			return nil, fmt.Errorf("Invalid storage endpoint URI: %+v", err)
 		}
 		config.APIEndpoint = storageEndpoint
+		if (c.StorageServiceId) != "" {
+			config.IdentityDomain = &c.StorageServiceId
+		}
 		storageClient, err := storage.NewStorageClient(&config)
 		if err != nil {
 			return nil, err
 		}
 		opcClient.storageClient = storageClient
-	}
-
-	if c.DatabaseEndpoint != "" {
-		databaseEndpoint, err := url.ParseRequestURI(c.DatabaseEndpoint)
-		if err != nil {
-			return nil, fmt.Errorf("Invalid database endpoint URI: %+v", err)
-		}
-		config.APIEndpoint = databaseEndpoint
-		databaseClient, err := database.NewDatabaseClient(&config)
-		if err != nil {
-			return nil, err
-		}
-		opcClient.databaseClient = databaseClient
 	}
 
 	return opcClient, nil
