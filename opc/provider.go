@@ -84,6 +84,7 @@ func Provider() terraform.ResourceProvider {
 			"opc_compute_ip_association":          resourceOPCIPAssociation(),
 			"opc_compute_ip_network_exchange":     resourceOPCIPNetworkExchange(),
 			"opc_compute_ip_reservation":          resourceOPCIPReservation(),
+			"opc_compute_machine_image":           resourceOPCMachineImage(),
 			"opc_compute_route":                   resourceOPCRoute(),
 			"opc_compute_security_application":    resourceOPCSecurityApplication(),
 			"opc_compute_security_association":    resourceOPCSecurityAssociation(),
