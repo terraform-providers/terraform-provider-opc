@@ -21,10 +21,10 @@ func resourceOPCMachineImage() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"account": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-				// ValidateFunc: validateAccount, TODO
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateComputeStorageAccountName,
 			},
 
 			"attributes": {
