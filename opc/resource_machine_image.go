@@ -6,6 +6,8 @@ import (
 	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/structure"
+	"github.com/hashicorp/terraform/helper/validation"
 )
 
 func resourceOPCMachineImage() *schema.Resource {
@@ -20,16 +22,18 @@ func resourceOPCMachineImage() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"account": {
 				Type:     schema.TypeString,
-				Optional: true,
+				Required: true,
 				ForceNew: true,
 				// ValidateFunc: validateAccount, TODO
 			},
 
-			// "attributes": {
-			// 	Type:     schema.TypeMap,
-			// 	Optional: true,
-			// 	ForceNew: true,
-			// },
+			"attributes": {
+				Type:             schema.TypeString,
+				ForceNew:         true,
+				Optional:         true,
+				ValidateFunc:     validation.ValidateJsonString,
+				DiffSuppressFunc: structure.SuppressJsonDiff,
+			},
 
 			"description": {
 				Type:     schema.TypeString,
@@ -74,6 +78,7 @@ func resourceOPCMachineImage() *schema.Resource {
 				Computed: true,
 			},
 
+			// TODO
 			// "sizes": {
 			// 	Type:     schema.TypeMap,
 			// 	Computed: true,
@@ -111,8 +116,17 @@ func resourceOPCMachineImageCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	// Get Optional attributes
-	if desc, ok := d.GetOk("description"); ok && desc != nil {
-		input.Description = desc.(string)
+	if description, ok := d.GetOk("description"); ok {
+		input.Description = description.(string)
+	}
+
+	if v, ok := d.GetOk("attributes"); ok {
+		attributesString := v.(string)
+		attributes, err := structure.ExpandJsonFromString(attributesString)
+		if err != nil {
+			return err
+		}
+		input.Attributes = attributes
 	}
 
 	info, err := client.CreateMachineImage(input)
@@ -147,8 +161,13 @@ func resourceOPCMachineImageRead(d *schema.ResourceData, meta interface{}) error
 		return nil
 	}
 
+	// Flatten JSON attributes
+	attributes, err := structure.FlattenJsonToString(result.Attributes)
+	if err != nil {
+		return err
+	}
+
 	d.Set("account", result.Account)
-	// d.Set("attributes", result.Attributes)
 	d.Set("audited", result.Audited)
 	d.Set("description", result.Description)
 	d.Set("error_reason", result.ErrorReason)
@@ -161,6 +180,11 @@ func resourceOPCMachineImageRead(d *schema.ResourceData, meta interface{}) error
 	// d.Set("sizes", result.Sizes)
 	d.Set("state", result.State)
 	d.Set("uri", result.URI)
+
+	if err := d.Set("attributes", attributes); err != nil {
+		return err
+	}
+
 	return nil
 }
 
