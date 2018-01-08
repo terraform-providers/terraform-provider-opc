@@ -327,6 +327,22 @@ func TestAccOPCOrchestratedInstance_activeToSuspend(t *testing.T) {
 	})
 }
 
+func TestAccOPCOrchestratedInstance_105(t *testing.T) {
+	ri := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckOrchestrationDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccOrchestration_105(ri),
+				ExpectError: regexp.MustCompile("Error creating Orchestration"),
+			},
+		},
+	})
+}
+
 func testAccCheckOrchestrationExists(s *terraform.State) error {
 	client := testAccProvider.Meta().(*OPCClient).computeClient.Orchestrations()
 
@@ -382,6 +398,36 @@ resource "opc_compute_orchestrated_instance" "test" {
 	}
 }
   `, rInt, rInt)
+}
+
+func testAccOrchestration_105(rInt int) string {
+	return fmt.Sprintf(`
+		resource "opc_compute_ip_network" "orchestration-test" {
+		  name              = "test_orchestration_%d"
+		  ip_address_prefix = "192.168.1.0/24"
+		}
+
+		resource "opc_compute_orchestrated_instance" "orchestrated-instance-test" {
+		  name          = "test_orchestration_%d"
+		  description   = "test_orchestration_%d"
+		  desired_state = "active"
+
+		  instance {
+		    name       = "orchestration-test-%d"
+		    hostname   = "orchestration-test-%d"
+		    label      = "orchestration-test-%d"
+		    image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
+		    shape      = "oc3"
+
+		    networking_info {
+		      index          = 0
+		      ip_network     = "${opc_compute_ip_network.orchestration-test.name}"
+		      vnic           = "orchestrationtest_eth0"
+		      ip_address      = "192.168.0.101"
+		    }
+		  }
+		}
+  `, rInt, rInt, rInt, rInt, rInt, rInt)
 }
 
 func testAccOrchestrationSuspend(rInt int) string {
