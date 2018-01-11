@@ -69,6 +69,7 @@ func Provider() terraform.ResourceProvider {
 
 		DataSourcesMap: map[string]*schema.Resource{
 			"opc_compute_image_list_entry":        dataSourceImageListEntry(),
+			"opc_compute_machine_image":           dataSourceMachineImage(),
 			"opc_compute_network_interface":       dataSourceNetworkInterface(),
 			"opc_compute_storage_volume_snapshot": dataSourceStorageVolumeSnapshot(),
 			"opc_compute_vnic":                    dataSourceVNIC(),
@@ -84,6 +85,7 @@ func Provider() terraform.ResourceProvider {
 			"opc_compute_ip_association":          resourceOPCIPAssociation(),
 			"opc_compute_ip_network_exchange":     resourceOPCIPNetworkExchange(),
 			"opc_compute_ip_reservation":          resourceOPCIPReservation(),
+			"opc_compute_machine_image":           resourceOPCMachineImage(),
 			"opc_compute_route":                   resourceOPCRoute(),
 			"opc_compute_security_application":    resourceOPCSecurityApplication(),
 			"opc_compute_security_association":    resourceOPCSecurityAssociation(),
