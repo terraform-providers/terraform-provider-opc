@@ -111,8 +111,6 @@ func resourceOPCMachineImageCreate(d *schema.ResourceData, meta interface{}) err
 
 	if account, ok := d.GetOk("account"); ok && account != nil {
 		input.Account = account.(string)
-	} else {
-		input.Account = fmt.Sprintf("/Compute-%s/cloud_storage", d.Get("identity_domain").(string)) // XXX TODO BROKEN
 	}
 
 	// Get Optional attributes
