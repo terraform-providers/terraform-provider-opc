@@ -116,7 +116,9 @@ func TestAccOPCStorageObject_objectMetadata(t *testing.T) {
 					testAccCheckStorageObjectExists,
 					resource.TestCheckResourceAttr(resName, "name", fmt.Sprintf("test-acc-%d", rInt)),
 					resource.TestCheckResourceAttr(resName, "container", fmt.Sprintf("acc-test-%d", rInt)),
-					resource.TestCheckResourceAttrSet(resName, "metadata"),
+					resource.TestCheckResourceAttr(resName, "metadata.%", "2"),
+					resource.TestCheckResourceAttr(resName, "metadata.Foo", "bar"),
+					resource.TestCheckResourceAttr(resName, "metadata.Abc-Def", "xyz"),
 				),
 			},
 		},
@@ -177,11 +179,11 @@ func testAccOPCStorageObject_objectMetadata(rInt int, body string) string {
 resource "opc_storage_object" "test" {
   name = "test-acc-%d"
   container = "${opc_storage_container.foo.name}"
-  content_type = "text/plain;charset=UTF-8"
 	metadata {
-		"Foo": "bar",
-		"Abc-Def": "XYZ"
+		"Foo" = "bar",
+		"Abc-Def" = "xyz"
 	}
+  content_type = "text/plain;charset=UTF-8"
   content = <<EOF
 %s
 EOF

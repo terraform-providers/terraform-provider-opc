@@ -1,7 +1,6 @@
 package opc
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/acctest"
@@ -12,7 +11,7 @@ func TestAccOPCStorageContainer_importBasic(t *testing.T) {
 	resourceName := "opc_storage_container.test"
 
 	rInt := acctest.RandInt()
-	config := fmt.Sprintf(testAccOPCStorageContainerBasic, rInt)
+	config := testAccOPCStorageContainerBasic(rInt)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
