@@ -111,7 +111,7 @@ func dataSourceMachineImageRead(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	// Populate schema attributes
-	d.SetId(fmt.Sprintf("%s", result.Name)) // TODO
+	d.SetId(fmt.Sprintf("%s", result.Name))
 	d.Set("account", result.Account)
 	d.Set("audited", result.Audited)
 	d.Set("description", result.Description)

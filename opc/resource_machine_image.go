@@ -78,12 +78,6 @@ func resourceOPCMachineImage() *schema.Resource {
 				Computed: true,
 			},
 
-			// TODO
-			// "sizes": {
-			// 	Type:     schema.TypeMap,
-			// 	Computed: true,
-			// },
-
 			"state": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -175,7 +169,6 @@ func resourceOPCMachineImageRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("name", result.Name)
 	d.Set("no_upload", result.NoUpload)
 	d.Set("platform", result.Platform)
-	// d.Set("sizes", result.Sizes)
 	d.Set("state", result.State)
 	d.Set("uri", result.URI)
 
