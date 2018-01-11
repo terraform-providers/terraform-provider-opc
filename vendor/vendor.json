@@ -256,42 +256,42 @@
 		{
 			"checksumSHA1": "hjQfXn32Tvuu6IJACOTsMzm+AbA=",
 			"path": "github.com/hashicorp/go-oracle-terraform/client",
-			"revision": "e3d1051e1357392572904240d851ec6a42b5d7ea",
-			"revisionTime": "2017-12-20T20:50:15Z",
-			"version": "v0.6.4",
-			"versionExact": "v0.6.4"
+			"revision": "5a9a298c54339d2296d2f1135eae55a3a8f5e8c2",
+			"revisionTime": "2018-01-11T20:31:13Z",
+			"version": "v0.6.6",
+			"versionExact": "v0.6.6"
 		},
 		{
-			"checksumSHA1": "iEfWmPImC+0Sc+1rbgvBSzno5G4=",
+			"checksumSHA1": "RhoE7zmHsn5zoXbx5AsAUUQI72E=",
 			"path": "github.com/hashicorp/go-oracle-terraform/compute",
-			"revision": "e3d1051e1357392572904240d851ec6a42b5d7ea",
-			"revisionTime": "2017-12-20T20:50:15Z",
-			"version": "v0.6.4",
-			"versionExact": "v0.6.4"
+			"revision": "5a9a298c54339d2296d2f1135eae55a3a8f5e8c2",
+			"revisionTime": "2018-01-11T20:31:13Z",
+			"version": "v0.6.6",
+			"versionExact": "v0.6.6"
 		},
 		{
 			"checksumSHA1": "E7dGmtLqjJnfc+Wz3paDimFVI8I=",
 			"path": "github.com/hashicorp/go-oracle-terraform/database",
-			"revision": "e3d1051e1357392572904240d851ec6a42b5d7ea",
-			"revisionTime": "2017-12-20T20:50:15Z",
-			"version": "v0.6.4",
-			"versionExact": "v0.6.4"
+			"revision": "5a9a298c54339d2296d2f1135eae55a3a8f5e8c2",
+			"revisionTime": "2018-01-11T20:31:13Z",
+			"version": "v0.6.6",
+			"versionExact": "v0.6.6"
 		},
 		{
 			"checksumSHA1": "NuObCk0/ybL3w++EnltgrB1GQRc=",
 			"path": "github.com/hashicorp/go-oracle-terraform/opc",
-			"revision": "e3d1051e1357392572904240d851ec6a42b5d7ea",
-			"revisionTime": "2017-12-20T20:50:15Z",
-			"version": "v0.6.4",
-			"versionExact": "v0.6.4"
+			"revision": "5a9a298c54339d2296d2f1135eae55a3a8f5e8c2",
+			"revisionTime": "2018-01-11T20:31:13Z",
+			"version": "v0.6.6",
+			"versionExact": "v0.6.6"
 		},
 		{
 			"checksumSHA1": "WKErIOzVwmPBcOC0lDp2RUEtSJs=",
 			"path": "github.com/hashicorp/go-oracle-terraform/storage",
-			"revision": "e3d1051e1357392572904240d851ec6a42b5d7ea",
-			"revisionTime": "2017-12-20T20:50:15Z",
-			"version": "v0.6.4",
-			"versionExact": "v0.6.4"
+			"revision": "5a9a298c54339d2296d2f1135eae55a3a8f5e8c2",
+			"revisionTime": "2018-01-11T20:31:13Z",
+			"version": "v0.6.6",
+			"versionExact": "v0.6.6"
 		},
 		{
 			"checksumSHA1": "b0nQutPMJHeUmz4SjpreotAo6Yk=",
