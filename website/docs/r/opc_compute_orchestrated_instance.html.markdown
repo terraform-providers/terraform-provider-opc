@@ -123,8 +123,6 @@ The following arguments are supported:
   - `inactive`:  all resources (instances) declared in the orchestration are removed including the instances that have
 `persistent = true`
 
-* `object_label` - (Required) The label to apply for the object.
-
 * `instance` - (Required) The information pertaining to creating an instance through the orchestration API.
 
 * `description` - (Optional) The description of the orchestration.
