@@ -15,12 +15,13 @@ instances in an OPC identity domain.
 
 ```hcl
 resource "opc_compute_orchestrated_instance" "default" {
-  name        = "default_orchestration"
+  name          = "default_orchestration"
   desired_state = "active"
+
   instance {
-    name = "default-orchestrated-instance"
-    label = "Orchestrated Instance 1 Label"
-    shape = "oc3"
+    name       = "default-orchestrated-instance"
+    label      = "Orchestrated Instance 1 Label"
+    shape      = "oc3"
     image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
   }
 }
@@ -30,18 +31,20 @@ resource "opc_compute_orchestrated_instance" "default" {
 
 ```hcl
 resource "opc_compute_orchestrated_instance" "default" {
-  name        = "default_orchestration"
+  name          = "default_orchestration"
   desired_state = "active"
+
   instance {
-    name = "default-instance-1"
-    label = "Instance One"
-    shape = "oc3"
+    name       = "default-instance-1"
+    label      = "Instance One"
+    shape      = "oc3"
     image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
   }
+
   instance {
-    name = "default-instance-2"
-    label = "Instance Two"
-    shape = "oc3"
+    name       = "default-instance-2"
+    label      = "Instance Two"
+    shape      = "oc3"
     image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
   }
 }
@@ -51,26 +54,28 @@ resource "opc_compute_orchestrated_instance" "default" {
 
 ```hcl
 resource "opc_compute_ip_network" "default" {
-  name = "default-ip-network"
-  description = "testing-ip-network-instance"
+  name              = "default-ip-network"
+  description       = "testing-ip-network-instance"
   ip_address_prefix = "10.1.12.0/24"
 }
 
 resource "opc_compute_orchestrated_instance" "default" {
-	name        = "default_orchestration"
-	desired_state = "active"
-	instance {
-	  name = "default-instance"
-	  label = "Default Instance"
-	  shape = "oc3"
-	  image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
-	  networking_info {
-	    index = 0
-	    ip_network = "${opc_compute_ip_network.default.id}"
-	    vnic = "default-ip-network"
-	    shared_network = false
-	  }
-	}
+  name          = "default_orchestration"
+  desired_state = "active"
+
+  instance {
+    name       = "default-instance"
+    label      = "Default Instance"
+    shape      = "oc3"
+    image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
+
+    networking_info {
+      index          = 0
+      ip_network     = "${opc_compute_ip_network.default.id}"
+      vnic           = "default-ip-network"
+      shared_network = false
+    }
+  }
 }
 ```
 
@@ -88,22 +93,25 @@ resource "opc_compute_storage_volume" "bar" {
 }
 
 resource "opc_compute_orchestrated_instance" "default" {
-	name        = "test_orchestration-%d"
-	desired_state = "active"
-	instance {
-  	name = "default-instance"
-  	label = "Default Instance"
-  	shape = "oc3"
-  	image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
-  	storage {
-  		volume = "${opc_compute_storage_volume.foo.name}"
-  		index = 1
-  	}
-  	storage {
-  	  volume = "${opc_compute_storage_volume.bar.name}"
-  	  index = 2
-  	}
-	}
+  name          = "test_orchestration-%d"
+  desired_state = "active"
+
+  instance {
+    name       = "default-instance"
+    label      = "Default Instance"
+    shape      = "oc3"
+    image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
+
+    storage {
+      volume = "${opc_compute_storage_volume.foo.name}"
+      index  = 1
+    }
+
+    storage {
+      volume = "${opc_compute_storage_volume.bar.name}"
+      index  = 2
+    }
+  }
 }
 ```
 
