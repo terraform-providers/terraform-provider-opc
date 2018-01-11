@@ -51,6 +51,7 @@ const (
 	OrchestrationStatusSuspending   OrchestrationStatus = "suspending"
 	OrchestrationStatusStarting     OrchestrationStatus = "starting"
 	OrchestrationStatusDeactivating OrchestrationStatus = "deactivating"
+	OrchestrationStatusSuspended    OrchestrationStatus = "suspended"
 )
 
 type OrchestrationType string
@@ -385,6 +386,13 @@ func (c *OrchestrationsClient) WaitForOrchestrationState(input *GetOrchestration
 		case OrchestrationStatusDeactivating:
 			c.client.DebugLogString("Orchestration deactivating")
 			return false, nil
+		case OrchestrationStatusSuspended:
+			c.client.DebugLogString("Orchestration suspended")
+			if info.DesiredState == OrchestrationDesiredStateSuspend {
+				return true, nil
+			} else {
+				return false, nil
+			}
 		default:
 			return false, fmt.Errorf("Unknown orchestration state: %s, erroring", s)
 		}

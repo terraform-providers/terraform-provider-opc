@@ -136,7 +136,7 @@ resource "opc_compute_instance" "foo" {
   name = "test-vnic-set-%d"
   label = "testing"
   shape = "oc3"
-  image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+  image_list = "%s"
   networking_info {
     index = 0
     ip_network = "${opc_compute_ip_network.foo.id}"
@@ -171,7 +171,7 @@ resource "opc_compute_vnic_set" "test" {
     "${data.opc_compute_network_interface.foo.vnic}",
     "${data.opc_compute_network_interface.bar.vnic}",
   ]
-}`, rInt, rInt, rInt, rInt, rInt, rName, rDesc)
+}`, rInt, rInt, rInt, TEST_IMAGE_LIST, rInt, rInt, rName, rDesc)
 }
 
 func testAccVnicSetBasic_Update(rName, rDesc string, rInt int) string {
@@ -192,7 +192,7 @@ resource "opc_compute_instance" "foo" {
   name = "test-vnic-set-%d"
   label = "testing"
   shape = "oc3"
-  image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+  image_list = "%s"
   networking_info {
     index = 0
     ip_network = "${opc_compute_ip_network.foo.id}"
@@ -227,7 +227,7 @@ resource "opc_compute_vnic_set" "test" {
     "${data.opc_compute_network_interface.foo.vnic}",
     "${data.opc_compute_network_interface.bar.vnic}",
   ]
-}`, rInt, rInt, rInt, rInt, rInt, rName, rDesc)
+}`, rInt, rInt, rInt, TEST_IMAGE_LIST, rInt, rInt, rName, rDesc)
 }
 
 func testAccVnicSetInstance(rInt int) string {

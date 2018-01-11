@@ -10,6 +10,8 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
+const TEST_IMAGE_LIST = "/oracle/public/OL_7.2_UEKR4_x86_64"
+
 func TestAccOPCInstance_basic(t *testing.T) {
 	resName := "opc_compute_instance.test"
 	rInt := acctest.RandInt()
@@ -327,13 +329,13 @@ resource "opc_compute_instance" "test" {
 	name = "acc-test-instance-%d"
 	label = "TestAccOPCInstance_basic"
 	shape = "oc3"
-	image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+	image_list = "%s"
 	instance_attributes = <<JSON
 {
   "foo": "bar"
 }
 JSON
-}`, rInt)
+}`, rInt, TEST_IMAGE_LIST)
 }
 
 func testAccInstanceSharedNetworking(rInt int) string {
@@ -342,7 +344,7 @@ resource "opc_compute_instance" "test" {
   name = "acc-test-instance-%d"
   label = "TestAccOPCInstance_sharedNetworking"
   shape = "oc3"
-  image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+  image_list = "%s"
   tags = ["tag1", "tag2"]
   networking_info {
     index = 0
@@ -356,7 +358,7 @@ data "opc_compute_network_interface" "test" {
   instance_id = "${opc_compute_instance.test.id}"
   interface = "eth0"
 }
-`, rInt)
+`, rInt, TEST_IMAGE_LIST)
 }
 
 func testAccInstanceIPNetworking(rInt int) string {
@@ -371,7 +373,7 @@ resource "opc_compute_instance" "test" {
   name = "acc-test-instance-%d"
   label = "TestAccOPCInstance_ipNetwork"
   shape = "oc3"
-  image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+  image_list = "%s"
   networking_info {
     index = 0
     ip_network = "${opc_compute_ip_network.foo.id}"
@@ -385,7 +387,7 @@ data "opc_compute_network_interface" "test" {
   instance_name = "${opc_compute_instance.test.name}"
   interface = "eth0"
 }
-`, rInt, rInt, rInt)
+`, rInt, rInt, TEST_IMAGE_LIST, rInt)
 }
 
 func testAccInstanceIPNetworkingDefaultGateway(rInt int) string {
@@ -400,7 +402,7 @@ resource "opc_compute_instance" "test" {
   name = "acc-test-instance-%d"
   label = "TestAccOPCInstance_ipNetwork"
   shape = "oc3"
-  image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+  image_list = "%s"
   networking_info {
     index = 0
     ip_network = "${opc_compute_ip_network.foo.id}"
@@ -415,7 +417,7 @@ data "opc_compute_network_interface" "test" {
   instance_name = "${opc_compute_instance.test.name}"
   interface = "eth0"
 }
-`, rInt, rInt, rInt)
+`, rInt, rInt, TEST_IMAGE_LIST, rInt)
 }
 
 func testAccInstanceStorage(rInt int) string {
@@ -434,7 +436,7 @@ resource "opc_compute_instance" "test" {
 	name = "acc-test-instance-%d"
 	label = "TestAccOPCInstance_basic"
 	shape = "oc3"
-	image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+	image_list = "%s"
 	storage {
 		volume = "${opc_compute_storage_volume.foo.name}"
 		index = 1
@@ -443,7 +445,7 @@ resource "opc_compute_instance" "test" {
 	  volume = "${opc_compute_storage_volume.bar.name}"
 	  index = 2
 	}
-}`, rInt, rInt, rInt)
+}`, rInt, rInt, rInt, TEST_IMAGE_LIST)
 }
 
 func testAccInstanceEmptyLabel(rInt int) string {
@@ -451,13 +453,13 @@ func testAccInstanceEmptyLabel(rInt int) string {
 resource "opc_compute_instance" "test" {
 	name = "acc-test-instance-%d"
 	shape = "oc3"
-	image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+	image_list = "%s"
 	instance_attributes = <<JSON
 {
   "foo": "bar"
 }
 JSON
-}`, rInt)
+}`, rInt, TEST_IMAGE_LIST)
 }
 
 func testAccInstanceUpdateTags(rInt int) string {
@@ -466,14 +468,14 @@ resource "opc_compute_instance" "test" {
 	name = "acc-test-instance-%d"
 	label = "TestAccOPCInstance_basic"
 	shape = "oc3"
-	image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+	image_list = "%s"
 	tags = ["tag1", "tag2"]
 	instance_attributes = <<JSON
 {
   "foo": "bar"
 }
 JSON
-}`, rInt)
+}`, rInt, TEST_IMAGE_LIST)
 }
 
 func testAccInstanceBootVolume(rInt int) string {
@@ -485,7 +487,7 @@ resource "opc_compute_image_list" "test" {
 
 resource "opc_compute_image_list_entry" "test" {
   name = "${opc_compute_image_list.test.name}"
-  machine_images = ["/oracle/public/oel_6.7_apaas_16.4.5_1610211300"]
+	machine_images = [ "/oracle/public/oel_6.7_apaas_16.4.5_1610211300" ]
   version = 1
 }
 
@@ -518,7 +520,7 @@ resource "opc_compute_image_list" "test" {
 
 resource "opc_compute_image_list_entry" "test" {
   name = "${opc_compute_image_list.test.name}"
-  machine_images = ["/oracle/public/oel_6.7_apaas_16.4.5_1610211300"]
+	machine_images = [ "/oracle/public/oel_6.7_apaas_16.4.5_1610211300" ]
   version = 1
 }
 
@@ -552,7 +554,7 @@ resource "opc_compute_image_list" "test" {
 
 resource "opc_compute_image_list_entry" "test" {
   name = "${opc_compute_image_list.test.name}"
-  machine_images = ["/oracle/public/oel_6.7_apaas_16.4.5_1610211300"]
+  machine_images = [ "/oracle/public/oel_6.7_apaas_16.4.5_1610211300" ]
   version = 1
 }
 
@@ -582,7 +584,7 @@ func testAccInstanceHostname(rInt int) string {
 resource "opc_compute_instance" "test" {
 	name = "acc-test-instance-%d"
 	shape = "oc3"
-	image_list = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
+	image_list = "%s"
 	hostname = "testhostname-%d"
-}`, rInt, rInt)
+}`, rInt, TEST_IMAGE_LIST, rInt)
 }

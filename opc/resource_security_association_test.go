@@ -12,7 +12,7 @@ import (
 
 func TestAccOPCSecurityAssociation_Basic(t *testing.T) {
 	ri := acctest.RandInt()
-	config := fmt.Sprintf(testAccSecurityAssociationBasic, ri, ri)
+	config := testAccSecurityAssociationBasic(ri)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -31,7 +31,7 @@ func TestAccOPCSecurityAssociation_Basic(t *testing.T) {
 
 func TestAccOPCSecurityAssociation_Complete(t *testing.T) {
 	ri := acctest.RandInt()
-	config := fmt.Sprintf(testAccSecurityAssociationComplete, ri, ri, ri)
+	config := testAccSecurityAssociationComplete(ri)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -86,43 +86,47 @@ func testAccOPCCheckSecurityAssociationDestroy(s *terraform.State) error {
 	return nil
 }
 
-var testAccSecurityAssociationBasic = `
-resource "opc_compute_security_list" "test" {
-  name                 = "acc-test-sec-ass-sec-list-%d"
-  policy               = "PERMIT"
-  outbound_cidr_policy = "DENY"
+func testAccSecurityAssociationBasic(rInt int) string {
+	return fmt.Sprintf(`
+	resource "opc_compute_security_list" "test" {
+	  name                 = "acc-test-sec-ass-sec-list-%d"
+	  policy               = "PERMIT"
+	  outbound_cidr_policy = "DENY"
+	}
+
+	resource "opc_compute_instance" "test" {
+	  name        = "acc-test-sec-ass-instance-%d"
+	  label       = "Security Associations Test Instance"
+	  shape       = "oc3"
+	  image_list   = "%s"
+	}
+
+	resource "opc_compute_security_association" "test" {
+	  vcable  = "${opc_compute_instance.test.vcable}"
+	  seclist = "${opc_compute_security_list.test.name}"
+	}
+	`, rInt, rInt, TEST_IMAGE_LIST)
 }
 
-resource "opc_compute_instance" "test" {
-  name        = "acc-test-sec-ass-instance-%d"
-  label       = "Security Associations Test Instance"
-  shape       = "oc3"
-  image_list   = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
-}
+func testAccSecurityAssociationComplete(rInt int) string {
+	return fmt.Sprintf(`
+	resource "opc_compute_security_list" "test" {
+	  name                 = "acc-test-sec-ass-sec-list-%d"
+	  policy               = "PERMIT"
+	  outbound_cidr_policy = "DENY"
+	}
 
-resource "opc_compute_security_association" "test" {
-  vcable  = "${opc_compute_instance.test.vcable}"
-  seclist = "${opc_compute_security_list.test.name}"
-}
-`
+	resource "opc_compute_instance" "test" {
+	  name        = "acc-test-sec-ass-instance-%d"
+	  label       = "Security Associations Test Instance"
+	  shape       = "oc3"
+	  image_list   = "%s"
+	}
 
-var testAccSecurityAssociationComplete = `
-resource "opc_compute_security_list" "test" {
-  name                 = "acc-test-sec-ass-sec-list-%d"
-  policy               = "PERMIT"
-  outbound_cidr_policy = "DENY"
+	resource "opc_compute_security_association" "test" {
+	  name    = "acc-test-sec-ass-%d"
+	  vcable  = "${opc_compute_instance.test.vcable}"
+	  seclist = "${opc_compute_security_list.test.name}"
+	}
+	`, rInt, rInt, TEST_IMAGE_LIST, rInt)
 }
-
-resource "opc_compute_instance" "test" {
-  name        = "acc-test-sec-ass-instance-%d"
-  label       = "Security Associations Test Instance"
-  shape       = "oc3"
-  image_list   = "/oracle/public/oel_6.7_apaas_16.4.5_1610211300"
-}
-
-resource "opc_compute_security_association" "test" {
-  name    = "acc-test-sec-ass-%d"
-  vcable  = "${opc_compute_instance.test.vcable}"
-  seclist = "${opc_compute_security_list.test.name}"
-}
-`

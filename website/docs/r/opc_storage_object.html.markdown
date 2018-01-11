@@ -1,6 +1,6 @@
 ---
 layout: "opc"
-page_title: "Oracle: opc_storage_opject"
+page_title: "Oracle: opc_storage_object"
 sidebar_current: "docs-opc-resource-storage-object"
 description: |-
   Creates and manages a Object in the OPC Storage Container. `storage_endpoint` must be set in the provider or environment to manage these resources.
