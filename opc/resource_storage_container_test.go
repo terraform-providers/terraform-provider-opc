@@ -13,7 +13,7 @@ import (
 func TestAccOPCStorageContainer_Basic(t *testing.T) {
 	containerResourceName := "opc_storage_container.test"
 	ri := acctest.RandInt()
-	config := fmt.Sprintf(testAccOPCStorageContainerBasic, ri)
+	config := testAccOPCStorageContainerBasic(ri)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -35,8 +35,8 @@ func TestAccOPCStorageContainer_Basic(t *testing.T) {
 func TestAccOPCStorageContainer_Updated(t *testing.T) {
 	containerResourceName := "opc_storage_container.test"
 	ri := acctest.RandInt()
-	config := fmt.Sprintf(testAccOPCStorageContainerBasic, ri)
-	config2 := fmt.Sprintf(testAccOPCStorageContainerUpdated, ri)
+	config := testAccOPCStorageContainerBasic(ri)
+	config2 := testAccOPCStorageContainerUpdated(ri)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -53,6 +53,11 @@ func TestAccOPCStorageContainer_Updated(t *testing.T) {
 					resource.TestCheckResourceAttr(containerResourceName, "allowed_origins.0", "origin-1"),
 					resource.TestCheckResourceAttr(containerResourceName, "exposed_headers.#", "1"),
 					resource.TestCheckResourceAttr(containerResourceName, "exposed_headers.0", "exposed-header-1"),
+					resource.TestCheckResourceAttr(containerResourceName, "quota_bytes", "1000000000"),
+					resource.TestCheckResourceAttr(containerResourceName, "quota_count", "1000"),
+					resource.TestCheckResourceAttr(containerResourceName, "metadata.%", "2"),
+					resource.TestCheckResourceAttr(containerResourceName, "metadata.Foo", "bar"),
+					resource.TestCheckResourceAttr(containerResourceName, "metadata.Abc-Def", "xyz"),
 				),
 			},
 			{
@@ -66,6 +71,11 @@ func TestAccOPCStorageContainer_Updated(t *testing.T) {
 					resource.TestCheckResourceAttr(containerResourceName, "allowed_origins.1", "origin-2"),
 					resource.TestCheckResourceAttr(containerResourceName, "exposed_headers.#", "2"),
 					resource.TestCheckResourceAttr(containerResourceName, "exposed_headers.1", "exposed-header-2"),
+					resource.TestCheckResourceAttr(containerResourceName, "quota_bytes", "2000000000"),
+					resource.TestCheckResourceAttr(containerResourceName, "quota_count", "2000"),
+					resource.TestCheckResourceAttr(containerResourceName, "metadata.%", "2"),
+					resource.TestCheckResourceAttr(containerResourceName, "metadata.Bar", "foo"),
+					resource.TestCheckResourceAttr(containerResourceName, "metadata.Abc-Def", "xyz"),
 				),
 			},
 		},
@@ -110,23 +120,39 @@ func testAccCheckStorageContainerDestroy(s *terraform.State) error {
 	return nil
 }
 
-const testAccOPCStorageContainerBasic = `
+func testAccOPCStorageContainerBasic(rInt int) string {
+	return fmt.Sprintf(`
 resource "opc_storage_container" "test" {
   name = "acc-storage-container-%d"
   max_age = 50
+	quota_bytes = 1000000000
+	quota_count = 1000
   primary_key = "test-key"
   allowed_origins = ["origin-1"]
 	exposed_headers = ["exposed-header-1"]
+	metadata {
+		"Foo" = "bar",
+		"Abc-Def" = "xyz"
+	}
 }
-`
+`, rInt)
+}
 
-const testAccOPCStorageContainerUpdated = `
+func testAccOPCStorageContainerUpdated(rInt int) string {
+	return fmt.Sprintf(`
 resource "opc_storage_container" "test" {
   name = "acc-storage-container-%d"
   max_age = 60
+	quota_bytes = 2000000000
+	quota_count = 2000
   primary_key = "test-key-updated"
   secondary_key = "test-key"
   allowed_origins = ["origin-1", "origin-2"]
 	exposed_headers = ["exposed-header-1", "exposed-header-2"]
+	metadata {
+		"Bar" = "foo",
+		"Abc-Def" = "xyz"
+	}
 }
-`
+`, rInt)
+}

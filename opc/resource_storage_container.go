@@ -59,6 +59,24 @@ func resourceOPCStorageContainer() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
+			"quota_bytes": {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"quota_count": {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"metadata": {
+				Type:     schema.TypeMap,
+				Optional: true,
+			},
+			// "georeplication_policy": {
+			// 	Type:     schema.TypeList,
+			// 	Optional: true,
+			// 	Computed: true,
+			// 	Elem:     &schema.Schema{Type: schema.TypeString},
+			// },
 		},
 	}
 }
@@ -92,6 +110,20 @@ func resourceOPCStorageContainerCreate(d *schema.ResourceData, meta interface{})
 	}
 	if maxAge, ok := d.GetOk("max_age"); ok {
 		input.MaxAge = maxAge.(int)
+	}
+	if quotaBytes, ok := d.GetOk("quota_bytes"); ok {
+		input.QuotaBytes = quotaBytes.(int)
+	}
+	if quotaCount, ok := d.GetOk("quota_count"); ok {
+		input.QuotaCount = quotaCount.(int)
+	}
+
+	if v, ok := d.GetOk("metadata"); ok {
+		metadata := make(map[string]string)
+		for name, value := range v.(map[string]interface{}) {
+			metadata[name] = value.(string)
+		}
+		input.CustomMetadata = metadata
 	}
 
 	info, err := client.CreateContainer(&input)
@@ -134,6 +166,10 @@ func resourceOPCStorageContainerRead(d *schema.ResourceData, meta interface{}) e
 	d.Set("primary_key", result.PrimaryKey)
 	d.Set("secondary_key", result.SecondaryKey)
 	d.Set("max_age", result.MaxAge)
+	d.Set("quota_bytes", result.QuotaBytes)
+	d.Set("quota_count", result.QuotaCount)
+	d.Set("metadata", result.CustomMetadata)
+
 	if err := setStringList(d, "read_acls", result.ReadACLs); err != nil {
 		return err
 	}
@@ -197,6 +233,33 @@ func resourceOPCStorageContainerUpdate(d *schema.ResourceData, meta interface{})
 	if maxAge, ok := d.GetOk("max_age"); ok {
 		input.MaxAge = maxAge.(int)
 	}
+	if quotaBytes, ok := d.GetOk("quota_bytes"); ok {
+		input.QuotaBytes = quotaBytes.(int)
+	}
+	if quotaCount, ok := d.GetOk("quota_count"); ok {
+		input.QuotaCount = quotaCount.(int)
+	}
+
+	// Create list of metadata headers to be removed
+	old, new := d.GetChange("metadata")
+	newHeaders := getKeys(new.(map[string]interface{}))
+	oldHeaders := getKeys(old.(map[string]interface{}))
+	removeHeaders := []string{}
+	for i := range oldHeaders {
+		if !contains(newHeaders, oldHeaders[i]) {
+			removeHeaders = append(removeHeaders, oldHeaders[i])
+		}
+	}
+	input.RemoveCustomMetadata = removeHeaders
+
+	// metadata headers to add or update
+	if v, ok := d.GetOk("metadata"); ok {
+		metadata := make(map[string]string)
+		for name, value := range v.(map[string]interface{}) {
+			metadata[name] = value.(string)
+		}
+		input.CustomMetadata = metadata
+	}
 
 	info, err := client.UpdateContainer(&input)
 	if err != nil {
@@ -206,4 +269,23 @@ func resourceOPCStorageContainerUpdate(d *schema.ResourceData, meta interface{})
 	d.SetId(info.Name)
 
 	return resourceOPCStorageContainerRead(d, meta)
+}
+
+// get keys from a map
+func getKeys(m map[string]interface{}) []string {
+	keys := []string{}
+	for k, _ := range m {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
+// check if value is in slice
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }

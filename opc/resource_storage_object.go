@@ -86,7 +86,7 @@ func resourceOPCStorageObject() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 				ForceNew:    true,
-				Description: "Specify the number of seconds after which the system deletes the object",
+				Description: "The date and time in UNIX Epoch time stamp format when the system removes the object",
 			},
 			"etag": {
 				Type:        schema.TypeString,
@@ -94,6 +94,13 @@ func resourceOPCStorageObject() *schema.Resource {
 				Computed:    true,
 				ForceNew:    true,
 				Description: "MD5 checksum value of the request body. Unquoted. Strongly Recommended",
+			},
+			"metadata": {
+				Type:        schema.TypeMap,
+				Optional:    true,
+				Computed:    true,
+				ForceNew:    true,
+				Description: "The object metadata",
 			},
 			"transfer_encoding": {
 				Type:        schema.TypeString,
@@ -201,6 +208,14 @@ func resourceOPCStorageObjectCreate(d *schema.ResourceData, meta interface{}) er
 		input.ETag = v.(string)
 	}
 
+	if v, ok := d.GetOk("metadata"); ok {
+		metadata := make(map[string]string)
+		for name, value := range v.(map[string]interface{}) {
+			metadata[name] = value.(string)
+		}
+		input.ObjectMetadata = metadata
+	}
+
 	if v, ok := d.GetOk("transfer_encoding"); ok {
 		input.TransferEncoding = v.(string)
 	}
@@ -245,6 +260,7 @@ func resourceOPCStorageObjectRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("last_modified", result.LastModified)
 	d.Set("delete_at", result.DeleteAt)
 	d.Set("object_manifest", result.ObjectManifest)
+	d.Set("metadata", result.ObjectMetadata)
 	d.Set("timestamp", result.Timestamp)
 	d.Set("transaction_id", result.TransactionID)
 
