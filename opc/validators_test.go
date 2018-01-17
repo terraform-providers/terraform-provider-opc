@@ -100,3 +100,37 @@ func TestValidateIPProtocol(t *testing.T) {
 	}
 
 }
+
+func TestValidateComputeStorageAccount(t *testing.T) {
+	validStorageAccounts := []string{
+		"/Compute-hasicorp/cloud_storage",
+		"/Compute-abc123456/cloud_storage",
+		"/Compute-123456789/cloud_storage",
+	}
+
+	for _, v := range validStorageAccounts {
+		_, errors := validateComputeStorageAccountName(v, "account")
+		if len(errors) != 0 {
+			t.Fatalf("%q should be a valid two part Storage Account name: %q", v, errors)
+		}
+	}
+
+	invalidStorageAccounts := []string{
+		"cloud_storage",
+		"/Storage-mydomain",
+		"/Compute-mydomain",
+		"/Storage-mydomain:user@example.com",
+		"/Storage-mydomain/user@example.com",
+		"/Compute-mydomain/user@example.com",
+		"/Compute-mydomain/cloud-storage",
+		"/Compute-mydomain/cloud_storage/",
+	}
+
+	for _, v := range invalidStorageAccounts {
+		_, errors := validateComputeStorageAccountName(v, "account")
+		if len(errors) == 0 {
+			t.Fatalf("%q should not be a valid two part Storage Account name", v)
+		}
+	}
+
+}

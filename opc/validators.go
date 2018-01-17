@@ -3,6 +3,7 @@ package opc
 import (
 	"fmt"
 	"net"
+	"regexp"
 
 	"github.com/hashicorp/go-oracle-terraform/compute"
 )
@@ -62,6 +63,17 @@ func validateIPProtocol(v interface{}, k string) (ws []string, errors []error) {
 		errors = append(errors, fmt.Errorf(
 			`%q must contain a valid Image owner , expected ["all",	"ah",	"esp", "icmp",	"icmpv6",	"igmp",	"ipip",	"gre",	"mplsip",	"ospf",	"pim",	"rdp",	"sctp",	"tcp",	"udp"] got %q`,
 			k, value))
+	}
+	return
+}
+
+// Check storage account name matches required format
+func validateComputeStorageAccountName(v interface{}, k string) (ws []string, errors []error) {
+	value := v.(string)
+
+	if match, _ := regexp.MatchString("^/Compute-([a-zA-Z0-9]*)/cloud_storage$", value); match != true {
+		errors = append(errors, fmt.Errorf(
+			"%s is not a valid storage account name (/Compute-identity_domain/cloud_storage)", value))
 	}
 	return
 }
