@@ -91,7 +91,7 @@ func testAccCheckStorageAttachmentDestroy(s *terraform.State) error {
 		}
 
 		input := compute.GetStorageAttachmentInput{
-			Name: rs.Primary.Attributes["name"],
+			Name: rs.Primary.Attributes["id"],
 		}
 		if info, err := client.GetStorageAttachment(&input); err == nil {
 			return fmt.Errorf("StorageAttachment %s still exists: %#v", input.Name, info)

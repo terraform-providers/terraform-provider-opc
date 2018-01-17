@@ -133,7 +133,6 @@ func resourceOPCStorageAttachmentRead(d *schema.ResourceData, meta interface{}) 
 	}
 
 	log.Printf("[DEBUG] Read state of storage_attachment %s: %#v", d.Id(), result)
-	d.Set("name", result.Name)
 	d.Set("index", result.Index)
 	d.Set("instance", strings.Split(result.InstanceName, "/")[0])
 	d.Set("storage_volume", result.StorageVolumeName)
