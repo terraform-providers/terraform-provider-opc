@@ -1,20 +1,20 @@
-## 1.1.0 (Unreleased)
+## 1.1.0 (January 18, 2018)
 
 FEATUREs: 
 
-* **New Resource:** `r/opc_storage_volume_attachment` [GH-112]
+* **New Resource:** `r/opc_storage_volume_attachment` ([#112](https://github.com/terraform-providers/terraform-provider-opc/issues/112))
 
-* **New Resource:** `r/opc_machine_image` [GH-109]
+* **New Resource:** `r/opc_machine_image` ([#109](https://github.com/terraform-providers/terraform-provider-opc/issues/109))
 
 BUG FIXES:
 
-* r/opc_orchestrated_instance: Fixed silent failures when creating an orchestrated instance [GH-108]
+* r/opc_orchestrated_instance: Fixed silent failures when creating an orchestrated instance ([#108](https://github.com/terraform-providers/terraform-provider-opc/issues/108))
 
 IMPROVEMENTS:
 
-* r/opc_storage_container: Add `quota_bytes`, `quota_count` and `metadata` attributes [GH-96]
+* r/opc_storage_container: Add `quota_bytes`, `quota_count` and `metadata` attributes ([#96](https://github.com/terraform-providers/terraform-provider-opc/issues/96))
 
-* r/opc_storage_object: Add `metadata` attributes [GH-96]
+* r/opc_storage_object: Add `metadata` attributes ([#96](https://github.com/terraform-providers/terraform-provider-opc/issues/96))
 
 ## 1.0.1 (December 20, 2017)
 
