@@ -19,10 +19,10 @@ resource "opc_compute_storage_volume" "default" {
 }
 
 resource "opc_compute_instance" "default" {
-	name = "instance-1"
-	label = "instance-1"
-	shape = "oc3"
-	image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
+  name = "instance-1"
+  label = "instance-1"
+  shape = "oc3"
+  image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
 }
 
 resource "opc_compute_storage_attachment" "test" {
@@ -38,6 +38,7 @@ The following arguments are supported:
 
 * `instance` - (Required) The name of the instance the volume will be attached to.
 
-* `storage_volume` - (Required) The name of the storage volume that will be attached to the instance
+* `storage_volume` - (Required) The name of the storage volume that will be attached to the
+ instance
 
 * `index` - (Required) The index on the instance that the storage volume will be attached to.
