@@ -27,9 +27,9 @@ The following arguments are supported:
 
 * `name` - (Required) The name of the Storage Container.
 
-* `read_acls` - (Optional) The list of ACLs that grant read access. See [Setting Container ACLs](setting-container-acls).
+* `read_acls` - (Optional) The list of ACLs that grant read access. See [Setting Container ACLs](#setting-container-acls).
 
-* `write_acls` - (Optional) The list of ACLs that grant write access. See [Setting Container ACLs](setting-container-acls).
+* `write_acls` - (Optional) The list of ACLs that grant write access. See [Setting Container ACLs](#setting-container-acls).
 
 * `primary_key` - (Optional) The primary secret key value for temporary URLs.
 
