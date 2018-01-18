@@ -1,12 +1,20 @@
-## 1.0.2 (Unreleased)
+## 1.1.0 (Unreleased)
+
+FEATUREs: 
+
+* **New Resource:** `r/opc_storage_volume_attachment` [GH-112]
+
+* **New Resource:** `r/opc_machine_image` [GH-109]
 
 BUG FIXES:
 
+* r/opc_orchestrated_instance: Fixed silent failures when creating an orchestrated instance [GH-108]
+
 IMPROVEMENTS:
 
-* r/opc_storage_container: Add `quota_bytes`, `quota_count` and `metadata` attributes
+* r/opc_storage_container: Add `quota_bytes`, `quota_count` and `metadata` attributes [GH-96]
 
-* r/opc_storage_object: Add `metadata` attributes
+* r/opc_storage_object: Add `metadata` attributes [GH-96]
 
 ## 1.0.1 (December 20, 2017)
 
