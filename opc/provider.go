@@ -104,6 +104,7 @@ func Provider() terraform.ResourceProvider {
 			"opc_compute_orchestrated_instance":   resourceOPCOrchestratedInstance(),
 			"opc_storage_container":               resourceOPCStorageContainer(),
 			"opc_storage_object":                  resourceOPCStorageObject(),
+			"opc_compute_storage_attachment":      resourceOPCStorageAttachment(),
 		},
 
 		ConfigureFunc: providerConfigure,
