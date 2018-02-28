@@ -5,7 +5,7 @@ FEATUREs:
 
 * **New Resource:** `r/opc_storage_volume_attachment` ([#112](https://github.com/terraform-providers/terraform-provider-opc/issues/112))
 
-* **New Resource:** `r/opc_machine_image` ([#109](https://github.com/terraform-providers/terraform-provider-opc/issues/109))
+* **New Resource:** `r/opc_compute_machine_image` ([#109](https://github.com/terraform-providers/terraform-provider-opc/issues/109))
 
 BUG FIXES:
 
