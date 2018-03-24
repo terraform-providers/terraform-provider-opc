@@ -3,12 +3,12 @@ layout: "opc"
 page_title: "Oracle: opc_compute_ip_network_exchange"
 sidebar_current: "docs-opc-resource-ip-network-exchange"
 description: |-
-  Creates and manages an IP network exchange in an OPC identity domain.
+  Creates and manages an IP network exchange in an Oracle Cloud Infrastructure Compute Classic identity domain.
 ---
 
 # opc\_compute\_ip\_network\_exchange
 
-The ``opc_compute_ip_network_exchange`` resource creates and manages an IP network exchange in an OPC identity domain.
+The `opc_compute_ip_network_exchange` resource creates and manages an IP network exchange in an Oracle Cloud Infrastructure Compute Classic identity domain.
 
 ## Example Usage
 

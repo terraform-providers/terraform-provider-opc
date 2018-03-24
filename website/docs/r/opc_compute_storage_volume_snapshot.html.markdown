@@ -3,12 +3,12 @@ layout: "opc"
 page_title: "Oracle: opc_compute_storage_volume_snapshot"
 sidebar_current: "docs-opc-resource-storage-volume-snapshot"
 description: |-
-  Creates and manages a storage volume snapshot in an OPC identity domain.
+  Creates and manages a storage volume snapshot in an Oracle Cloud Infrastructure Compute Classic identity domain.
 ---
 
 # opc\_compute\_storage\_volume_snapshot
 
-The ``opc_compute_storage_volume_snapshot`` resource creates and manages a storage volume snapshot in an OPC identity domain.
+The ``opc_compute_storage_volume_snapshot`` resource creates and manages a storage volume snapshot in an Oracle Cloud Infrastructure Compute Classic identity domain.
 
 ## Example Usage
 

@@ -3,12 +3,12 @@ layout: "opc"
 page_title: "Oracle: opc_compute_route"
 sidebar_current: "docs-opc-resource-route"
 description: |-
-  Creates and manages a Route resource for an IP Network
+  Creates and manages a Route resource for an IP Network in an Oracle Cloud Infrastructure Compute Classic identity domain.
 ---
 
 # opc\_compute\_route
 
-The `opc_compute_route` resource creates and manages a route for an IP Network.
+The `opc_compute_route` resource creates and manages a route for an IP Network in an Oracle Cloud Infrastructure Compute Classic identity domain.
 
 ## Example Usage
 

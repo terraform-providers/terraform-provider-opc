@@ -3,12 +3,12 @@ layout: "opc"
 page_title: "Oracle: opc_compute_storage_volume"
 sidebar_current: "docs-opc-resource-storage-volume-type"
 description: |-
-  Creates and manages a storage volume in an OPC identity domain.
+  Creates and manages a storage volume in an Oracle Cloud Infrastructure Compute Classic identity domain.
 ---
 
 # opc\_compute\_storage\_volume
 
-The ``opc_compute_storage_volume`` resource creates and manages a storage volume in an OPC identity domain.
+The ``opc_compute_storage_volume`` resource creates and manages a storage volume in an Oracle Cloud Infrastructure Compute Classic identity domain.
 
 ~> **Caution:** The ``opc_compute_storage_volume`` resource can completely delete your storage volume just as easily as it can create it. To avoid costly accidents, consider setting [``prevent_destroy``](/docs/configuration/resources.html#prevent_destroy) on your storage volume resources as an extra safety measure.
 

@@ -3,12 +3,12 @@ layout: "opc"
 page_title: "Oracle: opc_compute_vnic_set"
 sidebar_current: "docs-opc-resource-vnic-set"
 description: |-
-  Creates and manages a virtual NIC set in an OPC identity domain
+  Creates and manages a virtual NIC set in an Oracle Cloud Infrastructure Compute Classic identity domain
 ---
 
 # opc\_compute\_vnic\_set
 
-The ``opc_compute_vnic_set`` resource creates and manages a virtual NIC set in an OPC identity domain.
+The ``opc_compute_vnic_set`` resource creates and manages a virtual NIC set in an Oracle Cloud Infrastructure Compute Classic identity domain.
 
 ## Example Usage
 

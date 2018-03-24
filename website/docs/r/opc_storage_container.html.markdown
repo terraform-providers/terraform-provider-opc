@@ -3,13 +3,13 @@ layout: "opc"
 page_title: "Oracle: opc_storage_container"
 sidebar_current: "docs-opc-resource-storage-container"
 description: |-
-  Creates and manages a Container in the OPC Storage Domain. `storage_endpoint` must be set in the
+  Creates and manages a Container in the Oracle Cloud Infrastructure Storage Classic service. `storage_endpoint` must be set in the
   provider or environment to manage these resources.
 ---
 
 # opc\_storage\_container
 
-Creates and manages a Container in the OPC Storage Domain. `storage_endpoint` must be set in the
+Creates and manages a Container in the Oracle Cloud Infrastructure Storage Classic service. `storage_endpoint` must be set in the
 provider or environment to manage these resources.
 
 ## Example Usage

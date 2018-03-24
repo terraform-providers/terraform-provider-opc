@@ -3,12 +3,12 @@ layout: "opc"
 page_title: "Oracle: opc_compute_storage_volume_attachment"
 sidebar_current: "docs-opc-resource-storage-volume-attachment"
 description: |-
-  Creates and manages a storage volume attachment in an OPC identity domain.
+  Creates and manages a storage volume attachment in an Oracle Cloud Infrastructure Compute Classic identity domain.
 ---
 
 # opc\_compute\_storage\_volume\_attachment
 
-The `opc_compute_storage_volume_attachment` resource creates and manages a storage volume attachment in an OPC identity domain.
+The `opc_compute_storage_volume_attachment` resource creates and manages a storage volume attachment in an Oracle Cloud Infrastructure Compute Classic identity domain.
 
 ## Example Usage
 

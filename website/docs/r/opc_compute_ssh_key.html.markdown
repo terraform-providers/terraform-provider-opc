@@ -3,12 +3,12 @@ layout: "opc"
 page_title: "Oracle: opc_compute_ssh_key"
 sidebar_current: "docs-opc-resource-ssh-key"
 description: |-
-  Creates and manages an SSH key in an OPC identity domain.
+  Creates and manages an SSH key in an Oracle Cloud Infrastructure Compute Classic identity domain.
 ---
 
 # opc\_compute\_ssh_key
 
-The ``opc_compute_ssh_key`` resource creates and manages an SSH key in an OPC identity domain.
+The ``opc_compute_ssh_key`` resource creates and manages an SSH key in an Oracle Cloud Infrastructure Compute Classic identity domain.
 
 ## Example Usage
 

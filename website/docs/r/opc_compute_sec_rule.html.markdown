@@ -3,12 +3,12 @@ layout: "opc"
 page_title: "Oracle: opc_compute_sec_rule"
 sidebar_current: "docs-opc-resource-sec-rule"
 description: |-
-  Creates and manages a sec rule in an OPC identity domain.
+  Creates and manages a sec rule in an Oracle Cloud Infrastructure Compute Classic identity domain.
 ---
 
 # opc\_compute\_sec\_rule
 
-The ``opc_compute_sec_rule`` resource creates and manages a sec rule in an OPC identity domain, which joinstogether a source security list (or security IP list), a destination security list (or security IP list), and a security application.
+The ``opc_compute_sec_rule`` resource creates and manages a sec rule in an Oracle Cloud Infrastructure Compute Classic identity domain, which joins together a source security list (or security IP list), a destination security list (or security IP list), and a security application.
 
 ## Example Usage
 
