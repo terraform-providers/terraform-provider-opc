@@ -3,12 +3,12 @@ layout: "opc"
 page_title: "Oracle: opc_compute_acl"
 sidebar_current: "docs-opc-resource-acl"
 description: |-
-  Creates and manages an ACL in an OPC identity domain.
+  Creates and manages an ACL in an Oracle Cloud Infrastructure Compute Classic identity domain.
 ---
 
 # opc\_compute\_acl
 
-The ``opc_compute_acl`` resource creates and manages an ACL in an OPC identity domain.
+The ``opc_compute_acl`` resource creates and manages an ACL in an Oracle Cloud Infrastructure Compute Classic identity domain.
 
 ## Example Usage
 

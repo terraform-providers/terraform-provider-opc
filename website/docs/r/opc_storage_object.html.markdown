@@ -3,12 +3,12 @@ layout: "opc"
 page_title: "Oracle: opc_storage_object"
 sidebar_current: "docs-opc-resource-storage-object"
 description: |-
-  Creates and manages a Object in the OPC Storage Container. `storage_endpoint` must be set in the provider or environment to manage these resources.
+  Creates and manages a Object in an Oracle Cloud Infrastructure Storage Classic container. `storage_endpoint` must be set in the provider or environment to manage these resources.
 ---
 
 # opc\_storage\_object
 
-Creates and manages a Object in the OPC Storage Container. `storage_endpoint` must be set in the provider or environment to manage these resources.
+Creates and manages a Object in an Oracle Cloud Infrastructure Storage Classic container. `storage_endpoint` must be set in the provider or environment to manage these resources.
 
 ## Example Usage
 

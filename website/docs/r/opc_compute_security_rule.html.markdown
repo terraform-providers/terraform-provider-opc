@@ -3,12 +3,12 @@ layout: "opc"
 page_title: "Oracle: opc_compute_security_rule"
 sidebar_current: "docs-opc-resource-security-rule"
 description: |-
-  Creates and manages a security rule in an OPC identity domain.
+  Creates and manages a security rule in an Oracle Cloud Infrastructure Compute Classic identity domain.
 ---
 
 # opc\_compute\_security\_rule
 
-The ``opc_compute_security_rule`` resource creates and manages a security rule in an OPC identity domain.
+The ``opc_compute_security_rule`` resource creates and manages a security rule in an Oracle Cloud Infrastructure Compute Classic identity domain.
 
 ## Example Usage
 

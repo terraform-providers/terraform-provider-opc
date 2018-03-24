@@ -3,12 +3,12 @@ layout: "opc"
 page_title: "Oracle: opc_compute_security_ip_list"
 sidebar_current: "docs-opc-resource-security-list"
 description: |-
-  Creates and manages a security IP list in an OPC identity domain.
+  Creates and manages a security IP list in an Oracle Cloud Infrastructure Compute Classic identity domain.
 ---
 
 # opc\_compute\_security\_ip\_list
 
-The ``opc_compute_security_ip_list`` resource creates and manages a security IP list in an OPC identity domain.
+The ``opc_compute_security_ip_list`` resource creates and manages a security IP list in an Oracle Cloud Infrastructure Compute Classic identity domain.
 
 ## Example Usage
 

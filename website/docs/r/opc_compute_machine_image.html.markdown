@@ -3,7 +3,7 @@ layout: "opc"
 page_title: "Oracle: opc_compute_machine_image"
 sidebar_current: "docs-opc-resource-machine-image"
 description: |-
-  Creates and manages a Machine Image in a Compute Classic identity domain.
+  Creates and manages a Machine Image in a Oracle Cloud Infrastructure Compute Classic identity domain.
 ---
 
 # opc\_compute\_machine\_image

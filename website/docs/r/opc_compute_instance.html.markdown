@@ -3,12 +3,12 @@ layout: "opc"
 page_title: "Oracle: opc_compute_instance"
 sidebar_current: "docs-opc-resource-instance"
 description: |-
-  Creates and manages an instance in an OPC identity domain.
+  Creates and manages an instance in an Oracle Cloud Infrastructure Compute Classic identity domain.
 ---
 
 # opc\_compute\_instance
 
-The ``opc_compute_instance`` resource creates and manages an instance in an OPC identity domain.
+The ``opc_compute_instance`` resource creates and manages an instance in an Oracle Cloud Infrastructure Compute Classic identity domain.
 
 ~> **Caution:** The ``opc_compute_instance`` resource can completely delete your
 instance just as easily as it can create it. To avoid costly accidents,

@@ -3,12 +3,12 @@ layout: "opc"
 page_title: "Oracle: opc_compute_security_application"
 sidebar_current: "docs-opc-resource-security-application"
 description: |-
-  Creates and manages a security application in an OPC identity domain.
+  Creates and manages a security application in an Oracle Cloud Infrastructure Compute Classic identity domain.
 ---
 
 # opc\_compute\_security\_application
 
-The ``opc_compute_security_application`` resource creates and manages a security application in an OPC identity domain.
+The ``opc_compute_security_application`` resource creates and manages a security application in an Oracle Cloud Infrastructure Compute Classic identity domain.
 
 ## Example Usage (TCP)
 

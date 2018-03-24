@@ -3,12 +3,12 @@ layout: "opc"
 page_title: "Oracle: opc_compute_image_list"
 sidebar_current: "docs-opc-resource-image-list-type"
 description: |-
-  Creates and manages an Image List in an OPC identity domain.
+  Creates and manages an Image List in an Oracle Cloud Infrastructure Compute Classic identity domain.
 ---
 
 # opc\_compute\_image\_list
 
-The ``opc_compute_image_list`` resource creates and manages an Image List in an OPC identity domain.
+The ``opc_compute_image_list`` resource creates and manages an Image List in an Oracle Cloud Infrastructure Compute Classic identity domain.
 
 ## Example Usage
 

@@ -3,12 +3,12 @@ layout: "opc"
 page_title: "Oracle: opc_compute_security_protocol"
 sidebar_current: "docs-opc-resource-security-protocol"
 description: |-
-  Creates and manages an security protocol in an OPC identity domain.
+  Creates and manages an security protocol in an Oracle Cloud Infrastructure Compute Classic identity domain.
 ---
 
 # opc\_compute\_security\_protocol
 
-The ``opc_compute_security_protocol`` resource creates and manages a security protocol in an OPC identity domain.
+The ``opc_compute_security_protocol`` resource creates and manages a security protocol in an Oracle Cloud Infrastructure Compute Classic identity domain.
 
 ## Example Usage
 

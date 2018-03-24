@@ -3,7 +3,7 @@ layout: "opc"
 page_title: "Oracle: opc_compute_image_list_entry"
 sidebar_current: "docs-opc-datasource-image-list-entry"
 description: |-
-  Gets information about the configuration of an Image List Entry in an OPC identity domain
+  Gets information about the configuration of an Image List Entry within an Oracle Cloud Infrastructure Compute Classic domain.
 ---
 
 # opc\_compute\_image\_list\_entry

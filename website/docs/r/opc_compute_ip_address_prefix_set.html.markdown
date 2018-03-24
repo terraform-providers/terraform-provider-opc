@@ -3,12 +3,12 @@ layout: "opc"
 page_title: "Oracle: opc_compute_ip_address_prefix_set"
 sidebar_current: "docs-opc-resource-ip-address-prefix-set"
 description: |-
-  Creates and manages an IP address prefix set in an OPC identity domain.
+  Creates and manages an IP address prefix set in an Oracle Cloud Infrastructure Compute Classic identity domain.
 ---
 
 # opc\_compute\_ip\_address\_prefix\_set
 
-The ``opc_compute_ip_address_prefix_set`` resource creates and manages an IP address prefix set in an OPC identity domain.
+The ``opc_compute_ip_address_prefix_set`` resource creates and manages an IP address prefix set in an Oracle Cloud Infrastructure Compute Classic identity domain.
 
 ## Example Usage
 

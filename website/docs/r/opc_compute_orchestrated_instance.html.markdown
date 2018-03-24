@@ -3,13 +3,13 @@ layout: "opc"
 page_title: "Oracle: opc_compute_orchestrated_instance"
 sidebar_current: "docs-opc-resource-orchestrated-instance"
 description: |-
-  Creates and manages an Orchestration containing a number of instances in an OPC identity domain.
+  Creates and manages an Orchestration containing a number of instances in an Oracle Cloud Infrastructure Compute Classic identity domain.
 ---
 
 # opc\_compute\_orchestrated\_instance
 
 The `opc_compute_orchestrated_instance` resource creates and manages an orchestration containing a number of
-instances in an OPC identity domain.
+instances in an Oracle Cloud Infrastructure Compute Classic identity domain.
 
 ## Example Usage
 

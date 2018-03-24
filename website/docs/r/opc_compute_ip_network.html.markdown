@@ -3,12 +3,12 @@ layout: "opc"
 page_title: "Oracle: opc_compute_ip_network"
 sidebar_current: "docs-opc-resource-ip-network"
 description: |-
-  Creates and manages an IP Network
+  Creates and manages an IP Network in an Oracle Cloud Infrastructure Compute Classic identity domain.
 ---
 
 # opc\_compute\_ip_network
 
-The ``opc_compute_ip_network`` resource creates and manages an IP Network.
+The ``opc_compute_ip_network`` resource creates and manages an IP Network in an Oracle Cloud Infrastructure Compute Classic identity domain.
 
 ## Example Usage
 

@@ -3,12 +3,12 @@ layout: "opc"
 page_title: "Oracle: opc_compute_security_list"
 sidebar_current: "docs-opc-resource-security-list"
 description: |-
-  Creates and manages a security list in an OPC identity domain.
+  Creates and manages a security list in an Oracle Cloud Infrastructure Compute Classic identity domain.
 ---
 
 # opc\_compute\_security\_list
 
-The ``opc_compute_security_list`` resource creates and manages a security list in an OPC identity domain.
+The ``opc_compute_security_list`` resource creates and manages a security list in an Oracle Cloud Infrastructure Compute Classic identity domain.
 
 ## Example Usage
 

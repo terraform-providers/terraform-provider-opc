@@ -3,12 +3,12 @@ layout: "opc"
 page_title: "Oracle: opc_compute_image_list_entry"
 sidebar_current: "docs-opc-resource-image-list-entry"
 description: |-
-  Creates and manages an Image List Entry in an OPC identity domain.
+  Creates and manages an Image List Entry in an Oracle Cloud Infrastructure Compute Classic identity domain.
 ---
 
 # opc\_compute\_image\_list_entry
 
-The ``opc_compute_image_list_entry`` resource creates and manages an Image List Entry in an OPC identity domain.
+The ``opc_compute_image_list_entry`` resource creates and manages an Image List Entry in an Oracle Cloud Infrastructure Compute Classic identity domain.
 
 ## Example Usage
 
