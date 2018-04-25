@@ -78,6 +78,7 @@ Storage Volume's can be imported using the `resource name`, e.g.
 $ terraform import opc_compute_storage_volume.volume1 example
 ```
 
+<a id="snapshots"></a>
 ## Snapshots
 
 Restoring a storage volume from a snapshot can happen via the use of the `snapshot`, `snapshot_id`, and `snapshot_account` attributes.
@@ -92,6 +93,7 @@ There are two different ways to identify the snapshot in which to restore the st
 and it's child snapshot name: `mystorage/mysnapshot`.
 
 Example 1:
+
 ```hcl
 resource "opc_compute_storage_volume" "foo" {
   name = "from-snapshot"
@@ -102,6 +104,7 @@ resource "opc_compute_storage_volume" "foo" {
 ```
 
 Example 2:
+
 ```hcl
 data "opc_compute_storage_volume_snapshot" "foo" {
  name = "my-boot-volume/my-snapshot"
@@ -113,6 +116,33 @@ resource "opc_compute_storage_volume" "foo" {
  size = "${opc_compute_storage_volume_snapshot.foo.snapshot_id}"
 }
 ```
+
+### Colocated Snapshots
+
+Colocated snapshots are stored in the same physical location as the original storage volume. While creating a storage volume from a colocated snapshot, you must specify values for the following parameters:
+
+- `snapshot` the fully qualified multipart name of the snapshot.
+- `size` set to the size of the source snapshot volume.
+- `storage_type` same type as the parent storage volume of the snapshot.
+
+If you are restoring a bootable storage volume from a snapshot, additionally you must specify the value for `bootable` as `true`.  `snapshot_id` and `snapshot_source` are _not_ used when creating a volume from a colocated snapshot.
+
+Example:
+
+```hcl
+data "opc_compute_storage_volume_snapshot" "snapshot1" {
+  name = "my-bootable-storage-volume/my-colocated-snapshot"
+}
+
+resource "opc_compute_storage_volume" "volume1" {
+  name         = "volume-from-colocated-storage-snapshot"
+  snapshot     = "/Compute-${var.domain}/${var.user}/${data.opc_compute_storage_volume_snapshot.snapshot1.name}"
+  size         = "${data.opc_compute_storage_volume_snapshot.snapshot1.size}"
+  storage_type = "/oracle/public/storage/default"
+  bootable     = "${data.opc_compute_storage_volume_snapshot.snapshot1.parent_volume_bootable}"
+}
+```
+
 
 <a id="timeouts"></a>
 ## Timeouts
