@@ -44,7 +44,7 @@ To compile the provider, run `make build`. This will build the provider and put 
 ```sh
 $ make bin
 ...
-$ $GOPATH/bin/terraform-provider-$PROVIDER_NAME
+$ $GOPATH/bin/terraform-provider-opc
 ...
 ```
 
