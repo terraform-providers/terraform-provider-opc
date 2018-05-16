@@ -130,7 +130,7 @@ in the Shared Network, or an IP Network. Some attributes can only be used if the
 The following attributes are supported:
 
 * `index` - (Required) The numerical index of the network interface. Specified as an integer to allow for use of `count`, but directly maps to `ethX`. ie: With `index` set to `0`, the interface `eth0` will be created. Can only be `0-9`.
-* `dns` - (Optional) Array of DNS servers for the interface.
+* `dns` - (Optional, IP Network Only) List of DNS A record names for the instance. You can specify up to eight DNS A record names for each interface on an IP network. These names can be queried by instances on any IP network in the same IP network exchange.
 * `ip_address` - (Optional, IP Network Only) IP Address assigned to the interface.
 * `ip_network` - (Optional, IP Network Only) The IP Network assigned to the interface.
 * `mac_address` - (Optional, IP Network Only) The MAC address of the interface.
