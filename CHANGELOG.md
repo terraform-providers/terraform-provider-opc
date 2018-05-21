@@ -1,4 +1,9 @@
 ## 1.1.1 (Unreleased)
+
+IMPROVEMENTS:
+
+* r/opc_compute_ip_reservation: Allows users to specify specific `parent_pool` [GH-127]
+
 ## 1.1.0 (January 18, 2018)
 
 FEATUREs: 
