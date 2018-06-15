@@ -1,4 +1,9 @@
 ## 1.1.2 (Unreleased)
+
+FEATURES:
+
+* **New Datasource:** `d/opc_compute_ssh_key` [GH-129]
+
 ## 1.1.1 (May 24, 2018)
 
 IMPROVEMENTS:
@@ -7,7 +12,7 @@ IMPROVEMENTS:
 
 ## 1.1.0 (January 18, 2018)
 
-FEATUREs: 
+FEATURES: 
 
 * **New Resource:** `r/opc_storage_volume_attachment` ([#112](https://github.com/terraform-providers/terraform-provider-opc/issues/112))
 
