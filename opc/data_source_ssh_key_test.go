@@ -31,7 +31,7 @@ func TestAccOPCDataSourceSSHKey_basic(t *testing.T) {
 func testAccDataSourceSSHKeyBasic(rInt int) string {
 
 	testAccMachineImageBasic := `
-  resource "opc_compute_ssh_key" "foo" {
+        resource "opc_compute_ssh_key" "foo" {
 		name    = "acc-test-ssh%d"
 		key     = "%s"
 		enabled = true
