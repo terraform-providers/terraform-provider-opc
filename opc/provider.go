@@ -71,6 +71,7 @@ func Provider() terraform.ResourceProvider {
 			"opc_compute_image_list_entry":        dataSourceImageListEntry(),
 			"opc_compute_machine_image":           dataSourceMachineImage(),
 			"opc_compute_network_interface":       dataSourceNetworkInterface(),
+			"opc_compute_ssh_key":                 dataSourceSSHKey(),
 			"opc_compute_storage_volume_snapshot": dataSourceStorageVolumeSnapshot(),
 			"opc_compute_vnic":                    dataSourceVNIC(),
 		},

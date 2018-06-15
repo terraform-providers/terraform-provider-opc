@@ -39,13 +39,14 @@ func testAccPreCheck(t *testing.T) {
 		}
 	}
 	config := Config{
-		User:            os.Getenv("OPC_USERNAME"),
-		Password:        os.Getenv("OPC_PASSWORD"),
-		IdentityDomain:  os.Getenv("OPC_IDENTITY_DOMAIN"),
-		Endpoint:        os.Getenv("OPC_ENDPOINT"),
-		MaxRetries:      1,
-		Insecure:        false,
-		StorageEndpoint: os.Getenv("OPC_STORAGE_ENDPOINT"),
+		User:             os.Getenv("OPC_USERNAME"),
+		Password:         os.Getenv("OPC_PASSWORD"),
+		IdentityDomain:   os.Getenv("OPC_IDENTITY_DOMAIN"),
+		Endpoint:         os.Getenv("OPC_ENDPOINT"),
+		MaxRetries:       1,
+		Insecure:         false,
+		StorageEndpoint:  os.Getenv("OPC_STORAGE_ENDPOINT"),
+		StorageServiceId: os.Getenv("OPC_STORAGE_SERVICE_ID"),
 	}
 	client, err := config.Client()
 	if err != nil {
