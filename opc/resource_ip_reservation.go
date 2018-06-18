@@ -2,7 +2,6 @@ package opc
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
@@ -40,12 +39,15 @@ func resourceOPCIPReservation() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"used": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
 		},
 	}
 }
 
 func resourceOPCIPReservationCreate(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("[DEBUG] Resource state: %#v", d.State())
 
 	reservation := compute.CreateIPReservationInput{
 		Name:       d.Get("name").(string),
@@ -57,9 +59,6 @@ func resourceOPCIPReservationCreate(d *schema.ResourceData, meta interface{}) er
 	if len(tags) != 0 {
 		reservation.Tags = tags
 	}
-
-	log.Printf("[DEBUG] Creating ip reservation from parent_pool %s with tags=%s",
-		reservation.ParentPool, reservation.Tags)
 
 	client := meta.(*OPCClient).computeClient.IPReservations()
 	info, err := client.CreateIPReservation(&reservation)
@@ -73,10 +72,8 @@ func resourceOPCIPReservationCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceOPCIPReservationRead(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("[DEBUG] Resource state: %#v", d.State())
 	computeClient := meta.(*OPCClient).computeClient.IPReservations()
 
-	log.Printf("[DEBUG] Reading state of ip reservation %s", d.Id())
 	input := compute.GetIPReservationInput{
 		Name: d.Id(),
 	}
@@ -96,7 +93,6 @@ func resourceOPCIPReservationRead(d *schema.ResourceData, meta interface{}) erro
 		return nil
 	}
 
-	log.Printf("[DEBUG] Read state of ip reservation %s: %#v", d.Id(), result)
 	d.Set("name", result.Name)
 	d.Set("parent_pool", result.ParentPool)
 	d.Set("permanent", result.Permanent)
@@ -106,14 +102,12 @@ func resourceOPCIPReservationRead(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	d.Set("ip", result.IP)
+	d.Set("used", result.Used)
 	return nil
 }
 
 func resourceOPCIPReservationDelete(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("[DEBUG] Resource state: %#v", d.State())
 	client := meta.(*OPCClient).computeClient.IPReservations()
-
-	log.Printf("[DEBUG] Deleting ip reservation %s", d.Id())
 
 	input := compute.DeleteIPReservationInput{
 		Name: d.Id(),
