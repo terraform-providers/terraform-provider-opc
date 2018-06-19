@@ -585,10 +585,10 @@
 			"revisionTime": "2016-09-27T10:08:44Z"
 		},
 		{
-			"checksumSHA1": "h7MljFs8SKucyCjLKzz9NgA5N8k=",
+			"checksumSHA1": "Ogp4zxE0eVXViP7hwRT23UozeiY=",
 			"path": "github.com/terraform-providers/terraform-provider-opc/opc",
-			"revision": "3b8a954bd47662b2601d35374f7c24eb378a20e6",
-			"revisionTime": "2018-06-15T20:08:38Z"
+			"revision": "531729c24b247aea7452ccffc4946b13add31ecf",
+			"revisionTime": "2018-06-19T15:35:08Z"
 		},
 		{
 			"checksumSHA1": "UWjVYmoHlIfHzVIskELHiJQtMOI=",
