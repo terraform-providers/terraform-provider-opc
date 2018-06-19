@@ -5,33 +5,25 @@ import (
 	"net/http"
 )
 
-func (c *StorageClient) createResource(name string, requestHeaders interface{}) error {
+func (c *Client) createResource(name string, requestHeaders interface{}) error {
 	return c.createResourceBody(name, requestHeaders, nil)
 }
 
-func (c *StorageClient) createResourceBody(name string, requestHeaders interface{}, body io.ReadSeeker) error {
+func (c *Client) createResourceBody(name string, requestHeaders interface{}, body io.ReadSeeker) error {
 	_, err := c.executeRequestBody("PUT", name, requestHeaders, body)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
-func (c *StorageClient) updateResource(name string, requestHeaders interface{}) error {
+func (c *Client) updateResource(name string, requestHeaders interface{}) error {
 	_, err := c.executeRequest("PUT", name, requestHeaders)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
-func (c *StorageClient) getResource(name string, responseBody interface{}) (*http.Response, error) {
+func (c *Client) getResource(name string, responseBody interface{}) (*http.Response, error) {
 	return c.getResourceHeaders(name, responseBody, nil)
 }
 
-func (c *StorageClient) getResourceHeaders(
+func (c *Client) getResourceHeaders(
 	name string,
 	responseBody interface{},
 	requestHeaders interface{},
@@ -43,12 +35,7 @@ func (c *StorageClient) getResourceHeaders(
 	return rsp, nil
 }
 
-func (c *StorageClient) deleteResource(name string) error {
+func (c *Client) deleteResource(name string) error {
 	_, err := c.executeRequest("DELETE", name, nil)
-	if err != nil {
-		return err
-	}
-
-	// No errors and no response body to write
-	return nil
+	return err
 }

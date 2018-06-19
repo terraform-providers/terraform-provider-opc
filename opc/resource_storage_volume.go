@@ -138,7 +138,7 @@ func resourceOPCStorageVolume() *schema.Resource {
 }
 
 func resourceOPCStorageVolumeCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.StorageVolumes()
+	client := meta.(*Client).computeClient.StorageVolumes()
 
 	name := d.Get("name").(string)
 	description := d.Get("description").(string)
@@ -180,7 +180,7 @@ func resourceOPCStorageVolumeCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceOPCStorageVolumeUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.StorageVolumes()
+	client := meta.(*Client).computeClient.StorageVolumes()
 
 	name := d.Id()
 	description := d.Get("description").(string)
@@ -208,7 +208,7 @@ func resourceOPCStorageVolumeUpdate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceOPCStorageVolumeRead(d *schema.ResourceData, meta interface{}) error {
-	sv := meta.(*OPCClient).computeClient.StorageVolumes()
+	sv := meta.(*Client).computeClient.StorageVolumes()
 
 	name := d.Id()
 	input := compute.GetStorageVolumeInput{
@@ -257,7 +257,7 @@ func resourceOPCStorageVolumeRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceOPCStorageVolumeDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.StorageVolumes()
+	client := meta.(*Client).computeClient.StorageVolumes()
 	name := d.Id()
 
 	input := compute.DeleteStorageVolumeInput{

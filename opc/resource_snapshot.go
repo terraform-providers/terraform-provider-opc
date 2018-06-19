@@ -50,7 +50,7 @@ func resourceOPCSnapshot() *schema.Resource {
 }
 
 func resourceOPCSnapshotCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.Snapshots()
+	client := meta.(*Client).computeClient.Snapshots()
 
 	instance := d.Get("instance").(string)
 
@@ -77,7 +77,7 @@ func resourceOPCSnapshotCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSnapshotRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*OPCClient).computeClient.Snapshots()
+	computeClient := meta.(*Client).computeClient.Snapshots()
 
 	name := d.Id()
 
@@ -105,8 +105,8 @@ func resourceOPCSnapshotRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSnapshotDelete(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*OPCClient).computeClient.Snapshots()
-	machineImageClient := meta.(*OPCClient).computeClient.MachineImages()
+	computeClient := meta.(*Client).computeClient.Snapshots()
+	machineImageClient := meta.(*Client).computeClient.MachineImages()
 	name := d.Id()
 
 	getInput := compute.GetSnapshotInput{

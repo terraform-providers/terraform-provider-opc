@@ -456,16 +456,16 @@ func expandStorageAttachments(d *schema.ResourceData, prefix string) []compute.S
 }
 
 func flattenOrchestratedInstances(d *schema.ResourceData, meta interface{}, objects []compute.Object) (interface{}, error) {
-	instanceClient := meta.(*OPCClient).computeClient.Instances()
+	instanceClient := meta.(*Client).computeClient.Instances()
 
 	result := make([]interface{}, len(objects))
 	for i := range objects {
 		v := make(map[string]interface{})
-		getIdInput := &compute.GetInstanceIdInput{
+		getIDInput := &compute.GetInstanceIDInput{
 			// Oracle's api returns an unordered list so we'll find out instances through the config file name
 			Name: d.Get(fmt.Sprintf("instance.%d.name", i)).(string),
 		}
-		instance, err := instanceClient.GetInstanceFromName(getIdInput)
+		instance, err := instanceClient.GetInstanceFromName(getIDInput)
 		if err != nil {
 			return nil, err
 		}

@@ -1,24 +1,25 @@
 package compute
 
 const (
-	IPAddressAssociationDescription   = "ip address association"
-	IPAddressAssociationContainerPath = "/network/v1/ipassociation/"
-	IPAddressAssociationResourcePath  = "/network/v1/ipassociation"
+	iPAddressAssociationDescription   = "ip address association"
+	iPAddressAssociationContainerPath = "/network/v1/ipassociation/"
+	iPAddressAssociationResourcePath  = "/network/v1/ipassociation"
 )
 
+// IPAddressAssociationsClient details the parameters for an ip address association client
 type IPAddressAssociationsClient struct {
 	ResourceClient
 }
 
-// IPAddressAssociations() returns an IPAddressAssociationsClient that can be used to access the
+// IPAddressAssociations returns an IPAddressAssociationsClient that can be used to access the
 // necessary CRUD functions for IP Address Associations.
-func (c *ComputeClient) IPAddressAssociations() *IPAddressAssociationsClient {
+func (c *Client) IPAddressAssociations() *IPAddressAssociationsClient {
 	return &IPAddressAssociationsClient{
 		ResourceClient: ResourceClient{
-			ComputeClient:       c,
-			ResourceDescription: IPAddressAssociationDescription,
-			ContainerPath:       IPAddressAssociationContainerPath,
-			ResourceRootPath:    IPAddressAssociationResourcePath,
+			Client:              c,
+			ResourceDescription: iPAddressAssociationDescription,
+			ContainerPath:       iPAddressAssociationContainerPath,
+			ResourceRootPath:    iPAddressAssociationResourcePath,
 		},
 	}
 }
@@ -37,9 +38,10 @@ type IPAddressAssociationInfo struct {
 	// Slice of tags associated with the IP Address Association
 	Tags []string `json:"tags"`
 	// Uniform Resource Identifier for the IP Address Association
-	Uri string `json:"uri"`
+	URI string `json:"uri"`
 }
 
+// CreateIPAddressAssociationInput details the attributes needed to create an ip address association
 type CreateIPAddressAssociationInput struct {
 	// The name of the IP Address Association to create. Object names can only contain alphanumeric,
 	// underscore, dash, and period characters. Names are case-sensitive.
@@ -63,7 +65,7 @@ type CreateIPAddressAssociationInput struct {
 	Tags []string `json:"tags"`
 }
 
-// Create a new IP Address Association from an IPAddressAssociationsClient and an input struct.
+// CreateIPAddressAssociation creates a new IP Address Association from an IPAddressAssociationsClient and an input struct.
 // Returns a populated Info struct for the IP Address Association, and any errors
 func (c *IPAddressAssociationsClient) CreateIPAddressAssociation(input *CreateIPAddressAssociationInput) (*IPAddressAssociationInfo, error) {
 	input.Name = c.getQualifiedName(input.Name)
@@ -78,13 +80,14 @@ func (c *IPAddressAssociationsClient) CreateIPAddressAssociation(input *CreateIP
 	return c.success(&ipInfo)
 }
 
+// GetIPAddressAssociationInput details the parameters needed to retrieve an ip address association
 type GetIPAddressAssociationInput struct {
 	// The name of the IP Address Association to query for. Case-sensitive
 	// Required
 	Name string `json:"name"`
 }
 
-// Returns a populated IPAddressAssociationInfo struct from an input struct
+// GetIPAddressAssociation returns a populated IPAddressAssociationInfo struct from an input struct
 func (c *IPAddressAssociationsClient) GetIPAddressAssociation(input *GetIPAddressAssociationInput) (*IPAddressAssociationInfo, error) {
 	input.Name = c.getQualifiedName(input.Name)
 
@@ -133,12 +136,14 @@ func (c *IPAddressAssociationsClient) UpdateIPAddressAssociation(updateInput *Up
 	return c.success(&ipInfo)
 }
 
+// DeleteIPAddressAssociationInput details the parameters neccessary to delete an ip address association
 type DeleteIPAddressAssociationInput struct {
 	// The name of the IP Address Association to query for. Case-sensitive
 	// Required
 	Name string `json:"name"`
 }
 
+// DeleteIPAddressAssociation deletes the specified ip address association
 func (c *IPAddressAssociationsClient) DeleteIPAddressAssociation(input *DeleteIPAddressAssociationInput) error {
 	return c.deleteResource(input.Name)
 }

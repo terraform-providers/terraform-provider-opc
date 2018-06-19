@@ -47,7 +47,7 @@ func resourceOPCStorageAttachmentCreate(d *schema.ResourceData, meta interface{}
 	log.Print("[DEBUG] Creating storage_attachment")
 
 	volumeName := d.Get("storage_volume").(string)
-	volumeClient := meta.(*OPCClient).computeClient.StorageVolumes()
+	volumeClient := meta.(*Client).computeClient.StorageVolumes()
 	getVolumeInput := compute.GetStorageVolumeInput{
 		Name: volumeName,
 	}
@@ -64,8 +64,8 @@ func resourceOPCStorageAttachmentCreate(d *schema.ResourceData, meta interface{}
 	}
 
 	instanceName := d.Get("instance").(string)
-	instanceClient := meta.(*OPCClient).computeClient.Instances()
-	getInstanceInput := &compute.GetInstanceIdInput{
+	instanceClient := meta.(*Client).computeClient.Instances()
+	getInstanceInput := &compute.GetInstanceIDInput{
 		Name: instanceName,
 	}
 	instance, err := instanceClient.GetInstanceFromName(getInstanceInput)
@@ -81,7 +81,7 @@ func resourceOPCStorageAttachmentCreate(d *schema.ResourceData, meta interface{}
 		return fmt.Errorf("Storage index %d is already in use on instance %s", volumeIndex, instanceName)
 	}
 
-	storageAttachmentClient := meta.(*OPCClient).computeClient.StorageAttachments()
+	storageAttachmentClient := meta.(*Client).computeClient.StorageAttachments()
 	input := compute.CreateStorageAttachmentInput{
 		StorageVolumeName: storageVolume.Name,
 		InstanceName:      fmt.Sprintf("%s/%s", instance.Name, instance.ID),
@@ -110,7 +110,7 @@ func checkForEmptyIndex(attachments []compute.StorageAttachment, index int) bool
 
 func resourceOPCStorageAttachmentRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	computeClient := meta.(*OPCClient).computeClient.StorageAttachments()
+	computeClient := meta.(*Client).computeClient.StorageAttachments()
 
 	log.Printf("[DEBUG] Reading state of ip reservation %s", d.Id())
 	getInput := compute.GetStorageAttachmentInput{
@@ -141,7 +141,7 @@ func resourceOPCStorageAttachmentRead(d *schema.ResourceData, meta interface{}) 
 
 func resourceOPCStorageAttachmentDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	client := meta.(*OPCClient).computeClient.StorageAttachments()
+	client := meta.(*Client).computeClient.StorageAttachments()
 	name := d.Id()
 
 	log.Printf("[DEBUG] Deleting StorageAttachment: %v", name)

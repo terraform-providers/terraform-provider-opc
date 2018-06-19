@@ -49,7 +49,7 @@ func dataSourceImageListEntry() *schema.Resource {
 }
 
 func dataSourceImageListEntryRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.ImageListEntries()
+	client := meta.(*Client).computeClient.ImageListEntries()
 
 	// Get required attributes
 	image_list := d.Get("image_list").(string)
@@ -95,7 +95,7 @@ func dataSourceImageListEntryRead(d *schema.ResourceData, meta interface{}) erro
 
 	// Populate schema attributes
 	d.SetId(fmt.Sprintf("%s|%d:%d", image_list, version, entry))
-	d.Set("uri", result.Uri)
+	d.Set("uri", result.URI)
 	if err := d.Set("attributes", attrs); err != nil {
 		return err
 	}

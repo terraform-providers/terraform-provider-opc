@@ -7,10 +7,10 @@ type SecurityIPListsClient struct {
 
 // SecurityIPLists obtains a SecurityIPListsClient which can be used to access to the
 // Security IP List functions of the Compute API
-func (c *ComputeClient) SecurityIPLists() *SecurityIPListsClient {
+func (c *Client) SecurityIPLists() *SecurityIPListsClient {
 	return &SecurityIPListsClient{
 		ResourceClient: ResourceClient{
-			ComputeClient:       c,
+			Client:              c,
 			ResourceDescription: "security ip list",
 			ContainerPath:       "/seciplist/",
 			ResourceRootPath:    "/seciplist",

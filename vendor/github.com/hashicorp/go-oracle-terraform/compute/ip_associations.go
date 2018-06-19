@@ -12,10 +12,10 @@ type IPAssociationsClient struct {
 
 // IPAssociations obtains a IPAssociationsClient which can be used to access to the
 // IP Association functions of the Compute API
-func (c *ComputeClient) IPAssociations() *IPAssociationsClient {
+func (c *Client) IPAssociations() *IPAssociationsClient {
 	return &IPAssociationsClient{
 		ResourceClient: &ResourceClient{
-			ComputeClient:       c,
+			Client:              c,
 			ResourceDescription: "ip association",
 			ContainerPath:       "/ip/association/",
 			ResourceRootPath:    "/ip/association",
@@ -45,6 +45,7 @@ type IPAssociationInfo struct {
 	VCable string `json:"vcable"`
 }
 
+// CreateIPAssociationInput details the attributes neccessary to create an ip association
 type CreateIPAssociationInput struct {
 	// The type of IP Address to associate with this instance
 	// for a Dynamic IP address specify `ippool:/oracle/public/ippool`.
@@ -69,6 +70,7 @@ func (c *IPAssociationsClient) CreateIPAssociation(input *CreateIPAssociationInp
 	return c.success(&assocInfo)
 }
 
+// GetIPAssociationInput details the attributes neccessary to retrieve an ip association
 type GetIPAssociationInput struct {
 	// The three-part name of the IP Association
 	// Required.
@@ -85,6 +87,7 @@ func (c *IPAssociationsClient) GetIPAssociation(input *GetIPAssociationInput) (*
 	return c.success(&assocInfo)
 }
 
+// DeleteIPAssociationInput details the attributes neccessary to delete an ip association
 type DeleteIPAssociationInput struct {
 	// The three-part name of the IP Association
 	// Required.

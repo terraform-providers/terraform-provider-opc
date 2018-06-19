@@ -57,7 +57,7 @@ func resourceOPCSecRule() *schema.Resource {
 }
 
 func resourceOPCSecRuleCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.SecRules()
+	client := meta.(*Client).computeClient.SecRules()
 
 	name := d.Get("name").(string)
 	sourceList := d.Get("source_list").(string)
@@ -90,7 +90,7 @@ func resourceOPCSecRuleCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSecRuleRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*OPCClient).computeClient.SecRules()
+	computeClient := meta.(*Client).computeClient.SecRules()
 
 	name := d.Id()
 
@@ -125,7 +125,7 @@ func resourceOPCSecRuleRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSecRuleUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.SecRules()
+	client := meta.(*Client).computeClient.SecRules()
 
 	name := d.Get("name").(string)
 	sourceList := d.Get("source_list").(string)
@@ -156,7 +156,7 @@ func resourceOPCSecRuleUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSecRuleDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.SecRules()
+	client := meta.(*Client).computeClient.SecRules()
 	name := d.Id()
 
 	input := compute.DeleteSecRuleInput{

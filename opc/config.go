@@ -15,6 +15,7 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
+// Config represents the provider configuarion attributes
 type Config struct {
 	User             string
 	Password         string
@@ -23,15 +24,17 @@ type Config struct {
 	MaxRetries       int
 	Insecure         bool
 	StorageEndpoint  string
-	StorageServiceId string
+	StorageServiceID string
 }
 
-type OPCClient struct {
-	computeClient *compute.ComputeClient
-	storageClient *storage.StorageClient
+// Client holder for the OPC (OCI Classic) API Clients
+type Client struct {
+	computeClient *compute.Client
+	storageClient *storage.Client
 }
 
-func (c *Config) Client() (*OPCClient, error) {
+// Client gets the OPC (OCI Classic) API Clients
+func (c *Config) Client() (*Client, error) {
 
 	userAgentString := fmt.Sprintf("HashiCorp-Terraform-v%s", terraform.VersionString())
 
@@ -60,12 +63,12 @@ func (c *Config) Client() (*OPCClient, error) {
 
 	config.HTTPClient = httpClient
 
-	opcClient := &OPCClient{}
+	opcClient := &Client{}
 
 	if c.Endpoint != "" {
 		computeEndpoint, err := url.ParseRequestURI(c.Endpoint)
 		if err != nil {
-			return nil, fmt.Errorf("Invalid endpoint URI: %s", err)
+			return nil, fmt.Errorf("Invalid Compute Endpoint URI: %s", err)
 		}
 		config.APIEndpoint = computeEndpoint
 		computeClient, err := compute.NewComputeClient(&config)
@@ -78,11 +81,11 @@ func (c *Config) Client() (*OPCClient, error) {
 	if c.StorageEndpoint != "" {
 		storageEndpoint, err := url.ParseRequestURI(c.StorageEndpoint)
 		if err != nil {
-			return nil, fmt.Errorf("Invalid storage endpoint URI: %+v", err)
+			return nil, fmt.Errorf("Invalid Storage Endpoint URI: %+v", err)
 		}
 		config.APIEndpoint = storageEndpoint
-		if (c.StorageServiceId) != "" {
-			config.IdentityDomain = &c.StorageServiceId
+		if (c.StorageServiceID) != "" {
+			config.IdentityDomain = &c.StorageServiceID
 		}
 		storageClient, err := storage.NewStorageClient(&config)
 		if err != nil {

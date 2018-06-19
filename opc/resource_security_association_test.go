@@ -49,7 +49,7 @@ func TestAccOPCSecurityAssociation_Complete(t *testing.T) {
 }
 
 func testAccOPCCheckSecurityAssociationExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.SecurityAssociations()
+	client := testAccProvider.Meta().(*Client).computeClient.SecurityAssociations()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_security_association" {
@@ -68,7 +68,7 @@ func testAccOPCCheckSecurityAssociationExists(s *terraform.State) error {
 }
 
 func testAccOPCCheckSecurityAssociationDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.SecurityAssociations()
+	client := testAccProvider.Meta().(*Client).computeClient.SecurityAssociations()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_security_association" {
@@ -105,7 +105,7 @@ func testAccSecurityAssociationBasic(rInt int) string {
 	  vcable  = "${opc_compute_instance.test.vcable}"
 	  seclist = "${opc_compute_security_list.test.name}"
 	}
-	`, rInt, rInt, TEST_IMAGE_LIST)
+	`, rInt, rInt, TestImageList)
 }
 
 func testAccSecurityAssociationComplete(rInt int) string {
@@ -128,5 +128,5 @@ func testAccSecurityAssociationComplete(rInt int) string {
 	  vcable  = "${opc_compute_instance.test.vcable}"
 	  seclist = "${opc_compute_security_list.test.name}"
 	}
-	`, rInt, rInt, TEST_IMAGE_LIST, rInt)
+	`, rInt, rInt, TestImageList, rInt)
 }

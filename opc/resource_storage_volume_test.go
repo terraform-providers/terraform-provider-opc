@@ -223,7 +223,7 @@ func TestAccOPCStorageVolume_FromSnapshot(t *testing.T) {
 }
 
 func testAccCheckStorageVolumeExists(state *OPCResourceState) error {
-	sv := state.ComputeClient.StorageVolumes()
+	sv := state.Client.StorageVolumes()
 	volumeName := state.Attributes["name"]
 
 	input := compute.GetStorageVolumeInput{
@@ -242,7 +242,7 @@ func testAccCheckStorageVolumeExists(state *OPCResourceState) error {
 }
 
 func testAccCheckStorageVolumeDestroyed(state *OPCResourceState) error {
-	sv := state.ComputeClient.StorageVolumes()
+	sv := state.Client.StorageVolumes()
 
 	volumeName := state.Attributes["name"]
 

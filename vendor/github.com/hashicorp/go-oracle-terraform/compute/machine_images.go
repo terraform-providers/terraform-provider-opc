@@ -7,17 +7,17 @@ type MachineImagesClient struct {
 
 // MachineImages obtains an MachineImagesClient which can be used to access to the
 // MachineImage functions of the Compute API
-func (c *ComputeClient) MachineImages() *MachineImagesClient {
+func (c *Client) MachineImages() *MachineImagesClient {
 	return &MachineImagesClient{
 		ResourceClient: ResourceClient{
-			ComputeClient:       c,
+			Client:              c,
 			ResourceDescription: "MachineImage",
 			ContainerPath:       "/machineimage/",
 			ResourceRootPath:    "/machineimage",
 		}}
 }
 
-// MahineImage describes an existing Machine Image.
+// MachineImage describes an existing Machine Image.
 type MachineImage struct {
 	// account of the associated Object Storage Classic instance
 	Account string `json:"account"`
@@ -109,7 +109,7 @@ func (c *MachineImagesClient) CreateMachineImage(createInput *CreateMachineImage
 // DeleteMachineImageInput describes the MachineImage to delete
 type DeleteMachineImageInput struct {
 	// The name of the MachineImage
-	Name string `json:name`
+	Name string `json:"name"`
 }
 
 // DeleteMachineImage deletes the MachineImage with the given name.
@@ -117,12 +117,12 @@ func (c *MachineImagesClient) DeleteMachineImage(deleteInput *DeleteMachineImage
 	return c.deleteResource(deleteInput.Name)
 }
 
-// GetMachineList describes the MachineImage to get
+// GetMachineImageInput describes the MachineImage to get
 type GetMachineImageInput struct {
 	// account of the associated Object Storage Classic instance
 	Account string `json:"account"`
 	// The name of the Machine Image
-	Name string `json:name`
+	Name string `json:"name"`
 }
 
 // GetMachineImage retrieves the MachineImage with the given name.

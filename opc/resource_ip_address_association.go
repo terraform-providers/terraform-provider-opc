@@ -46,7 +46,7 @@ func resourceOPCIPAddressAssociation() *schema.Resource {
 }
 
 func resourceOPCIPAddressAssociationCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.IPAddressAssociations()
+	client := meta.(*Client).computeClient.IPAddressAssociations()
 
 	input := compute.CreateIPAddressAssociationInput{
 		Name: d.Get("name").(string),
@@ -79,7 +79,7 @@ func resourceOPCIPAddressAssociationCreate(d *schema.ResourceData, meta interfac
 }
 
 func resourceOPCIPAddressAssociationRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*OPCClient).computeClient.IPAddressAssociations()
+	computeClient := meta.(*Client).computeClient.IPAddressAssociations()
 	name := d.Id()
 
 	getInput := compute.GetIPAddressAssociationInput{
@@ -103,7 +103,7 @@ func resourceOPCIPAddressAssociationRead(d *schema.ResourceData, meta interface{
 	d.Set("ip_address_reservation", result.IPAddressReservation)
 	d.Set("vnic", result.Vnic)
 	d.Set("description", result.Description)
-	d.Set("uri", result.Uri)
+	d.Set("uri", result.URI)
 	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err
 	}
@@ -111,7 +111,7 @@ func resourceOPCIPAddressAssociationRead(d *schema.ResourceData, meta interface{
 }
 
 func resourceOPCIPAddressAssociationUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.IPAddressAssociations()
+	client := meta.(*Client).computeClient.IPAddressAssociations()
 
 	input := compute.UpdateIPAddressAssociationInput{
 		Name: d.Get("name").(string),
@@ -144,7 +144,7 @@ func resourceOPCIPAddressAssociationUpdate(d *schema.ResourceData, meta interfac
 }
 
 func resourceOPCIPAddressAssociationDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.IPAddressAssociations()
+	client := meta.(*Client).computeClient.IPAddressAssociations()
 	name := d.Id()
 
 	input := compute.DeleteIPAddressAssociationInput{
