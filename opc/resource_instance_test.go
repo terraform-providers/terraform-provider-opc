@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
-const TEST_IMAGE_LIST = "/oracle/public/OL_7.2_UEKR4_x86_64"
+const TestImageList = "/oracle/public/OL_7.2_UEKR4_x86_64"
 
 func TestAccOPCInstance_basic(t *testing.T) {
 	resName := "opc_compute_instance.test"
@@ -283,7 +283,7 @@ func TestAccOPCInstance_Restart(t *testing.T) {
 }
 
 func testAccOPCCheckInstanceExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.Instances()
+	client := testAccProvider.Meta().(*Client).computeClient.Instances()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_instance" {
@@ -304,7 +304,7 @@ func testAccOPCCheckInstanceExists(s *terraform.State) error {
 }
 
 func testAccOPCCheckInstanceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.Instances()
+	client := testAccProvider.Meta().(*Client).computeClient.Instances()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_instance" {
@@ -335,7 +335,7 @@ resource "opc_compute_instance" "test" {
   "foo": "bar"
 }
 JSON
-}`, rInt, TEST_IMAGE_LIST)
+}`, rInt, TestImageList)
 }
 
 func testAccInstanceSharedNetworking(rInt int) string {
@@ -358,7 +358,7 @@ data "opc_compute_network_interface" "test" {
   instance_id = "${opc_compute_instance.test.id}"
   interface = "eth0"
 }
-`, rInt, TEST_IMAGE_LIST)
+`, rInt, TestImageList)
 }
 
 func testAccInstanceIPNetworking(rInt int) string {
@@ -387,7 +387,7 @@ data "opc_compute_network_interface" "test" {
   instance_name = "${opc_compute_instance.test.name}"
   interface = "eth0"
 }
-`, rInt, rInt, TEST_IMAGE_LIST, rInt)
+`, rInt, rInt, TestImageList, rInt)
 }
 
 func testAccInstanceIPNetworkingDefaultGateway(rInt int) string {
@@ -417,7 +417,7 @@ data "opc_compute_network_interface" "test" {
   instance_name = "${opc_compute_instance.test.name}"
   interface = "eth0"
 }
-`, rInt, rInt, TEST_IMAGE_LIST, rInt)
+`, rInt, rInt, TestImageList, rInt)
 }
 
 func testAccInstanceStorage(rInt int) string {
@@ -445,7 +445,7 @@ resource "opc_compute_instance" "test" {
 	  volume = "${opc_compute_storage_volume.bar.name}"
 	  index = 2
 	}
-}`, rInt, rInt, rInt, TEST_IMAGE_LIST)
+}`, rInt, rInt, rInt, TestImageList)
 }
 
 func testAccInstanceEmptyLabel(rInt int) string {
@@ -459,7 +459,7 @@ resource "opc_compute_instance" "test" {
   "foo": "bar"
 }
 JSON
-}`, rInt, TEST_IMAGE_LIST)
+}`, rInt, TestImageList)
 }
 
 func testAccInstanceUpdateTags(rInt int) string {
@@ -475,7 +475,7 @@ resource "opc_compute_instance" "test" {
   "foo": "bar"
 }
 JSON
-}`, rInt, TEST_IMAGE_LIST)
+}`, rInt, TestImageList)
 }
 
 func testAccInstanceBootVolume(rInt int) string {
@@ -586,5 +586,5 @@ resource "opc_compute_instance" "test" {
 	shape = "oc3"
 	image_list = "%s"
 	hostname = "testhostname-%d"
-}`, rInt, TEST_IMAGE_LIST, rInt)
+}`, rInt, TestImageList, rInt)
 }

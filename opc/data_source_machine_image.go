@@ -82,7 +82,7 @@ func dataSourceMachineImage() *schema.Resource {
 }
 
 func dataSourceMachineImageRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.MachineImages()
+	client := meta.(*Client).computeClient.MachineImages()
 
 	// Get required attributes
 	account := d.Get("account").(string)

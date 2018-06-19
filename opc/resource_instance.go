@@ -377,7 +377,7 @@ func resourceInstance() *schema.Resource {
 }
 
 func resourceInstanceCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.Instances()
+	client := meta.(*Client).computeClient.Instances()
 
 	// Get Required Attributes
 	input := &compute.CreateInstanceInput{
@@ -450,7 +450,7 @@ func resourceInstanceCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceInstanceRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*OPCClient).computeClient.Instances()
+	computeClient := meta.(*Client).computeClient.Instances()
 
 	name := d.Get("name").(string)
 
@@ -564,7 +564,7 @@ func updateInstanceAttributes(d *schema.ResourceData, instance *compute.Instance
 }
 
 func resourceInstanceUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.Instances()
+	client := meta.(*Client).computeClient.Instances()
 
 	name := d.Get("name").(string)
 
@@ -595,7 +595,7 @@ func resourceInstanceUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceInstanceDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.Instances()
+	client := meta.(*Client).computeClient.Instances()
 
 	name := d.Get("name").(string)
 

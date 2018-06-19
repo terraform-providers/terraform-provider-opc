@@ -76,7 +76,7 @@ func TestAccOPCSecurityList_lowercasePolicies(t *testing.T) {
 }
 
 func testAccCheckSecurityListExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.SecurityLists()
+	client := testAccProvider.Meta().(*Client).computeClient.SecurityLists()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_security_list" {
@@ -95,7 +95,7 @@ func testAccCheckSecurityListExists(s *terraform.State) error {
 }
 
 func testAccCheckSecurityListDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.SecurityLists()
+	client := testAccProvider.Meta().(*Client).computeClient.SecurityLists()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_security_list" {

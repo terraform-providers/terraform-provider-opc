@@ -41,7 +41,7 @@ func resourceOPCSecurityAssociation() *schema.Resource {
 }
 
 func resourceOPCSecurityAssociationCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.SecurityAssociations()
+	client := meta.(*Client).computeClient.SecurityAssociations()
 
 	name := d.Get("name").(string)
 	vcable := d.Get("vcable").(string)
@@ -63,7 +63,7 @@ func resourceOPCSecurityAssociationCreate(d *schema.ResourceData, meta interface
 }
 
 func resourceOPCSecurityAssociationRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*OPCClient).computeClient.SecurityAssociations()
+	computeClient := meta.(*Client).computeClient.SecurityAssociations()
 
 	name := d.Id()
 
@@ -94,7 +94,7 @@ func resourceOPCSecurityAssociationRead(d *schema.ResourceData, meta interface{}
 }
 
 func resourceOPCSecurityAssociationDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.SecurityAssociations()
+	client := meta.(*Client).computeClient.SecurityAssociations()
 
 	name := d.Id()
 

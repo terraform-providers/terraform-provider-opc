@@ -46,7 +46,7 @@ func testAccPreCheck(t *testing.T) {
 		MaxRetries:       1,
 		Insecure:         false,
 		StorageEndpoint:  os.Getenv("OPC_STORAGE_ENDPOINT"),
-		StorageServiceId: os.Getenv("OPC_STORAGE_SERVICE_ID"),
+		StorageServiceID: os.Getenv("OPC_STORAGE_SERVICE_ID"),
 	}
 	client, err := config.Client()
 	if err != nil {
@@ -70,7 +70,7 @@ func opcResourceCheck(resourceName string, f func(checker *OPCResourceState) err
 		}
 
 		state := &OPCResourceState{
-			Client:        testAccProvider.Meta().(*OPCClient).computeClient,
+			Client:        testAccProvider.Meta().(*Client).computeClient,
 			InstanceState: rs.Primary,
 		}
 

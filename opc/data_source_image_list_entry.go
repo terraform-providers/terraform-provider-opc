@@ -49,7 +49,7 @@ func dataSourceImageListEntry() *schema.Resource {
 }
 
 func dataSourceImageListEntryRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.ImageListEntries()
+	client := meta.(*Client).computeClient.ImageListEntries()
 
 	// Get required attributes
 	image_list := d.Get("image_list").(string)

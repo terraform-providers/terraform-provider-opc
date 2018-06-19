@@ -64,7 +64,7 @@ func resourceOPCSecurityListCreate(d *schema.ResourceData, meta interface{}) err
 	policy := d.Get("policy").(string)
 	outboundCIDRPolicy := d.Get("outbound_cidr_policy").(string)
 
-	client := meta.(*OPCClient).computeClient.SecurityLists()
+	client := meta.(*Client).computeClient.SecurityLists()
 	input := compute.CreateSecurityListInput{
 		Name:               name,
 		Description:        description,
@@ -82,7 +82,7 @@ func resourceOPCSecurityListCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCSecurityListUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.SecurityLists()
+	client := meta.(*Client).computeClient.SecurityLists()
 
 	name := d.Get("name").(string)
 	description := d.Get("description").(string)
@@ -104,7 +104,7 @@ func resourceOPCSecurityListUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCSecurityListRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*OPCClient).computeClient.SecurityLists()
+	computeClient := meta.(*Client).computeClient.SecurityLists()
 
 	name := d.Id()
 
@@ -136,7 +136,7 @@ func resourceOPCSecurityListRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceOPCSecurityListDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.SecurityLists()
+	client := meta.(*Client).computeClient.SecurityLists()
 
 	name := d.Id()
 	input := compute.DeleteSecurityListInput{

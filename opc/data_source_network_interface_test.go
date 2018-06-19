@@ -75,7 +75,7 @@ data "opc_compute_network_interface" "test" {
   instance_name = "${opc_compute_instance.test.name}"
   instance_id = "${opc_compute_instance.test.id}"
   interface = "eth0"
-}`, rInt, rInt, TEST_IMAGE_LIST, rInt)
+}`, rInt, rInt, TestImageList, rInt)
 }
 
 func testAccDataSourceNetworkInterfaceShared(rInt int) string {
@@ -97,5 +97,5 @@ data "opc_compute_network_interface" "test" {
   instance_name = "${opc_compute_instance.test.name}"
   instance_id = "${opc_compute_instance.test.id}"
   interface = "eth0"
-}`, rInt, TEST_IMAGE_LIST)
+}`, rInt, TestImageList)
 }

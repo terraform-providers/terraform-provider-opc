@@ -126,7 +126,7 @@ func TestAccOPCStorageObject_objectMetadata(t *testing.T) {
 }
 
 func testAccCheckStorageObjectExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).storageClient.Objects()
+	client := testAccProvider.Meta().(*Client).storageClient.Objects()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_storage_object" {
@@ -144,7 +144,7 @@ func testAccCheckStorageObjectExists(s *terraform.State) error {
 }
 
 func testAccCheckStorageObjectDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).storageClient.Objects()
+	client := testAccProvider.Meta().(*Client).storageClient.Objects()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_storage_object" {

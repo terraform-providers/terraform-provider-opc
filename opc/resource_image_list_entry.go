@@ -62,7 +62,7 @@ func resourceOPCImageListEntry() *schema.Resource {
 }
 
 func resourceOPCImageListEntryCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.ImageListEntries()
+	client := meta.(*Client).computeClient.ImageListEntries()
 
 	name := d.Get("name").(string)
 	machineImages := expandOPCImageListEntryMachineImages(d)
@@ -95,7 +95,7 @@ func resourceOPCImageListEntryCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceOPCImageListEntryRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.ImageListEntries()
+	client := meta.(*Client).computeClient.ImageListEntries()
 
 	// Only parse image list entry ID if delimiter exists
 	name, version, err := parseOPCImageListEntryID(d.Id())
@@ -133,7 +133,7 @@ func resourceOPCImageListEntryRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCImageListEntryDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.ImageListEntries()
+	client := meta.(*Client).computeClient.ImageListEntries()
 
 	name, version, err := parseOPCImageListEntryID(d.Id())
 	if err != nil {

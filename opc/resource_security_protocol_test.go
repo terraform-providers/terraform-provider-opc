@@ -89,7 +89,7 @@ func TestAccOPCSecurityProtocol_Update(t *testing.T) {
 }
 
 func testAccCheckSecurityProtocolExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.SecurityProtocols()
+	client := testAccProvider.Meta().(*Client).computeClient.SecurityProtocols()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_security_protocol" {
@@ -108,7 +108,7 @@ func testAccCheckSecurityProtocolExists(s *terraform.State) error {
 }
 
 func testAccCheckSecurityProtocolDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.SecurityProtocols()
+	client := testAccProvider.Meta().(*Client).computeClient.SecurityProtocols()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_security_protocol" {

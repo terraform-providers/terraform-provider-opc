@@ -92,7 +92,7 @@ func resourceOPCMachineImage() *schema.Resource {
 }
 
 func resourceOPCMachineImageCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.MachineImages()
+	client := meta.(*Client).computeClient.MachineImages()
 
 	// Get required attributes
 	name := d.Get("name").(string)
@@ -132,7 +132,7 @@ func resourceOPCMachineImageCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCMachineImageRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*OPCClient).computeClient.MachineImages()
+	computeClient := meta.(*Client).computeClient.MachineImages()
 
 	name := d.Id()
 	input := &compute.GetMachineImageInput{
@@ -180,7 +180,7 @@ func resourceOPCMachineImageRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceOPCMachineImageDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.MachineImages()
+	client := meta.(*Client).computeClient.MachineImages()
 
 	name := d.Id()
 	input := &compute.DeleteMachineImageInput{

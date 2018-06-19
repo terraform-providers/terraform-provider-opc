@@ -30,7 +30,7 @@ func TestAccOPCIPAssociation_Basic(t *testing.T) {
 }
 
 func testAccOPCCheckIPAssociationExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.IPAssociations()
+	client := testAccProvider.Meta().(*Client).computeClient.IPAssociations()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_ip_association" {
@@ -49,7 +49,7 @@ func testAccOPCCheckIPAssociationExists(s *terraform.State) error {
 }
 
 func testAccOPCCheckIPAssociationDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.IPAssociations()
+	client := testAccProvider.Meta().(*Client).computeClient.IPAssociations()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_ip_association" {
@@ -86,5 +86,5 @@ func testAccIPAssociationBasic(rInt int) string {
 	  vcable      = "${opc_compute_instance.test.vcable}"
 	  parent_pool = "ipreservation:${opc_compute_ip_reservation.test.name}"
 	}
-	`, rInt, TEST_IMAGE_LIST, rInt)
+	`, rInt, TestImageList, rInt)
 }

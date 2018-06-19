@@ -64,7 +64,7 @@ func TestAccOPCStorageAttachment_BootAndAttached(t *testing.T) {
 }
 
 func testAccCheckStorageAttachmentExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.StorageAttachments()
+	client := testAccProvider.Meta().(*Client).computeClient.StorageAttachments()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_storage_attachment" {
@@ -83,7 +83,7 @@ func testAccCheckStorageAttachmentExists(s *terraform.State) error {
 }
 
 func testAccCheckStorageAttachmentDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.StorageAttachments()
+	client := testAccProvider.Meta().(*Client).computeClient.StorageAttachments()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_storage_attachment" {
@@ -120,7 +120,7 @@ resource "opc_compute_storage_attachment" "test" {
   storage_volume = "${opc_compute_storage_volume.foo.name}"
   index = 1
 }
-`, rInt, rInt, TEST_IMAGE_LIST)
+`, rInt, rInt, TestImageList)
 }
 
 func testAccStorageAttachmentInvalidIndex(rInt int) string {
@@ -151,7 +151,7 @@ resource "opc_compute_storage_attachment" "test" {
   storage_volume = "${opc_compute_storage_volume.foo.name}"
   index = 1
 }
-`, rInt, rInt, rInt, TEST_IMAGE_LIST)
+`, rInt, rInt, rInt, TestImageList)
 }
 
 func testAccStorageAttachmentBootAndAttached(rInt int) string {
@@ -196,5 +196,5 @@ resource "opc_compute_storage_attachment" "test" {
   storage_volume = "${opc_compute_storage_volume.foo.name}"
   index = 2
 }
-`, rInt, rInt, rInt, rInt, TEST_IMAGE_LIST)
+`, rInt, rInt, rInt, rInt, TestImageList)
 }
