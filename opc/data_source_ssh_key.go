@@ -32,7 +32,7 @@ func dataSourceSSHKey() *schema.Resource {
 }
 
 func dataSourceSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*OPCClient).computeClient.SSHKeys()
+	computeClient := meta.(*Client).computeClient.SSHKeys()
 	name := d.Get("name").(string)
 
 	input := compute.GetSSHKeyInput{

@@ -28,7 +28,7 @@ func TestAccOPCIPNetworkExchange_Basic(t *testing.T) {
 }
 
 func testAccCheckIPNetworkExchangeExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.IPNetworkExchanges()
+	client := testAccProvider.Meta().(*Client).computeClient.IPNetworkExchanges()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_ip_network_exchange" {
@@ -47,7 +47,7 @@ func testAccCheckIPNetworkExchangeExists(s *terraform.State) error {
 }
 
 func testAccCheckIPNetworkExchangeDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.IPNetworkExchanges()
+	client := testAccProvider.Meta().(*Client).computeClient.IPNetworkExchanges()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_ip_network_exchange" {

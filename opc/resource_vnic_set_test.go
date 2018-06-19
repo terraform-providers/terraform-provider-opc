@@ -81,7 +81,7 @@ func TestAccOPCVNICSet_UpdateFromInstance(t *testing.T) {
 }
 
 func testAccOPCCheckVNICSetExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.VirtNICSets()
+	client := testAccProvider.Meta().(*Client).computeClient.VirtNICSets()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_vnic_set" {
@@ -100,7 +100,7 @@ func testAccOPCCheckVNICSetExists(s *terraform.State) error {
 }
 
 func testAccOPCCheckVNICSetDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.VirtNICSets()
+	client := testAccProvider.Meta().(*Client).computeClient.VirtNICSets()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_vnic_set" {
@@ -171,7 +171,7 @@ resource "opc_compute_vnic_set" "test" {
     "${data.opc_compute_network_interface.foo.vnic}",
     "${data.opc_compute_network_interface.bar.vnic}",
   ]
-}`, rInt, rInt, rInt, TEST_IMAGE_LIST, rInt, rInt, rName, rDesc)
+}`, rInt, rInt, rInt, TestImageList, rInt, rInt, rName, rDesc)
 }
 
 func testAccVnicSetBasic_Update(rName, rDesc string, rInt int) string {
@@ -227,7 +227,7 @@ resource "opc_compute_vnic_set" "test" {
     "${data.opc_compute_network_interface.foo.vnic}",
     "${data.opc_compute_network_interface.bar.vnic}",
   ]
-}`, rInt, rInt, rInt, TEST_IMAGE_LIST, rInt, rInt, rName, rDesc)
+}`, rInt, rInt, rInt, TestImageList, rInt, rInt, rName, rDesc)
 }
 
 func testAccVnicSetInstance(rInt int) string {

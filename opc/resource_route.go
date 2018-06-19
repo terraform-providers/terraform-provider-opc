@@ -52,7 +52,7 @@ func resourceOPCRoute() *schema.Resource {
 }
 
 func resourceOPCRouteCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.Routes()
+	client := meta.(*Client).computeClient.Routes()
 
 	// Get Required attributes
 	name := d.Get("name").(string)
@@ -94,7 +94,7 @@ func resourceOPCRouteCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCRouteRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*OPCClient).computeClient.Routes()
+	computeClient := meta.(*Client).computeClient.Routes()
 
 	name := d.Id()
 	input := &compute.GetRouteInput{
@@ -127,7 +127,7 @@ func resourceOPCRouteRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCRouteUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.Routes()
+	client := meta.(*Client).computeClient.Routes()
 
 	// Get Required attributes
 	name := d.Get("name").(string)
@@ -169,7 +169,7 @@ func resourceOPCRouteUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCRouteDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.Routes()
+	client := meta.(*Client).computeClient.Routes()
 
 	name := d.Id()
 	input := &compute.DeleteRouteInput{

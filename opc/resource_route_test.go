@@ -79,7 +79,7 @@ resource "opc_compute_route" "test" {
   admin_distance = 1
   ip_address_prefix = "10.0.12.0/24"
   next_hop_vnic_set = "${opc_compute_vnic_set.test.name}"
-}`, rInt, rInt, TEST_IMAGE_LIST, rInt, rInt, rInt, rInt, rInt)
+}`, rInt, rInt, TestImageList, rInt, rInt, rInt, rInt, rInt)
 }
 
 func testAccOPCRouteConfig_BasicUpdate(rInt int) string {
@@ -121,11 +121,11 @@ resource "opc_compute_route" "test" {
   admin_distance = 2
   ip_address_prefix = "10.0.14.0/24"
   next_hop_vnic_set = "${opc_compute_vnic_set.test.name}"
-}`, rInt, rInt, TEST_IMAGE_LIST, rInt, rInt, rInt, rInt, rInt)
+}`, rInt, rInt, TestImageList, rInt, rInt, rInt, rInt, rInt)
 }
 
 func testAccOPCCheckRouteExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.Routes()
+	client := testAccProvider.Meta().(*Client).computeClient.Routes()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_route" {
@@ -144,7 +144,7 @@ func testAccOPCCheckRouteExists(s *terraform.State) error {
 }
 
 func testAccOPCCheckRouteDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.Routes()
+	client := testAccProvider.Meta().(*Client).computeClient.Routes()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_route" {

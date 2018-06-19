@@ -38,7 +38,7 @@ var explicitMetaHeaders = []string{
 }
 
 // Determine if a given header is a standard attribute or custom header
-func (c *StorageClient) isCustomHeader(header string) bool {
+func (c *Client) isCustomHeader(header string) bool {
 	for _, v := range explicitMetaHeaders {
 		if v == header {
 			return false
@@ -118,7 +118,7 @@ type CreateContainerInput struct {
 }
 
 // CreateContainer creates a new Container with the given name, key and enabled flag.
-func (c *StorageClient) CreateContainer(input *CreateContainerInput) (*Container, error) {
+func (c *Client) CreateContainer(input *CreateContainerInput) (*Container, error) {
 	headers := make(map[string]string)
 
 	input.Name = c.getQualifiedName(input.Name)
@@ -153,7 +153,7 @@ func (c *StorageClient) CreateContainer(input *CreateContainerInput) (*Container
 		for name, value := range input.CustomMetadata {
 			header := fmt.Sprintf("%s%s", hMetaPrefix, name)
 			if c.isCustomHeader(header) {
-				headers[header] = fmt.Sprintf("%s", value)
+				headers[header] = value
 			}
 		}
 	}
@@ -169,7 +169,7 @@ func (c *StorageClient) CreateContainer(input *CreateContainerInput) (*Container
 	return c.GetContainer(&getInput)
 }
 
-// DeleteKeyInput describes the container to delete
+// DeleteContainerInput describes the container to delete
 type DeleteContainerInput struct {
 	// The name of the Container
 	// Required
@@ -177,7 +177,7 @@ type DeleteContainerInput struct {
 }
 
 // DeleteContainer deletes the Container with the given name.
-func (c *StorageClient) DeleteContainer(input *DeleteContainerInput) error {
+func (c *Client) DeleteContainer(input *DeleteContainerInput) error {
 	input.Name = c.getQualifiedName(input.Name)
 	return c.deleteResource(input.Name)
 }
@@ -190,7 +190,7 @@ type GetContainerInput struct {
 }
 
 // GetContainer retrieves the Container with the given name.
-func (c *StorageClient) GetContainer(input *GetContainerInput) (*Container, error) {
+func (c *Client) GetContainer(input *GetContainerInput) (*Container, error) {
 	var container Container
 	input.Name = c.getQualifiedName(input.Name)
 
@@ -247,7 +247,7 @@ type UpdateContainerInput struct {
 
 // Set an X-Container-Meta-{name} header with the value provided
 // or if the value is empty set the X-Remove-Container-Meta-{name} header
-func (c *StorageClient) updateOrRemoveStringValue(headers map[string]string, header, value string) {
+func (c *Client) updateOrRemoveStringValue(headers map[string]string, header, value string) {
 	if value == "" {
 		headers[strings.Replace(header, hMetaPrefix, hRemoveMetaPrefix, 1)] = ""
 	} else {
@@ -257,7 +257,7 @@ func (c *StorageClient) updateOrRemoveStringValue(headers map[string]string, hea
 
 // Set an X-Container-Meta-{name} header with the value provided
 // or if the value is 0 set the X-Remove-Container-Meta-{name} header
-func (c *StorageClient) updateOrRemoveIntValue(headers map[string]string, header string, value int) {
+func (c *Client) updateOrRemoveIntValue(headers map[string]string, header string, value int) {
 	if value == 0 {
 		headers[strings.Replace(header, hMetaPrefix, hRemoveMetaPrefix, 1)] = ""
 	} else {
@@ -266,7 +266,7 @@ func (c *StorageClient) updateOrRemoveIntValue(headers map[string]string, header
 }
 
 // UpdateContainer updates the key and enabled flag of the Container with the given name.
-func (c *StorageClient) UpdateContainer(input *UpdateContainerInput) (*Container, error) {
+func (c *Client) UpdateContainer(input *UpdateContainerInput) (*Container, error) {
 	headers := make(map[string]string)
 
 	// There are default values for these that we don't want to zero out if Read and Write ACLs are not set.
@@ -292,7 +292,7 @@ func (c *StorageClient) UpdateContainer(input *UpdateContainerInput) (*Container
 		for name, value := range input.CustomMetadata {
 			header := fmt.Sprintf("%s%s", hMetaPrefix, name)
 			if c.isCustomHeader(header) {
-				headers[header] = fmt.Sprintf("%s", value)
+				headers[header] = value
 			}
 		}
 	}
@@ -321,8 +321,14 @@ func (c *StorageClient) UpdateContainer(input *UpdateContainerInput) (*Container
 	return c.GetContainer(&getInput)
 }
 
-func (c *StorageClient) success(rsp *http.Response, container *Container) (*Container, error) {
-	var err error
+func (c *Client) success(rsp *http.Response, container *Container) (*Container, error) {
+	var (
+		err        error
+		maxAge     int
+		quotaBytes int
+		quotaCount int
+	)
+
 	container.ReadACLs = strings.Split(rsp.Header.Get(hContainerRead), ",")
 	container.WriteACLs = strings.Split(rsp.Header.Get(hContainerWrite), ",")
 	container.PrimaryKey = rsp.Header.Get(hTempURLKey)
@@ -331,14 +337,14 @@ func (c *StorageClient) success(rsp *http.Response, container *Container) (*Cont
 	container.ExposedHeaders = strings.Split(rsp.Header.Get(hAccessControlExposeHeaders), " ")
 	container.GeoreplicationPolicy = strings.Split(rsp.Header.Get(hPolicyGeoreplication), " ")
 
-	if value, err := strconv.Atoi(rsp.Header.Get(hAccessControlMaxAge)); err == nil {
-		container.MaxAge = value
+	if maxAge, err = strconv.Atoi(rsp.Header.Get(hAccessControlMaxAge)); err == nil {
+		container.MaxAge = maxAge
 	}
-	if value, err := strconv.Atoi(rsp.Header.Get(hQuotaBytes)); err == nil {
-		container.QuotaBytes = value
+	if quotaBytes, err = strconv.Atoi(rsp.Header.Get(hQuotaBytes)); err == nil {
+		container.QuotaBytes = quotaBytes
 	}
-	if value, err := strconv.Atoi(rsp.Header.Get(hQuotaCount)); err == nil {
-		container.QuotaCount = value
+	if quotaCount, err = strconv.Atoi(rsp.Header.Get(hQuotaCount)); err == nil {
+		container.QuotaCount = quotaCount
 	}
 
 	container.CustomMetadata = make(map[string]string)

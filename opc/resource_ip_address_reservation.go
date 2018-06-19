@@ -52,7 +52,7 @@ func resourceOPCIPAddressReservation() *schema.Resource {
 }
 
 func resourceOPCIPAddressReservationCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.IPAddressReservations()
+	client := meta.(*Client).computeClient.IPAddressReservations()
 
 	input := compute.CreateIPAddressReservationInput{
 		Name:          d.Get("name").(string),
@@ -75,7 +75,7 @@ func resourceOPCIPAddressReservationCreate(d *schema.ResourceData, meta interfac
 }
 
 func resourceOPCIPAddressReservationRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*OPCClient).computeClient.IPAddressReservations()
+	computeClient := meta.(*Client).computeClient.IPAddressReservations()
 
 	input := compute.GetIPAddressReservationInput{
 		Name: d.Id(),
@@ -100,7 +100,7 @@ func resourceOPCIPAddressReservationRead(d *schema.ResourceData, meta interface{
 	d.Set("description", result.Description)
 	d.Set("ip_address_pool", result.IPAddressPool)
 	d.Set("ip_address", result.IPAddress)
-	d.Set("uri", result.Uri)
+	d.Set("uri", result.URI)
 
 	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err
@@ -109,7 +109,7 @@ func resourceOPCIPAddressReservationRead(d *schema.ResourceData, meta interface{
 }
 
 func resourceOPCIPAddressReservationUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.IPAddressReservations()
+	client := meta.(*Client).computeClient.IPAddressReservations()
 
 	input := compute.UpdateIPAddressReservationInput{
 		Name:          d.Get("name").(string),
@@ -132,7 +132,7 @@ func resourceOPCIPAddressReservationUpdate(d *schema.ResourceData, meta interfac
 }
 
 func resourceOPCIPAddressReservationDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.IPAddressReservations()
+	client := meta.(*Client).computeClient.IPAddressReservations()
 	name := d.Id()
 
 	input := compute.DeleteIPAddressReservationInput{

@@ -60,7 +60,7 @@ func resourceOPCIPReservationCreate(d *schema.ResourceData, meta interface{}) er
 		reservation.Tags = tags
 	}
 
-	client := meta.(*OPCClient).computeClient.IPReservations()
+	client := meta.(*Client).computeClient.IPReservations()
 	info, err := client.CreateIPReservation(&reservation)
 	if err != nil {
 		return fmt.Errorf("Error creating ip reservation from parent_pool %s with tags=%s: %s",
@@ -72,7 +72,7 @@ func resourceOPCIPReservationCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceOPCIPReservationRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*OPCClient).computeClient.IPReservations()
+	computeClient := meta.(*Client).computeClient.IPReservations()
 
 	input := compute.GetIPReservationInput{
 		Name: d.Id(),
@@ -107,7 +107,7 @@ func resourceOPCIPReservationRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceOPCIPReservationDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.IPReservations()
+	client := meta.(*Client).computeClient.IPReservations()
 
 	input := compute.DeleteIPReservationInput{
 		Name: d.Id(),

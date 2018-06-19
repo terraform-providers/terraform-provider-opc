@@ -83,7 +83,7 @@ func TestAccOPCStorageContainer_Updated(t *testing.T) {
 }
 
 func testAccCheckStorageContainerExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).storageClient
+	client := testAccProvider.Meta().(*Client).storageClient
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_storage_container" {
@@ -102,7 +102,7 @@ func testAccCheckStorageContainerExists(s *terraform.State) error {
 }
 
 func testAccCheckStorageContainerDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).storageClient
+	client := testAccProvider.Meta().(*Client).storageClient
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_storage_container" {

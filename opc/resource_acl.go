@@ -53,7 +53,7 @@ func resourceOPCACLCreate(d *schema.ResourceData, meta interface{}) error {
 
 	log.Print("[DEBUG] Creating acl")
 
-	client := meta.(*OPCClient).computeClient.ACLs()
+	client := meta.(*Client).computeClient.ACLs()
 	input := compute.CreateACLInput{
 		Name:    d.Get("name").(string),
 		Enabled: d.Get("enabled").(bool),
@@ -79,7 +79,7 @@ func resourceOPCACLCreate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceOPCACLRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	computeClient := meta.(*OPCClient).computeClient.ACLs()
+	computeClient := meta.(*Client).computeClient.ACLs()
 
 	log.Printf("[DEBUG] Reading state of ip reservation %s", d.Id())
 	getInput := compute.GetACLInput{
@@ -117,7 +117,7 @@ func resourceOPCACLUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	log.Print("[DEBUG] Updating acl")
 
-	client := meta.(*OPCClient).computeClient.ACLs()
+	client := meta.(*Client).computeClient.ACLs()
 	input := compute.UpdateACLInput{
 		Name:    d.Get("name").(string),
 		Enabled: d.Get("enabled").(bool),
@@ -143,7 +143,7 @@ func resourceOPCACLUpdate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceOPCACLDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	client := meta.(*OPCClient).computeClient.ACLs()
+	client := meta.(*Client).computeClient.ACLs()
 	name := d.Id()
 
 	log.Printf("[DEBUG] Deleting ACL: %v", name)

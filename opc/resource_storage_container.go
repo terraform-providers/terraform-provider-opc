@@ -82,7 +82,7 @@ func resourceOPCStorageContainer() *schema.Resource {
 }
 
 func resourceOPCStorageContainerCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).storageClient
+	client := meta.(*Client).storageClient
 	if client == nil {
 		return fmt.Errorf("Storage Client is not initialized. Make sure to use `storage_endpoint` variable or `OPC_STORAGE_ENDPOINT env variable`")
 	}
@@ -137,7 +137,7 @@ func resourceOPCStorageContainerCreate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceOPCStorageContainerRead(d *schema.ResourceData, meta interface{}) error {
-	storageClient := meta.(*OPCClient).storageClient
+	storageClient := meta.(*Client).storageClient
 	if storageClient == nil {
 		return fmt.Errorf("Storage Client is not initialized. Make sure to use `storage_endpoint` variable or `OPC_STORAGE_ENDPOINT env variable`")
 	}
@@ -187,7 +187,7 @@ func resourceOPCStorageContainerRead(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceOPCStorageContainerDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).storageClient
+	client := meta.(*Client).storageClient
 	if client == nil {
 		return fmt.Errorf("Storage Client is not initialized. Make sure to use `storage_endpoint` variable or `OPC_STORAGE_ENDPOINT env variable`")
 	}
@@ -204,7 +204,7 @@ func resourceOPCStorageContainerDelete(d *schema.ResourceData, meta interface{})
 }
 
 func resourceOPCStorageContainerUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).storageClient
+	client := meta.(*Client).storageClient
 	if client == nil {
 		return fmt.Errorf("Storage Client is not initialized. Make sure to use `storage_endpoint` variable or `OPC_STORAGE_ENDPOINT env variable`")
 	}
@@ -274,7 +274,7 @@ func resourceOPCStorageContainerUpdate(d *schema.ResourceData, meta interface{})
 // get keys from a map
 func getKeys(m map[string]interface{}) []string {
 	keys := []string{}
-	for k, _ := range m {
+	for k := range m {
 		keys = append(keys, k)
 	}
 	return keys

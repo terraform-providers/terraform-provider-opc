@@ -63,7 +63,7 @@ func resourceOPCOrchestratedInstanceCreate(d *schema.ResourceData, meta interfac
 
 	log.Print("[DEBUG] Creating Orchestration")
 
-	client := meta.(*OPCClient).computeClient.Orchestrations()
+	client := meta.(*Client).computeClient.Orchestrations()
 	input := compute.CreateOrchestrationInput{
 		Name:         d.Get("name").(string),
 		DesiredState: compute.OrchestrationDesiredState(d.Get("desired_state").(string)),
@@ -96,7 +96,7 @@ func resourceOPCOrchestratedInstanceCreate(d *schema.ResourceData, meta interfac
 
 func resourceOPCOrchestratedInstanceRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	computeClient := meta.(*OPCClient).computeClient.Orchestrations()
+	computeClient := meta.(*Client).computeClient.Orchestrations()
 
 	log.Printf("[DEBUG] Reading state of orchestrated instance %s", d.Id())
 	getInput := compute.GetOrchestrationInput{
@@ -146,7 +146,7 @@ func resourceOPCOrchestratedInstanceUpdate(d *schema.ResourceData, meta interfac
 
 	log.Print("[DEBUG] Updating Orchestration")
 
-	computeClient := meta.(*OPCClient).computeClient.Orchestrations()
+	computeClient := meta.(*Client).computeClient.Orchestrations()
 
 	// Obtain orchestration so we can grab the instance information
 	getInput := compute.GetOrchestrationInput{
@@ -196,7 +196,7 @@ func resourceOPCOrchestratedInstanceUpdate(d *schema.ResourceData, meta interfac
 }
 
 func resourceOPCOrchestratedInstanceDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.Orchestrations()
+	client := meta.(*Client).computeClient.Orchestrations()
 
 	name := d.Id()
 

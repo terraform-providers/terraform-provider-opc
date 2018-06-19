@@ -105,7 +105,7 @@ func dataSourceNetworkInterface() *schema.Resource {
 }
 
 func dataSourceNetworkInterfaceRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*OPCClient).computeClient.Instances()
+	computeClient := meta.(*Client).computeClient.Instances()
 
 	// Get required attributes
 	instance_name := d.Get("instance_name").(string)

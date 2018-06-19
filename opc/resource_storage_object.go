@@ -11,6 +11,8 @@ import (
 	"github.com/mitchellh/go-homedir"
 )
 
+const storageClientInitError = "Storage client is not initialized. Make sure to use `storage_endpoint` variable or the `OPC_STORAGE_ENDPOINT` environment variable"
+
 func resourceOPCStorageObject() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceOPCStorageObjectCreate,
@@ -153,9 +155,9 @@ func resourceOPCStorageObject() *schema.Resource {
 }
 
 func resourceOPCStorageObjectCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).storageClient.Objects()
+	client := meta.(*Client).storageClient.Objects()
 	if client == nil {
-		return fmt.Errorf(StorageClientInitError)
+		return fmt.Errorf(storageClientInitError)
 	}
 
 	// Populate required attr
@@ -230,9 +232,9 @@ func resourceOPCStorageObjectCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceOPCStorageObjectRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).storageClient.Objects()
+	client := meta.(*Client).storageClient.Objects()
 	if client == nil {
-		return fmt.Errorf(StorageClientInitError)
+		return fmt.Errorf(storageClientInitError)
 	}
 
 	input := &storage.GetObjectInput{
@@ -268,9 +270,9 @@ func resourceOPCStorageObjectRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceOPCStorageObjectDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).storageClient.Objects()
+	client := meta.(*Client).storageClient.Objects()
 	if client == nil {
-		return fmt.Errorf(StorageClientInitError)
+		return fmt.Errorf(storageClientInitError)
 	}
 
 	input := &storage.DeleteObjectInput{

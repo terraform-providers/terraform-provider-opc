@@ -1,13 +1,15 @@
 package compute
 
+// VirtNICsClient defines a vritual nics client
 type VirtNICsClient struct {
 	ResourceClient
 }
 
-func (c *ComputeClient) VirtNICs() *VirtNICsClient {
+// VirtNICs returns a virtual nics client
+func (c *Client) VirtNICs() *VirtNICsClient {
 	return &VirtNICsClient{
 		ResourceClient: ResourceClient{
-			ComputeClient:       c,
+			Client:              c,
 			ResourceDescription: "Virtual NIC",
 			ContainerPath:       "/network/v1/vnic/",
 			ResourceRootPath:    "/network/v1/vnic",
@@ -15,6 +17,7 @@ func (c *ComputeClient) VirtNICs() *VirtNICsClient {
 	}
 }
 
+// VirtualNIC defines the attributes in a virtual nic
 type VirtualNIC struct {
 	// Description of the object.
 	Description string `json:"description"`
@@ -27,16 +30,17 @@ type VirtualNIC struct {
 	// True if the VNIC is of type "transit".
 	TransitFlag bool `json:"transitFlag"`
 	// Uniform Resource Identifier
-	Uri string `json:"uri"`
+	URI string `json:"uri"`
 }
 
-// Can only GET a virtual NIC, not update, create, or delete
+// GetVirtualNICInput Can only GET a virtual NIC, not update, create, or delete
 type GetVirtualNICInput struct {
 	// The three-part name (/Compute-identity_domain/user/object) of the Virtual NIC.
 	// Required
 	Name string `json:"name"`
 }
 
+// GetVirtualNIC returns the specified virtual nic
 func (c *VirtNICsClient) GetVirtualNIC(input *GetVirtualNICInput) (*VirtualNIC, error) {
 	var virtNIC VirtualNIC
 	input.Name = c.getQualifiedName(input.Name)

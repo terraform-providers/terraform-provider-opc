@@ -45,7 +45,7 @@ func TestAccOPCSecurityApplication_TCP(t *testing.T) {
 }
 
 func testAccOPCCheckSecurityApplicationExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.SecurityApplications()
+	client := testAccProvider.Meta().(*Client).computeClient.SecurityApplications()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_security_application" {
@@ -64,7 +64,7 @@ func testAccOPCCheckSecurityApplicationExists(s *terraform.State) error {
 }
 
 func testAccOPCCheckSecurityApplicationDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.SecurityApplications()
+	client := testAccProvider.Meta().(*Client).computeClient.SecurityApplications()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_security_application" {

@@ -58,5 +58,5 @@ data "opc_compute_network_interface" "eth0" {
 
 data "opc_compute_vnic" "foo" {
   name = "${data.opc_compute_network_interface.eth0.vnic}"
-}`, rInt, rInt, TEST_IMAGE_LIST, rInt)
+}`, rInt, rInt, TestImageList, rInt)
 }

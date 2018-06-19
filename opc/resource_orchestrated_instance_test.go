@@ -344,7 +344,7 @@ func TestAccOPCOrchestratedInstance_105(t *testing.T) {
 }
 
 func testAccCheckOrchestrationExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.Orchestrations()
+	client := testAccProvider.Meta().(*Client).computeClient.Orchestrations()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_orchestration" {
@@ -363,7 +363,7 @@ func testAccCheckOrchestrationExists(s *terraform.State) error {
 }
 
 func testAccCheckOrchestrationDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.Orchestrations()
+	client := testAccProvider.Meta().(*Client).computeClient.Orchestrations()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_orchestrated_instance" {

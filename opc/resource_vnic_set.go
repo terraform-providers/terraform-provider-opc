@@ -49,7 +49,7 @@ func resourceOPCVNICSet() *schema.Resource {
 }
 
 func resourceOPCVNICSetCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.VirtNICSets()
+	client := meta.(*Client).computeClient.VirtNICSets()
 
 	name := d.Get("name").(string)
 	desc, descOk := d.GetOk("description")
@@ -88,7 +88,7 @@ func resourceOPCVNICSetCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCVNICSetRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*OPCClient).computeClient.VirtNICSets()
+	computeClient := meta.(*Client).computeClient.VirtNICSets()
 
 	name := d.Id()
 	input := &compute.GetVirtualNICSetInput{
@@ -124,7 +124,7 @@ func resourceOPCVNICSetRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCVNICSetUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.VirtNICSets()
+	client := meta.(*Client).computeClient.VirtNICSets()
 
 	name := d.Id()
 	desc, descOk := d.GetOk("description")
@@ -162,7 +162,7 @@ func resourceOPCVNICSetUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCVNICSetDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.VirtNICSets()
+	client := meta.(*Client).computeClient.VirtNICSets()
 
 	name := d.Id()
 	input := &compute.DeleteVirtualNICSetInput{

@@ -29,7 +29,7 @@ func TestAccOPCMachineImage_Basic(t *testing.T) {
 }
 
 func testAccCheckMachineImageExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.MachineImages()
+	client := testAccProvider.Meta().(*Client).computeClient.MachineImages()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_machine_image" {
@@ -48,7 +48,7 @@ func testAccCheckMachineImageExists(s *terraform.State) error {
 }
 
 func testAccCheckMachineImageDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.MachineImages()
+	client := testAccProvider.Meta().(*Client).computeClient.MachineImages()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_machine_image" {

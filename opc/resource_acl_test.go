@@ -54,7 +54,7 @@ func TestAccOPCACL_Update(t *testing.T) {
 }
 
 func testAccCheckACLExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.ACLs()
+	client := testAccProvider.Meta().(*Client).computeClient.ACLs()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_acl" {
@@ -73,7 +73,7 @@ func testAccCheckACLExists(s *terraform.State) error {
 }
 
 func testAccCheckACLDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.ACLs()
+	client := testAccProvider.Meta().(*Client).computeClient.ACLs()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_acl" {

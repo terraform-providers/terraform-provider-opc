@@ -35,7 +35,7 @@ func resourceOPCImageList() *schema.Resource {
 }
 
 func resourceOPCImageListCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.ImageList()
+	client := meta.(*Client).computeClient.ImageList()
 
 	name := d.Get("name").(string)
 
@@ -56,7 +56,7 @@ func resourceOPCImageListCreate(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceOPCImageListUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.ImageList()
+	client := meta.(*Client).computeClient.ImageList()
 
 	name := d.Id()
 
@@ -75,7 +75,7 @@ func resourceOPCImageListUpdate(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceOPCImageListRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.ImageList()
+	client := meta.(*Client).computeClient.ImageList()
 
 	input := &compute.GetImageListInput{
 		Name: d.Id(),
@@ -99,7 +99,7 @@ func resourceOPCImageListRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCImageListDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.ImageList()
+	client := meta.(*Client).computeClient.ImageList()
 
 	deleteInput := &compute.DeleteImageListInput{
 		Name: d.Id(),

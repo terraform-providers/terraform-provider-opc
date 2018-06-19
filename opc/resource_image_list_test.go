@@ -45,7 +45,7 @@ func TestAccOPCImageList_Complete(t *testing.T) {
 }
 
 func testAccCheckImageListExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.ImageList()
+	client := testAccProvider.Meta().(*Client).computeClient.ImageList()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_image_list" {
@@ -64,7 +64,7 @@ func testAccCheckImageListExists(s *terraform.State) error {
 }
 
 func testAccCheckImageListDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.ImageList()
+	client := testAccProvider.Meta().(*Client).computeClient.ImageList()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_image_list" {

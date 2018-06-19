@@ -47,7 +47,7 @@ func resourceOPCIPAddressPrefixSet() *schema.Resource {
 }
 
 func resourceOPCIPAddressPrefixSetCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.IPAddressPrefixSets()
+	client := meta.(*Client).computeClient.IPAddressPrefixSets()
 
 	input := compute.CreateIPAddressPrefixSetInput{
 		Name: d.Get("name").(string),
@@ -77,7 +77,7 @@ func resourceOPCIPAddressPrefixSetCreate(d *schema.ResourceData, meta interface{
 }
 
 func resourceOPCIPAddressPrefixSetRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*OPCClient).computeClient.IPAddressPrefixSets()
+	computeClient := meta.(*Client).computeClient.IPAddressPrefixSets()
 
 	input := compute.GetIPAddressPrefixSetInput{
 		Name: d.Id(),
@@ -100,7 +100,7 @@ func resourceOPCIPAddressPrefixSetRead(d *schema.ResourceData, meta interface{})
 
 	d.Set("name", result.Name)
 	d.Set("description", result.Description)
-	d.Set("uri", result.Uri)
+	d.Set("uri", result.URI)
 	if err := setStringList(d, "prefixes", result.IPAddressPrefixes); err != nil {
 		return err
 	}
@@ -111,7 +111,7 @@ func resourceOPCIPAddressPrefixSetRead(d *schema.ResourceData, meta interface{})
 }
 
 func resourceOPCIPAddressPrefixSetUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.IPAddressPrefixSets()
+	client := meta.(*Client).computeClient.IPAddressPrefixSets()
 
 	input := compute.UpdateIPAddressPrefixSetInput{
 		Name: d.Get("name").(string),
@@ -141,7 +141,7 @@ func resourceOPCIPAddressPrefixSetUpdate(d *schema.ResourceData, meta interface{
 }
 
 func resourceOPCIPAddressPrefixSetDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*OPCClient).computeClient.IPAddressPrefixSets()
+	client := meta.(*Client).computeClient.IPAddressPrefixSets()
 	name := d.Id()
 
 	input := compute.DeleteIPAddressPrefixSetInput{

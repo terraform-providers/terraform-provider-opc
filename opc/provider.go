@@ -5,8 +5,7 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
-const StorageClientInitError = "Storage client is not initialized. Make sure to use `storage_endpoint` variable or the `OPC_STORAGE_ENDPOINT` environment variable"
-
+// Provider returns the provider schema
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
@@ -123,7 +122,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		MaxRetries:       d.Get("max_retries").(int),
 		Insecure:         d.Get("insecure").(bool),
 		StorageEndpoint:  d.Get("storage_endpoint").(string),
-		StorageServiceId: d.Get("storage_service_id").(string),
+		StorageServiceID: d.Get("storage_service_id").(string),
 	}
 
 	return config.Client()

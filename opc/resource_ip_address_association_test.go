@@ -60,7 +60,7 @@ func TestAccOPCIPAddressAssociation_Full(t *testing.T) {
 }
 
 func testAccCheckIPAddressAssociationExists(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.IPAddressAssociations()
+	client := testAccProvider.Meta().(*Client).computeClient.IPAddressAssociations()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_ip_address_association" {
@@ -79,7 +79,7 @@ func testAccCheckIPAddressAssociationExists(s *terraform.State) error {
 }
 
 func testAccCheckIPAddressAssociationDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*OPCClient).computeClient.IPAddressAssociations()
+	client := testAccProvider.Meta().(*Client).computeClient.IPAddressAssociations()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "opc_compute_ip_address_association" {
@@ -151,5 +151,5 @@ resource "opc_compute_ip_address_association" "test" {
   vnic = "${data.opc_compute_network_interface.eth0.vnic}"
   description = "acctesting ip address association test %d"
   tags = ["tag1", "tag2"]
-}`, rInt, rInt, TEST_IMAGE_LIST, rInt, rInt, rInt, rInt, rInt)
+}`, rInt, rInt, TestImageList, rInt, rInt, rInt, rInt, rInt)
 }
