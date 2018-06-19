@@ -123,7 +123,7 @@ func resourceOPCIPNetworkRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("ip_network_exchanged", result.IPNetworkExchange)
 	d.Set("description", result.Description)
 	d.Set("public_napt_enabled", result.PublicNaptEnabled)
-	d.Set("uri", result.Uri)
+	d.Set("uri", result.URI)
 	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err
 	}

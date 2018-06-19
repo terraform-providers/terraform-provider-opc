@@ -70,7 +70,7 @@ func dataSourceVNICRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("description", vnic.Description)
 	d.Set("mac_address", vnic.MACAddress)
 	d.Set("transit_flag", vnic.TransitFlag)
-	d.Set("uri", vnic.Uri)
+	d.Set("uri", vnic.URI)
 	if err := setStringList(d, "tags", vnic.Tags); err != nil {
 		return err
 	}

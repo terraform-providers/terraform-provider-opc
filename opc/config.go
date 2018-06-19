@@ -27,8 +27,8 @@ type Config struct {
 }
 
 type OPCClient struct {
-	computeClient *compute.ComputeClient
-	storageClient *storage.StorageClient
+	computeClient *compute.Client
+	storageClient *storage.Client
 }
 
 func (c *Config) Client() (*OPCClient, error) {
@@ -65,7 +65,7 @@ func (c *Config) Client() (*OPCClient, error) {
 	if c.Endpoint != "" {
 		computeEndpoint, err := url.ParseRequestURI(c.Endpoint)
 		if err != nil {
-			return nil, fmt.Errorf("Invalid endpoint URI: %s", err)
+			return nil, fmt.Errorf("Invalid Compute Endpoint URI: %s", err)
 		}
 		config.APIEndpoint = computeEndpoint
 		computeClient, err := compute.NewComputeClient(&config)
@@ -78,7 +78,7 @@ func (c *Config) Client() (*OPCClient, error) {
 	if c.StorageEndpoint != "" {
 		storageEndpoint, err := url.ParseRequestURI(c.StorageEndpoint)
 		if err != nil {
-			return nil, fmt.Errorf("Invalid storage endpoint URI: %+v", err)
+			return nil, fmt.Errorf("Invalid Storage Endpoint URI: %+v", err)
 		}
 		config.APIEndpoint = storageEndpoint
 		if (c.StorageServiceId) != "" {

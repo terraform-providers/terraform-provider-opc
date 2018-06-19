@@ -98,14 +98,14 @@ func resourceOPCSecurityRuleCreate(d *schema.ResourceData, meta interface{}) err
 		input.SecProtocols = securityProtocols
 	}
 
-	srcIPAdressPrefixes := getStringList(d, "src_ip_address_prefixes")
-	if len(srcIPAdressPrefixes) != 0 {
-		input.SrcIpAddressPrefixSets = srcIPAdressPrefixes
+	srcIPAddressPrefixes := getStringList(d, "src_ip_address_prefixes")
+	if len(srcIPAddressPrefixes) != 0 {
+		input.SrcIPAddressPrefixSets = srcIPAddressPrefixes
 	}
 
-	dstIPAdressPrefixes := getStringList(d, "dst_ip_address_prefixes")
-	if len(dstIPAdressPrefixes) != 0 {
-		input.DstIpAddressPrefixSets = dstIPAdressPrefixes
+	dstIPAddressPrefixes := getStringList(d, "dst_ip_address_prefixes")
+	if len(dstIPAddressPrefixes) != 0 {
+		input.DstIPAddressPrefixSets = dstIPAddressPrefixes
 	}
 
 	tags := getStringList(d, "tags")
@@ -155,15 +155,15 @@ func resourceOPCSecurityRuleRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("src_vnic_set", result.SrcVnicSet)
 	d.Set("dst_vnic_set", result.DstVnicSet)
 	d.Set("description", result.Description)
-	d.Set("uri", result.Uri)
+	d.Set("uri", result.URI)
 
 	if err := setStringList(d, "security_protocols", result.SecProtocols); err != nil {
 		return err
 	}
-	if err := setStringList(d, "dst_ip_address_prefixes", result.DstIpAddressPrefixSets); err != nil {
+	if err := setStringList(d, "dst_ip_address_prefixes", result.DstIPAddressPrefixSets); err != nil {
 		return err
 	}
-	if err := setStringList(d, "src_ip_address_prefixes", result.SrcIpAddressPrefixSets); err != nil {
+	if err := setStringList(d, "src_ip_address_prefixes", result.SrcIPAddressPrefixSets); err != nil {
 		return err
 	}
 	if err := setStringList(d, "tags", result.Tags); err != nil {
@@ -197,14 +197,14 @@ func resourceOPCSecurityRuleUpdate(d *schema.ResourceData, meta interface{}) err
 		input.SecProtocols = securityProtocols
 	}
 
-	srcIPAdressPrefixes := getStringList(d, "src_ip_address_prefixes")
-	if len(srcIPAdressPrefixes) != 0 {
-		input.SrcIpAddressPrefixSets = srcIPAdressPrefixes
+	srcIPAddressPrefixes := getStringList(d, "src_ip_address_prefixes")
+	if len(srcIPAddressPrefixes) != 0 {
+		input.SrcIPAddressPrefixSets = srcIPAddressPrefixes
 	}
 
-	dstIPAdressPrefixes := getStringList(d, "dst_ip_address_prefixes")
-	if len(dstIPAdressPrefixes) != 0 {
-		input.DstIpAddressPrefixSets = dstIPAdressPrefixes
+	dstIPAddressPrefixes := getStringList(d, "dst_ip_address_prefixes")
+	if len(dstIPAddressPrefixes) != 0 {
+		input.DstIPAddressPrefixSets = dstIPAddressPrefixes
 	}
 
 	tags := getStringList(d, "tags")

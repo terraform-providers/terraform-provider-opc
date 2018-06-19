@@ -127,7 +127,7 @@ func resourceOPCImageListEntryRead(d *schema.ResourceData, meta interface{}) err
 	d.Set("machine_images", result.MachineImages)
 	d.Set("version", result.Version)
 	d.Set("attributes", attrs)
-	d.Set("uri", result.Uri)
+	d.Set("uri", result.URI)
 
 	return nil
 }

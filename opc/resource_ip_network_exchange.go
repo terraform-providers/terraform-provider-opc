@@ -88,7 +88,7 @@ func resourceOPCIPNetworkExchangeRead(d *schema.ResourceData, meta interface{}) 
 
 	d.Set("name", result.Name)
 	d.Set("description", result.Description)
-	d.Set("uri", result.Uri)
+	d.Set("uri", result.URI)
 
 	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err

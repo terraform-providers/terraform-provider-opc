@@ -6,20 +6,20 @@ type ACLsClient struct {
 }
 
 const (
-	ACLDescription   = "acl"
-	ACLContainerPath = "/network/v1/acl/"
-	ACLResourcePath  = "/network/v1/acl"
+	aclDescription   = "acl"
+	aclContainerPath = "/network/v1/acl/"
+	aclResourcePath  = "/network/v1/acl"
 )
 
 // ACLs obtains a ACLsClient which can be used to access to the
 // ACLs functions of the Compute API
-func (c *ComputeClient) ACLs() *ACLsClient {
+func (c *Client) ACLs() *ACLsClient {
 	return &ACLsClient{
 		ResourceClient: ResourceClient{
-			ComputeClient:       c,
-			ResourceDescription: ACLDescription,
-			ContainerPath:       ACLContainerPath,
-			ResourceRootPath:    ACLResourcePath,
+			Client:              c,
+			ResourceDescription: aclDescription,
+			ContainerPath:       aclContainerPath,
+			ResourceRootPath:    aclResourcePath,
 		}}
 }
 

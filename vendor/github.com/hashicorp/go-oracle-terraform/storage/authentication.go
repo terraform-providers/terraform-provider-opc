@@ -6,9 +6,8 @@ import (
 )
 
 // Get a new auth token for the storage client
-func (c *StorageClient) getAuthenticationToken() error {
-	var authHeaders map[string]string
-	authHeaders = make(map[string]string)
+func (c *Client) getAuthenticationToken() error {
+	authHeaders := make(map[string]string)
 	authHeaders["X-Storage-User"] = c.getUserName()
 	authHeaders["X-Storage-Pass"] = *c.client.Password
 

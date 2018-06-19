@@ -58,7 +58,7 @@ func testAccPreCheck(t *testing.T) {
 }
 
 type OPCResourceState struct {
-	*compute.ComputeClient
+	*compute.Client
 	*terraform.InstanceState
 }
 
@@ -70,7 +70,7 @@ func opcResourceCheck(resourceName string, f func(checker *OPCResourceState) err
 		}
 
 		state := &OPCResourceState{
-			ComputeClient: testAccProvider.Meta().(*OPCClient).computeClient,
+			Client:        testAccProvider.Meta().(*OPCClient).computeClient,
 			InstanceState: rs.Primary,
 		}
 

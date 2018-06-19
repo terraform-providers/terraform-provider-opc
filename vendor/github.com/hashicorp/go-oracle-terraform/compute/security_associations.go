@@ -7,10 +7,10 @@ type SecurityAssociationsClient struct {
 
 // SecurityAssociations obtains a SecurityAssociationsClient which can be used to access to the
 // Security Association functions of the Compute API
-func (c *ComputeClient) SecurityAssociations() *SecurityAssociationsClient {
+func (c *Client) SecurityAssociations() *SecurityAssociationsClient {
 	return &SecurityAssociationsClient{
 		ResourceClient: ResourceClient{
-			ComputeClient:       c,
+			Client:              c,
 			ResourceDescription: "security association",
 			ContainerPath:       "/secassociation/",
 			ResourceRootPath:    "/secassociation",

@@ -100,7 +100,7 @@ func resourceOPCIPAddressPrefixSetRead(d *schema.ResourceData, meta interface{})
 
 	d.Set("name", result.Name)
 	d.Set("description", result.Description)
-	d.Set("uri", result.Uri)
+	d.Set("uri", result.URI)
 	if err := setStringList(d, "prefixes", result.IPAddressPrefixes); err != nil {
 		return err
 	}

@@ -1,9 +1,7 @@
 package storage
 
 import (
-	"log"
 	"net/http"
-	"net/http/httptest"
 	"net/url"
 	"os"
 	"time"
@@ -11,26 +9,8 @@ import (
 	"github.com/hashicorp/go-oracle-terraform/opc"
 )
 
-const (
-	_ClientTestUser   = "test-user"
-	_ClientTestDomain = "test-domain"
-)
-
-func newAuthenticatingServer(handler func(w http.ResponseWriter, r *http.Request)) *httptest.Server {
-	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if os.Getenv("ORACLE_LOG") != "" {
-			log.Printf("[DEBUG] Received request: %s, %s\n", r.Method, r.URL)
-		}
-
-		if r.URL.Path == "/authenticate/" {
-			http.SetCookie(w, &http.Cookie{Name: "testAuthCookie", Value: "cookie value"})
-		} else {
-			handler(w, r)
-		}
-	}))
-}
-
-func getStorageTestClient(c *opc.Config) (*StorageClient, error) {
+// nolint: deadcode
+func getStorageTestClient(c *opc.Config) (*Client, error) {
 	// Build up config with default values if omitted
 
 	if c.IdentityDomain == nil {

@@ -11,21 +11,22 @@ import (
 	"github.com/hashicorp/go-oracle-terraform/opc"
 )
 
-const STR_ACCOUNT = "/Storage-%s"
-const STR_USERNAME = "/Storage-%s:%s"
-const AUTH_HEADER = "X-Auth-Token"
-const STR_QUALIFIED_NAME = "%s%s/%s"
-const API_VERSION = "v1"
+const strAccount = "/Storage-%s"
+const strUsername = "/Storage-%s:%s"
+const authHeader = "X-Auth-Token"
+const strQualifiedName = "%s%s/%s"
+const apiVersion = "v1"
 
-// Client represents an authenticated compute client, with compute credentials and an api client.
-type StorageClient struct {
+// Client represents an authenticated storage client, with storage credentials and an api client.
+type Client struct {
 	client      *client.Client
 	authToken   *string
 	tokenIssued time.Time
 }
 
-func NewStorageClient(c *opc.Config) (*StorageClient, error) {
-	sClient := &StorageClient{}
+// NewStorageClient returns an authenticate storage client
+func NewStorageClient(c *opc.Config) (*Client, error) {
+	sClient := &Client{}
 	opcClient, err := client.NewClient(c)
 	if err != nil {
 		return nil, err
@@ -40,13 +41,13 @@ func NewStorageClient(c *opc.Config) (*StorageClient, error) {
 }
 
 // Execute a request with a nil body
-func (c *StorageClient) executeRequest(method, path string, headers interface{}) (*http.Response, error) {
+func (c *Client) executeRequest(method, path string, headers interface{}) (*http.Response, error) {
 	return c.executeRequestBody(method, path, headers, nil)
 }
 
 // Execute a request with a body supplied. The body can be nil for the request.
 // Does not marshal the body into json to create the request
-func (c *StorageClient) executeRequestBody(method, path string, headers interface{}, body io.ReadSeeker) (*http.Response, error) {
+func (c *Client) executeRequestBody(method, path string, headers interface{}, body io.ReadSeeker) (*http.Response, error) {
 	req, err := c.client.BuildNonJSONRequest(method, path, body)
 	if err != nil {
 		return nil, err
@@ -72,11 +73,11 @@ func (c *StorageClient) executeRequestBody(method, path string, headers interfac
 	// If we have an authentication token, let's authenticate, refreshing cookie if need be
 	if c.authToken != nil {
 		if time.Since(c.tokenIssued).Minutes() > 25 {
-			if err := c.getAuthenticationToken(); err != nil {
+			if err = c.getAuthenticationToken(); err != nil {
 				return nil, err
 			}
 		}
-		req.Header.Add(AUTH_HEADER, *c.authToken)
+		req.Header.Add(authHeader, *c.authToken)
 	}
 
 	resp, err := c.client.ExecuteRequest(req)
@@ -86,27 +87,27 @@ func (c *StorageClient) executeRequestBody(method, path string, headers interfac
 	return resp, nil
 }
 
-func (c *StorageClient) getUserName() string {
-	return fmt.Sprintf(STR_USERNAME, *c.client.IdentityDomain, *c.client.UserName)
+func (c *Client) getUserName() string {
+	return fmt.Sprintf(strUsername, *c.client.IdentityDomain, *c.client.UserName)
 }
 
-func (c *StorageClient) getAccount() string {
-	return fmt.Sprintf(STR_ACCOUNT, *c.client.IdentityDomain)
+func (c *Client) getAccount() string {
+	return fmt.Sprintf(strAccount, *c.client.IdentityDomain)
 }
 
 // GetQualifiedName returns the fully-qualified name of a storage object, e.g. /v1/{account}/{name}
-func (c *StorageClient) getQualifiedName(name string) string {
+func (c *Client) getQualifiedName(name string) string {
 	if name == "" {
 		return ""
 	}
-	if strings.HasPrefix(name, "/Storage-") || strings.HasPrefix(name, API_VERSION+"/") {
+	if strings.HasPrefix(name, "/Storage-") || strings.HasPrefix(name, apiVersion+"/") {
 		return name
 	}
-	return fmt.Sprintf(STR_QUALIFIED_NAME, API_VERSION, c.getAccount(), name)
+	return fmt.Sprintf(strQualifiedName, apiVersion, c.getAccount(), name)
 }
 
 // GetUnqualifiedName returns the unqualified name of a Storage object, e.g. the {name} part of /v1/{account}/{name}
-func (c *StorageClient) getUnqualifiedName(name string) string {
+func (c *Client) getUnqualifiedName(name string) string {
 	if name == "" {
 		return name
 	}
@@ -116,10 +117,4 @@ func (c *StorageClient) getUnqualifiedName(name string) string {
 
 	nameParts := strings.Split(name, "/")
 	return strings.Join(nameParts[len(nameParts)-1:], "/")
-}
-
-func (c *StorageClient) unqualify(names ...*string) {
-	for _, name := range names {
-		*name = c.getUnqualifiedName(*name)
-	}
 }

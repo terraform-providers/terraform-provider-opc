@@ -65,7 +65,7 @@ func resourceOPCStorageAttachmentCreate(d *schema.ResourceData, meta interface{}
 
 	instanceName := d.Get("instance").(string)
 	instanceClient := meta.(*OPCClient).computeClient.Instances()
-	getInstanceInput := &compute.GetInstanceIdInput{
+	getInstanceInput := &compute.GetInstanceIDInput{
 		Name: instanceName,
 	}
 	instance, err := instanceClient.GetInstanceFromName(getInstanceInput)

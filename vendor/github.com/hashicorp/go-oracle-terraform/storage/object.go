@@ -14,13 +14,15 @@ import (
 	"strings"
 )
 
+// ObjectClient details the parameters needed for a storage object client
 type ObjectClient struct {
-	StorageClient
+	Client
 }
 
-func (c *StorageClient) Objects() *ObjectClient {
+// Objects returns an object client
+func (c *Client) Objects() *ObjectClient {
 	return &ObjectClient{
-		StorageClient: StorageClient{
+		Client: Client{
 			client:      c.client,
 			authToken:   c.authToken,
 			tokenIssued: c.tokenIssued,
@@ -30,24 +32,23 @@ func (c *StorageClient) Objects() *ObjectClient {
 
 // Header Constants
 const (
-	h_AcceptRanges       = "Accept-Ranges"
-	h_ContentDisposition = "Content-Disposition"
-	h_ContentEncoding    = "Content-Encoding"
-	h_ContentLength      = "Content-Length"
-	h_ContentType        = "Content-Type"
-	h_CopyFrom           = "X-Copy-From"
-	h_Date               = "Date"
-	h_DeleteAt           = "X-Delete-At"
-	h_ETag               = "ETag"
-	h_LastModified       = "Last-Modified"
-	h_Newest             = "X-Newest"
-	h_ObjectManifest     = "X-Object-Manifest"
-	h_Range              = "Range"
-	h_Timestamp          = "X-Timestamp"
-	h_TransactionID      = "X-Trans-Id"
-	h_TransferEncoding   = "Transfer-Encoding"
-
-	h_MetadataPrefix = "X-Object-Meta-"
+	hAcceptRanges       = "Accept-Ranges"
+	hContentDisposition = "Content-Disposition"
+	hContentEncoding    = "Content-Encoding"
+	hContentLength      = "Content-Length"
+	hContentType        = "Content-Type"
+	hCopyFrom           = "X-Copy-From"
+	hDate               = "Date"
+	hDeleteAt           = "X-Delete-At"
+	hETag               = "ETag"
+	hLastModified       = "Last-Modified"
+	hNewest             = "X-Newest"
+	hObjectManifest     = "X-Object-Manifest"
+	hRange              = "Range"
+	hTimestamp          = "X-Timestamp"
+	hTransactionID      = "X-Trans-Id"
+	hTransferEncoding   = "Transfer-Encoding"
+	hMetadataPrefix     = "X-Object-Meta-"
 )
 
 // ObjectInfo describes an existing object
@@ -142,32 +143,32 @@ func (c *ObjectClient) CreateObject(input *CreateObjectInput) (*ObjectInfo, erro
 	name := c.getQualifiedName(fmt.Sprintf("%s/%s", input.Container, input.Name))
 
 	if input.ContentDisposition != "" {
-		headers[h_ContentDisposition] = input.ContentDisposition
+		headers[hContentDisposition] = input.ContentDisposition
 	}
 	if input.ContentEncoding != "" {
-		headers[h_ContentEncoding] = input.ContentEncoding
+		headers[hContentEncoding] = input.ContentEncoding
 	}
 	if input.ContentType != "" {
-		headers[h_ContentType] = input.ContentType
+		headers[hContentType] = input.ContentType
 	}
 	if input.ETag != "" {
-		headers[h_ETag] = input.ETag
+		headers[hETag] = input.ETag
 	}
 	if input.TransferEncoding != "" {
-		headers[h_TransferEncoding] = input.TransferEncoding
+		headers[hTransferEncoding] = input.TransferEncoding
 	}
 	if input.CopyFrom != "" {
-		headers[h_CopyFrom] = input.CopyFrom
+		headers[hCopyFrom] = input.CopyFrom
 	}
 	if input.DeleteAt != 0 {
-		headers[h_DeleteAt] = fmt.Sprintf("%d", input.DeleteAt)
+		headers[hDeleteAt] = fmt.Sprintf("%d", input.DeleteAt)
 	}
 	if len(input.ObjectMetadata) > 0 {
 		// add a header entry for each metadata item
 		// X-Object-Meta-{name}: value
 		for name, value := range input.ObjectMetadata {
-			header := fmt.Sprintf("%s%s", h_MetadataPrefix, name)
-			headers[header] = fmt.Sprintf("%s", value)
+			header := fmt.Sprintf("%s%s", hMetadataPrefix, name)
+			headers[header] = value
 		}
 	}
 
@@ -227,8 +228,8 @@ func (c *ObjectClient) GetObject(input *GetObjectInput) (*ObjectInfo, error) {
 	}
 
 	// Build request headers
-	headers[h_Range] = input.Range
-	headers[h_Newest] = fmt.Sprintf("%t", input.Newest)
+	headers[hRange] = input.Range
+	headers[hNewest] = fmt.Sprintf("%t", input.Newest)
 
 	resp, err := c.getResourceHeaders(name, &object, headers)
 	if err != nil {
@@ -281,25 +282,25 @@ func (c *ObjectClient) DeleteObject(input *DeleteObjectInput) error {
 func (c *ObjectClient) success(resp *http.Response, object *ObjectInfo) (*ObjectInfo, error) {
 	var err error
 	// Translate response headers into object info struct
-	object.AcceptRanges = resp.Header.Get(h_AcceptRanges)
-	object.ContentDisposition = resp.Header.Get(h_ContentDisposition)
-	object.ContentEncoding = resp.Header.Get(h_ContentEncoding)
-	object.ContentType = resp.Header.Get(h_ContentType)
-	object.Date = resp.Header.Get(h_Date)
-	object.Etag = resp.Header.Get(h_ETag)
-	object.LastModified = resp.Header.Get(h_LastModified)
-	object.ObjectManifest = resp.Header.Get(h_ObjectManifest)
-	object.Timestamp = resp.Header.Get(h_Timestamp)
-	object.TransactionID = resp.Header.Get(h_TransactionID)
+	object.AcceptRanges = resp.Header.Get(hAcceptRanges)
+	object.ContentDisposition = resp.Header.Get(hContentDisposition)
+	object.ContentEncoding = resp.Header.Get(hContentEncoding)
+	object.ContentType = resp.Header.Get(hContentType)
+	object.Date = resp.Header.Get(hDate)
+	object.Etag = resp.Header.Get(hETag)
+	object.LastModified = resp.Header.Get(hLastModified)
+	object.ObjectManifest = resp.Header.Get(hObjectManifest)
+	object.Timestamp = resp.Header.Get(hTimestamp)
+	object.TransactionID = resp.Header.Get(hTransactionID)
 
-	if v := resp.Header.Get(h_ContentLength); v != "" {
+	if v := resp.Header.Get(hContentLength); v != "" {
 		object.ContentLength, err = strconv.Atoi(v)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	if v := resp.Header.Get(h_DeleteAt); v != "" {
+	if v := resp.Header.Get(hDeleteAt); v != "" {
 		object.DeleteAt, err = strconv.Atoi(v)
 		if err != nil {
 			return nil, err
@@ -308,8 +309,8 @@ func (c *ObjectClient) success(resp *http.Response, object *ObjectInfo) (*Object
 
 	object.ObjectMetadata = make(map[string]string)
 	for header, value := range resp.Header {
-		if strings.HasPrefix(header, h_MetadataPrefix) {
-			name := strings.TrimPrefix(header, h_MetadataPrefix)
+		if strings.HasPrefix(header, hMetadataPrefix) {
+			name := strings.TrimPrefix(header, hMetadataPrefix)
 			object.ObjectMetadata[name] = strings.Join(value, " ")
 		}
 	}
