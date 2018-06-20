@@ -39,7 +39,7 @@ func dataSourceIPReservation() *schema.Resource {
 }
 
 func dataSourceIPReservationRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*OPCClient).computeClient.IPReservations()
+	computeClient := meta.(*Client).computeClient.IPReservations()
 	name := d.Get("name").(string)
 
 	input := compute.GetIPReservationInput{

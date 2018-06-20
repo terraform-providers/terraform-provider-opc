@@ -40,7 +40,7 @@ func dataSourceIPAddressReservation() *schema.Resource {
 }
 
 func dataSourceIPAddressReservationRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*OPCClient).computeClient.IPAddressReservations()
+	computeClient := meta.(*Client).computeClient.IPAddressReservations()
 	name := d.Get("name").(string)
 
 	input := compute.GetIPAddressReservationInput{
@@ -65,7 +65,7 @@ func dataSourceIPAddressReservationRead(d *schema.ResourceData, meta interface{}
 	d.Set("description", result.Description)
 	d.Set("ip_address_pool", result.IPAddressPool)
 	d.Set("ip_address", result.IPAddress)
-	d.Set("uri", result.Uri)
+	d.Set("uri", result.URI)
 
 	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err
