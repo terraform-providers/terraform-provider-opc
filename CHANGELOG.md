@@ -3,6 +3,7 @@
 FEATURES:
 
 * **New Datasource:** `d/opc_compute_ssh_key` [GH-129]
+* **New Datasource:** `d/opc_compute_ip_reservation` [GH-130]
 
 ## 1.1.1 (May 24, 2018)
 
