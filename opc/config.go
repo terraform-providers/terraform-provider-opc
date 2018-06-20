@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/go-cleanhttp"
 	"github.com/hashicorp/go-oracle-terraform/compute"
+	"github.com/hashicorp/go-oracle-terraform/lbaas"
 	"github.com/hashicorp/go-oracle-terraform/opc"
 	"github.com/hashicorp/go-oracle-terraform/storage"
 	"github.com/hashicorp/terraform/helper/logging"
@@ -25,12 +26,14 @@ type Config struct {
 	Insecure         bool
 	StorageEndpoint  string
 	StorageServiceID string
+	LBaaSEndpoint    string
 }
 
 // Client holder for the OPC (OCI Classic) API Clients
 type Client struct {
 	computeClient *compute.Client
 	storageClient *storage.Client
+	lbaasClient   *lbaas.Client
 }
 
 // Client gets the OPC (OCI Classic) API Clients
@@ -63,7 +66,7 @@ func (c *Config) Client() (*Client, error) {
 
 	config.HTTPClient = httpClient
 
-	opcClient := &Client{}
+	client := &Client{}
 
 	if c.Endpoint != "" {
 		computeEndpoint, err := url.ParseRequestURI(c.Endpoint)
@@ -75,7 +78,9 @@ func (c *Config) Client() (*Client, error) {
 		if err != nil {
 			return nil, err
 		}
-		opcClient.computeClient = computeClient
+		client.computeClient = computeClient
+		log.Print("[DEBUG] Authenticated with Compute Client")
+
 	}
 
 	if c.StorageEndpoint != "" {
@@ -91,10 +96,26 @@ func (c *Config) Client() (*Client, error) {
 		if err != nil {
 			return nil, err
 		}
-		opcClient.storageClient = storageClient
+		client.storageClient = storageClient
+		log.Print("[DEBUG] Authenticated with Storage Client")
+
 	}
 
-	return opcClient, nil
+	if c.LBaaSEndpoint != "" {
+		lbaasEndpoint, err := url.ParseRequestURI(c.LBaaSEndpoint)
+		if err != nil {
+			return nil, fmt.Errorf("Invalid LBaaS Endpoint URI: %+v", err)
+		}
+		config.APIEndpoint = lbaasEndpoint
+		lbaasClient, err := lbaas.NewClient(&config)
+		if err != nil {
+			return nil, err
+		}
+		client.lbaasClient = lbaasClient
+		log.Print("[DEBUG] Authenticated with Load Balancer Client")
+	}
+
+	return client, nil
 }
 
 type opcLogger struct{}

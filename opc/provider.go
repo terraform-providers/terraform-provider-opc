@@ -64,6 +64,13 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("OPC_STORAGE_SERVICE_ID", nil),
 				Description: "The Storage Service ID. ",
 			},
+
+			"lbaas_endpoint": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("OPC_LBAAS_ENDPOINT", nil),
+				Description: "The HTTP endpoint for the Load Balancer Classic service.",
+			},
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
@@ -76,13 +83,13 @@ func Provider() terraform.ResourceProvider {
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
-			"opc_compute_ip_network":              resourceOPCIPNetwork(),
 			"opc_compute_acl":                     resourceOPCACL(),
 			"opc_compute_image_list":              resourceOPCImageList(),
 			"opc_compute_image_list_entry":        resourceOPCImageListEntry(),
 			"opc_compute_instance":                resourceInstance(),
 			"opc_compute_ip_address_reservation":  resourceOPCIPAddressReservation(),
 			"opc_compute_ip_association":          resourceOPCIPAssociation(),
+			"opc_compute_ip_network":              resourceOPCIPNetwork(),
 			"opc_compute_ip_network_exchange":     resourceOPCIPNetworkExchange(),
 			"opc_compute_ip_reservation":          resourceOPCIPReservation(),
 			"opc_compute_machine_image":           resourceOPCMachineImage(),
@@ -94,6 +101,7 @@ func Provider() terraform.ResourceProvider {
 			"opc_compute_security_rule":           resourceOPCSecurityRule(),
 			"opc_compute_sec_rule":                resourceOPCSecRule(),
 			"opc_compute_ssh_key":                 resourceOPCSSHKey(),
+			"opc_compute_storage_attachment":      resourceOPCStorageAttachment(),
 			"opc_compute_storage_volume":          resourceOPCStorageVolume(),
 			"opc_compute_storage_volume_snapshot": resourceOPCStorageVolumeSnapshot(),
 			"opc_compute_vnic_set":                resourceOPCVNICSet(),
@@ -102,9 +110,9 @@ func Provider() terraform.ResourceProvider {
 			"opc_compute_ip_address_association":  resourceOPCIPAddressAssociation(),
 			"opc_compute_snapshot":                resourceOPCSnapshot(),
 			"opc_compute_orchestrated_instance":   resourceOPCOrchestratedInstance(),
+			"opc_lbaas_load_balancer":             resourceOPCLoadBalancer(),
 			"opc_storage_container":               resourceOPCStorageContainer(),
 			"opc_storage_object":                  resourceOPCStorageObject(),
-			"opc_compute_storage_attachment":      resourceOPCStorageAttachment(),
 		},
 
 		ConfigureFunc: providerConfigure,
@@ -121,6 +129,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		Insecure:         d.Get("insecure").(bool),
 		StorageEndpoint:  d.Get("storage_endpoint").(string),
 		StorageServiceID: d.Get("storage_service_id").(string),
+		LBaaSEndpoint:    d.Get("lbaas_endpoint").(string),
 	}
 
 	return config.Client()
