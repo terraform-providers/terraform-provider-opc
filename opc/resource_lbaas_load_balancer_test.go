@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hashicorp/go-oracle-terraform/lbaas"
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -37,11 +38,13 @@ func testAccCheckLoadBalancerExists(s *terraform.State) error {
 			continue
 		}
 
-		name := rs.Primary.Attributes["name"]
-		region := rs.Primary.Attributes["region"]
+		lb := lbaas.LoadBalancerContext{
+			Region: rs.Primary.Attributes["region"],
+			Name:   rs.Primary.Attributes["name"],
+		}
 
-		if _, err := client.GetLoadBalancer(region, name); err != nil {
-			return fmt.Errorf("Error retrieving state of Load Balancer %s: %s", name, err)
+		if _, err := client.GetLoadBalancer(lb); err != nil {
+			return fmt.Errorf("Error retrieving state of Load Balancer %s: %s", lb.Name, err)
 		}
 	}
 
@@ -56,11 +59,13 @@ func testAccCheckLoadBalancerDestroy(s *terraform.State) error {
 			continue
 		}
 
-		name := rs.Primary.Attributes["name"]
-		region := rs.Primary.Attributes["region"]
+		lb := lbaas.LoadBalancerContext{
+			Region: rs.Primary.Attributes["region"],
+			Name:   rs.Primary.Attributes["name"],
+		}
 
-		if info, err := client.GetLoadBalancer(region, name); err == nil {
-			return fmt.Errorf("Load Balancer %s still exists: %#v", name, info)
+		if info, err := client.GetLoadBalancer(lb); err == nil {
+			return fmt.Errorf("Load Balancer %s still exists: %#v", lb.Name, info)
 		}
 	}
 

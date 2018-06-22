@@ -29,6 +29,7 @@ func resourceOPCLoadBalancer() *schema.Resource {
 				Optional: true,
 			},
 			"enabled": {
+				// TODO separate enabled flag (desired state) from DisabledState (current state)
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
@@ -137,10 +138,13 @@ func resourceOPCLoadBalancerCreate(d *schema.ResourceData, meta interface{}) err
 
 func resourceOPCLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
 	lbaasClient := meta.(*Client).lbaasClient.LoadBalancerClient()
-	name := d.Id()
-	region := d.Get("region").(string)
 
-	result, err := lbaasClient.GetLoadBalancer(region, name)
+	lb := lbaas.LoadBalancerContext{
+		Region: d.Get("region").(string),
+		Name:   d.Get("name").(string),
+	}
+
+	result, err := lbaasClient.GetLoadBalancer(lb)
 	if err != nil {
 		// LoadBalancer does not exist
 		if client.WasNotFoundError(err) {
@@ -180,8 +184,11 @@ func resourceOPCLoadBalancerRead(d *schema.ResourceData, meta interface{}) error
 
 func resourceOPCLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) error {
 	lbaasClient := meta.(*Client).lbaasClient.LoadBalancerClient()
-	name := d.Id()
-	region := d.Get("region").(string)
+
+	lb := lbaas.LoadBalancerContext{
+		Region: d.Get("region").(string),
+		Name:   d.Get("name").(string),
+	}
 
 	input := lbaas.UpdateLoadBalancerInput{}
 
@@ -211,11 +218,7 @@ func resourceOPCLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) err
 		input.Tags = tags
 	}
 
-	if description, ok := d.GetOk("description"); ok {
-		input.Description = description.(string)
-	}
-
-	result, err := lbaasClient.UpdateLoadBalancer(region, name, &input)
+	result, err := lbaasClient.UpdateLoadBalancer(lb, &input)
 	if err != nil {
 		return fmt.Errorf("Error updating LoadBalancer: %s", err)
 	}
@@ -228,10 +231,13 @@ func resourceOPCLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) err
 
 func resourceOPCLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
 	lbaasClient := meta.(*Client).lbaasClient.LoadBalancerClient()
-	name := d.Id()
-	region := d.Get("region").(string)
 
-	if _, err := lbaasClient.DeleteLoadBalancer(region, name); err != nil {
+	lb := lbaas.LoadBalancerContext{
+		Region: d.Get("region").(string),
+		Name:   d.Get("name").(string),
+	}
+
+	if _, err := lbaasClient.DeleteLoadBalancer(lb); err != nil {
 		return fmt.Errorf("Error deleting LoadBalancer")
 	}
 	return nil
