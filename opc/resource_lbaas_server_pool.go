@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
-func resourceOriginServerPool() *schema.Resource {
+func resourceLBaaSOriginServerPool() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceOriginServerPoolCreate,
 		Read:   resourceOriginServerPoolRead,
@@ -108,7 +108,7 @@ func resourceOriginServerPoolCreate(d *schema.ResourceData, meta interface{}) er
 
 	originServers := getStringList(d, "servers")
 	if len(originServers) != 0 {
-		input.OriginServers = createOriginServerInput(originServers)
+		input.OriginServers = expandOriginServerConfig(originServers)
 	}
 
 	tags := getStringList(d, "tags")
@@ -154,21 +154,22 @@ func resourceOriginServerPoolRead(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	d.Set("consumers", result.Consumers)
-	d.Set("name", result.Name)
 	d.Set("enabled", result.Status == lbaas.LBaaSStatusEnabled)
+	d.Set("name", result.Name)
 	d.Set("operation_details", result.OperationDetails)
 	d.Set("reason_for_disabling", result.ReasonForDisabling)
 	d.Set("state", result.State)
 	d.Set("uri", result.URI)
 	d.Set("vnic_set_name", result.VnicSetName)
 
-	// TODO
-	// if err := setStringList(d, "servers", result.OriginServers); err != nil {
-	// 	return err
-	// }
+	if err := setStringList(d, "servers", flattenOriginServerConfig(result.OriginServers)); err != nil {
+		return err
+	}
+
 	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -197,7 +198,7 @@ func resourceOriginServerPoolUpdate(d *schema.ResourceData, meta interface{}) er
 
 	originServers := getStringList(d, "servers")
 	if len(originServers) != 0 {
-		input.OriginServers = createOriginServerInput(originServers)
+		input.OriginServers = expandOriginServerConfig(originServers)
 	}
 
 	tags := getStringList(d, "tags")
@@ -235,7 +236,8 @@ func resourceOriginServerPoolDelete(d *schema.ResourceData, meta interface{}) er
 	return nil
 }
 
-func createOriginServerInput(servers []string) []lbaas.CreateOriginServerInput {
+// convert the list of "server:port" strings to a list of CreateOriginServerInput
+func expandOriginServerConfig(servers []string) []lbaas.CreateOriginServerInput {
 	config := []lbaas.CreateOriginServerInput{}
 	for _, element := range servers {
 		s := strings.Split(element, ":")
@@ -251,4 +253,13 @@ func createOriginServerInput(servers []string) []lbaas.CreateOriginServerInput {
 		config = append(config, server)
 	}
 	return config
+}
+
+// convert the OriginServerInfo reponse to a listing of "server:port" strings
+func flattenOriginServerConfig(info []lbaas.OriginServerInfo) []string {
+	servers := []string{}
+	for _, config := range info {
+		servers = append(servers, fmt.Sprintf("%s:%d", config.Hostname, config.Port))
+	}
+	return servers
 }

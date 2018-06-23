@@ -1,0 +1,319 @@
+package opc
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/hashicorp/go-oracle-terraform/client"
+	"github.com/hashicorp/go-oracle-terraform/lbaas"
+	"github.com/hashicorp/terraform/helper/schema"
+)
+
+func resourceLBaaSListener() *schema.Resource {
+	return &schema.Resource{
+		Create: resourceListenerCreate,
+		Read:   resourceListenerRead,
+		Update: resourceListenerUpdate,
+		Delete: resourceListenerDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
+		Schema: map[string]*schema.Schema{
+			"load_balancer": {
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+			},
+			"name": {
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+			},
+			"balancer_protocol": {
+				Type:     schema.TypeString,
+				Required: true,
+			},
+			"server_protocol": {
+				Type:     schema.TypeString,
+				Required: true,
+			},
+			"port": {
+				Type:     schema.TypeInt,
+				Required: true,
+			},
+			"enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  true,
+			},
+			"server_pool": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"path_prefixes": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"policies": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"ssl_certificates": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"tags": {
+				Type:     schema.TypeList, // TODO TypeSet?
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"virtual_hosts": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+
+			// Read only attributes
+			// TODO
+			// "effective_origin_servers": {
+			// 	Type:     schema.TypeList,
+			// 	Computed: true,
+			// 	Elem:     &schema.Schema{Type: schema.TypeString},
+			// },
+			"effective_state": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"inline_policies": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"operation_details": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"parent_listener": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"state": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
+			"uri": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+		},
+	}
+}
+
+func resourceListenerCreate(d *schema.ResourceData, meta interface{}) error {
+
+	client := meta.(*Client).lbaasClient.ListenerClient()
+
+	var lb lbaas.LoadBalancerContext
+	if load_balancer, ok := d.GetOk("load_balancer"); ok {
+		s := strings.Split(load_balancer.(string), "/")
+		lb = lbaas.LoadBalancerContext{
+			Region: s[0],
+			Name:   s[1],
+		}
+	}
+
+	input := lbaas.CreateListenerInput{
+		Name:                 d.Get("name").(string),
+		BalancerProtocol:     lbaas.Protocol(d.Get("balancer_protocol").(string)),
+		OriginServerProtocol: lbaas.Protocol(d.Get("server_protocol").(string)),
+		Port:                 d.Get("port").(int),
+	}
+
+	if enabled, ok := d.GetOk("enabled"); ok {
+		input.Disabled = getDisabledStateKeyword(enabled.(bool))
+	}
+
+	if serverPool, ok := d.GetOk("server_pool"); ok {
+		input.OriginServerPool = fmt.Sprintf("vlbrs/%s/%s/originserverpools/%s", lb.Region, lb.Name, serverPool.(string))
+	}
+
+	pathPrefixes := getStringList(d, "path_prefixes")
+	if len(pathPrefixes) != 0 {
+		input.PathPrefixes = pathPrefixes
+	}
+
+	policies := getStringList(d, "policies")
+	if len(policies) != 0 {
+		input.Policies = policies
+	}
+
+	tags := getStringList(d, "tags")
+	if len(tags) != 0 {
+		input.Tags = tags
+	}
+
+	info, err := client.CreateListener(lb, &input)
+	if err != nil {
+		return fmt.Errorf("Error creating Load Balancer: %s", err)
+	}
+
+	d.SetId(info.Name)
+	return resourceListenerRead(d, meta)
+}
+
+func resourceListenerRead(d *schema.ResourceData, meta interface{}) error {
+	lbaasClient := meta.(*Client).lbaasClient.ListenerClient()
+	name := d.Id()
+
+	var lb lbaas.LoadBalancerContext
+	if load_balancer, ok := d.GetOk("load_balancer"); ok {
+		s := strings.Split(load_balancer.(string), "/")
+		lb = lbaas.LoadBalancerContext{
+			Region: s[0],
+			Name:   s[1],
+		}
+	}
+
+	result, err := lbaasClient.GetListener(lb, name)
+	if err != nil {
+		// Listener does not exist
+		if client.WasNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("Error reading Server Pool %s: %s", d.Id(), err)
+	}
+
+	if result == nil {
+		d.SetId("")
+		return nil
+	}
+
+	d.Set("balancer_protocol", result.BalancerProtocol)
+	d.Set("effective_state", getEnabledState(result.EffectiveState))
+	d.Set("enabled", getEnabledState(result.Disabled))
+	d.Set("name", result.Name)
+	d.Set("operation_details", result.OperationDetails)
+	d.Set("parent_listener", result.ParentListener)
+	d.Set("port", result.Port)
+	d.Set("server_pool", result.OriginServerPool[strings.LastIndex(result.OriginServerPool, "/")+1:len(result.OriginServerPool)])
+	d.Set("server_protocol", result.OriginServerProtocol)
+	d.Set("state", result.State)
+	d.Set("uri", result.URI)
+
+	// TODO
+	// if err := setStringList(d, "effective_origin_servers", result.EffectiveOriginServers); err != nil {
+	// 	return err
+	// }
+
+	if err := setStringList(d, "inline_policies", result.InlinePolicies); err != nil {
+		return err
+	}
+
+	if err := setStringList(d, "path_prefixes", result.PathPrefixes); err != nil {
+		return err
+	}
+
+	if err := setStringList(d, "policies", result.Policies); err != nil {
+		return err
+	}
+
+	if err := setStringList(d, "ssl_certificates", result.SSLCerts); err != nil {
+		return err
+	}
+
+	if err := setStringList(d, "virtual_hosts", result.VirtualHosts); err != nil {
+		return err
+	}
+
+	if err := setStringList(d, "tags", result.Tags); err != nil {
+		return err
+	}
+	return nil
+}
+
+func resourceListenerUpdate(d *schema.ResourceData, meta interface{}) error {
+	lbaasClient := meta.(*Client).lbaasClient.ListenerClient()
+	name := d.Id()
+
+	var lb lbaas.LoadBalancerContext
+	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
+		s := strings.Split(loadBalancer.(string), "/")
+		lb = lbaas.LoadBalancerContext{
+			Region: s[0],
+			Name:   s[1],
+		}
+	}
+
+	input := lbaas.UpdateListenerInput{
+		Name: d.Get("name").(string),
+	}
+
+	if balancerProtocol, ok := d.GetOk("balancer_protocol"); ok {
+		input.BalancerProtocol = lbaas.Protocol(balancerProtocol.(string))
+	}
+
+	if enabled, ok := d.GetOk("enabled"); ok {
+		input.Disabled = getDisabledStateKeyword(enabled.(bool))
+	}
+
+	if port, ok := d.GetOk("port"); ok {
+		input.Port = port.(int)
+	}
+
+	if serverPool, ok := d.GetOk("server_pool"); ok {
+		input.OriginServerPool = fmt.Sprintf("vlbrs/%s/%s/originserverpools/%s", lb.Region, lb.Name, serverPool.(string))
+	}
+
+	if serverProtocol, ok := d.GetOk("server_protocol"); ok {
+		input.OriginServerProtocol = lbaas.Protocol(serverProtocol.(string))
+	}
+
+	pathPrefixes := getStringList(d, "path_prefixes")
+	if len(pathPrefixes) != 0 {
+		input.PathPrefixes = pathPrefixes
+	}
+
+	policies := getStringList(d, "policies")
+	if len(policies) != 0 {
+		input.Policies = policies
+	}
+
+	tags := getStringList(d, "tags")
+	if len(tags) != 0 {
+		input.Tags = tags
+	}
+
+	result, err := lbaasClient.UpdateListener(lb, name, &input)
+	if err != nil {
+		return fmt.Errorf("Error updating Listener: %s", err)
+	}
+
+	d.SetId(result.Name)
+
+	// TODO instead of re-read, process info from UpdateListener()
+	return resourceListenerRead(d, meta)
+}
+
+func resourceListenerDelete(d *schema.ResourceData, meta interface{}) error {
+	lbaasClient := meta.(*Client).lbaasClient.ListenerClient()
+	name := d.Id()
+
+	var lb lbaas.LoadBalancerContext
+	if load_balancer, ok := d.GetOk("load_balancer"); ok {
+		s := strings.Split(load_balancer.(string), "/")
+		lb = lbaas.LoadBalancerContext{
+			Region: s[0],
+			Name:   s[1],
+		}
+	}
+
+	if _, err := lbaasClient.DeleteListener(lb, name); err != nil {
+		return fmt.Errorf("Error deleting Listener")
+	}
+	return nil
+}

@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
-func TestAccOPCLoadBalancer_Basic(t *testing.T) {
+func TestAccLBaaSLoadBalancer_Basic(t *testing.T) {
 
 	ri := acctest.RandInt()
 	config := fmt.Sprintf(testAccLoadBalancerBasic, ri)

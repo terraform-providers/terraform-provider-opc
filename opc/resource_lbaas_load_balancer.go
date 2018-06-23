@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
-func resourceOPCLoadBalancer() *schema.Resource {
+func resourceLBaaSLoadBalancer() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceOPCLoadBalancerCreate,
 		Read:   resourceOPCLoadBalancerRead,
@@ -43,7 +43,7 @@ func resourceOPCLoadBalancer() *schema.Resource {
 				// TODO add valication only supported for INTERNAL load balancer?
 			},
 			"premitted_methods": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeList, // TODO TypeSet? API returns ordered list
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				// TODO add validation
