@@ -156,6 +156,11 @@ func resourceListenerCreate(d *schema.ResourceData, meta interface{}) error {
 		input.Tags = tags
 	}
 
+	virtualHosts := getStringList(d, "virtual_hosts")
+	if len(virtualHosts) != 0 {
+		input.VirtualHosts = virtualHosts
+	}
+
 	info, err := client.CreateListener(lb, &input)
 	if err != nil {
 		return fmt.Errorf("Error creating Load Balancer: %s", err)
@@ -226,13 +231,14 @@ func resourceListenerRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
+	if err := setStringList(d, "tags", result.Tags); err != nil {
+		return err
+	}
+
 	if err := setStringList(d, "virtual_hosts", result.VirtualHosts); err != nil {
 		return err
 	}
 
-	if err := setStringList(d, "tags", result.Tags); err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -286,6 +292,11 @@ func resourceListenerUpdate(d *schema.ResourceData, meta interface{}) error {
 	tags := getStringList(d, "tags")
 	if len(tags) != 0 {
 		input.Tags = tags
+	}
+
+	virtualHosts := getStringList(d, "virtual_hosts")
+	if len(virtualHosts) != 0 {
+		input.VirtualHosts = virtualHosts
 	}
 
 	result, err := lbaasClient.UpdateListener(lb, name, &input)
