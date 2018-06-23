@@ -257,14 +257,14 @@ func getDisabledStateKeyword(enabled bool) lbaas.LBaaSDisabled {
 	if enabled {
 		return lbaas.LBaaSDisabledFalse
 	} else {
-		return lbaas.LBaaSDisabledFalse
+		return lbaas.LBaaSDisabledTrue
 	}
 }
 
 // convert the DisabledState attribute to a boolean representing the enabled state
 func getEnabledState(state lbaas.LBaaSDisabled) bool {
 	if state == lbaas.LBaaSDisabledFalse {
-		return false
+		return true
 	}
-	return true
+	return false
 }
