@@ -2,6 +2,7 @@ package opc
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/lbaas"
@@ -32,16 +33,17 @@ func resourceOPCLoadBalancer() *schema.Resource {
 				// TODO separate enabled flag (desired state) from DisabledState (current state)
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  true,
+				Computed: true,
 			},
 			"ip_network": {
 				Type:     schema.TypeString,
 				Optional: true,
+				Computed: true,
 				// TODO add validation for 3 part name
 				// TODO add valication only supported for INTERNAL load balancer?
 			},
 			"premitted_methods": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				// TODO add validation
@@ -69,7 +71,7 @@ func resourceOPCLoadBalancer() *schema.Resource {
 
 			// Read only attributes
 			"balancer_vips": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Computed: true,
 			},
@@ -117,10 +119,10 @@ func resourceOPCLoadBalancerCreate(d *schema.ResourceData, meta interface{}) err
 		input.ServerPool = serverPool.(string)
 	}
 
-	// TODO permittedMethods := getStringList(d, "premitted_methods")
-	// if len(permittedMethods) != 0 {
-	// 	input.PermittedMethods = permittedMethods
-	// }
+	permittedMethods := getStringList(d, "premitted_methods")
+	if len(permittedMethods) != 0 {
+		input.PermittedMethods = permittedMethods
+	}
 
 	tags := getStringList(d, "tags")
 	if len(tags) != 0 {
@@ -132,16 +134,17 @@ func resourceOPCLoadBalancerCreate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Error creating Load Balancer: %s", err)
 	}
 
-	d.SetId(info.Name)
+	d.SetId(info.Region + "/" + info.Name)
 	return resourceOPCLoadBalancerRead(d, meta)
 }
 
 func resourceOPCLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
 	lbaasClient := meta.(*Client).lbaasClient.LoadBalancerClient()
 
+	s := strings.Split(d.Id(), "/")
 	lb := lbaas.LoadBalancerContext{
-		Region: d.Get("region").(string),
-		Name:   d.Get("name").(string),
+		Region: s[0],
+		Name:   s[1],
 	}
 
 	result, err := lbaasClient.GetLoadBalancer(lb)
@@ -185,12 +188,15 @@ func resourceOPCLoadBalancerRead(d *schema.ResourceData, meta interface{}) error
 func resourceOPCLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) error {
 	lbaasClient := meta.(*Client).lbaasClient.LoadBalancerClient()
 
+	s := strings.Split(d.Id(), "/")
 	lb := lbaas.LoadBalancerContext{
-		Region: d.Get("region").(string),
-		Name:   d.Get("name").(string),
+		Region: s[0],
+		Name:   s[1],
 	}
 
-	input := lbaas.UpdateLoadBalancerInput{}
+	input := lbaas.UpdateLoadBalancerInput{
+		Name: d.Get("name").(string),
+	}
 
 	if description, ok := d.GetOk("description"); ok {
 		input.Description = description.(string)
@@ -200,9 +206,11 @@ func resourceOPCLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) err
 		input.Disabled = getDisabledStateKeyword(enabled.(bool))
 	}
 
-	if ipNetwork, ok := d.GetOk("ip_network"); ok {
-		input.IPNetworkName = ipNetwork.(string)
-	}
+	// TODO API complains
+	// * opc_lbaas_load_balancer.lb1: Error updating LoadBalancer: 400: ip_network_name should not be specified while updating lb1.
+	// if ipNetwork, ok := d.GetOk("ip_network"); ok {
+	// 	input.IPNetworkName = ipNetwork.(string)
+	// }
 
 	if serverPool, ok := d.GetOk("server_pool"); ok {
 		input.ServerPool = serverPool.(string)
@@ -223,7 +231,7 @@ func resourceOPCLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Error updating LoadBalancer: %s", err)
 	}
 
-	d.SetId(result.Name)
+	d.SetId(result.Region + "/" + result.Name)
 
 	// TODO instead of re-read, process info from UpdateLoadBalancer()
 	return resourceOPCLoadBalancerRead(d, meta)
@@ -232,9 +240,10 @@ func resourceOPCLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) err
 func resourceOPCLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
 	lbaasClient := meta.(*Client).lbaasClient.LoadBalancerClient()
 
+	s := strings.Split(d.Id(), "/")
 	lb := lbaas.LoadBalancerContext{
-		Region: d.Get("region").(string),
-		Name:   d.Get("name").(string),
+		Region: s[0],
+		Name:   s[1],
 	}
 
 	if _, err := lbaasClient.DeleteLoadBalancer(lb); err != nil {
@@ -244,17 +253,17 @@ func resourceOPCLoadBalancerDelete(d *schema.ResourceData, meta interface{}) err
 }
 
 // return the Disbaled State keyword for Load Balancer enabled state
-func getDisabledStateKeyword(enabled bool) lbaas.LoadBalancerDisabled {
+func getDisabledStateKeyword(enabled bool) lbaas.LBaaSDisabled {
 	if enabled {
-		return lbaas.LoadBalancerDisabledFalse
+		return lbaas.LBaaSDisabledFalse
 	} else {
-		return lbaas.LoadBalancerDisabledTrue
+		return lbaas.LBaaSDisabledFalse
 	}
 }
 
 // convert the DisabledState attribute to a boolean representing the enabled state
-func getEnabledState(state lbaas.LoadBalancerDisabled) bool {
-	if state == lbaas.LoadBalancerDisabledFalse {
+func getEnabledState(state lbaas.LBaaSDisabled) bool {
+	if state == lbaas.LBaaSDisabledFalse {
 		return false
 	}
 	return true

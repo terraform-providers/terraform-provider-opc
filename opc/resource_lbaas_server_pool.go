@@ -2,6 +2,8 @@ package opc
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/lbaas"
@@ -36,7 +38,7 @@ func resourceOriginServerPool() *schema.Resource {
 			},
 			"servers": {
 				Type:     schema.TypeList,
-				Optional: true,
+				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				// TODO add validation, must be "hostname:port"
 			},
@@ -81,10 +83,11 @@ func resourceOriginServerPoolCreate(d *schema.ResourceData, meta interface{}) er
 
 	var lb lbaas.LoadBalancerContext
 	if load_balancer, ok := d.GetOk("load_balancer"); ok {
-		lb.Region = load_balancer.(string)
-		lb.Name = load_balancer.(string)
-	} else {
-		return fmt.Errorf("Error creating Server Pool. Invalid Load Balancer ID: %s", load_balancer)
+		s := strings.Split(load_balancer.(string), "/")
+		lb = lbaas.LoadBalancerContext{
+			Region: s[0],
+			Name:   s[1],
+		}
 	}
 
 	input := lbaas.CreateOriginServerPoolInput{
@@ -92,18 +95,21 @@ func resourceOriginServerPoolCreate(d *schema.ResourceData, meta interface{}) er
 	}
 
 	if enabled, ok := d.GetOk("enabled"); ok {
-		input.Status = getDisabledStateKeyword(enabled.(bool))
+		if enabled.(bool) {
+			input.Status = lbaas.LBaaSStatusEnabled
+		} else {
+			input.Status = lbaas.LBaaSStatusDisabled
+		}
 	}
 
 	if vnicSet, ok := d.GetOk("vnic_set_name"); ok {
 		input.VnicSetName = vnicSet.(string)
 	}
 
-	// TODO Create Server struct
-	// originServers := getStringList(d, "servers")
-	// if len(originServers) != 0 {
-	// 	input.OriginServers = originServers
-	// }
+	originServers := getStringList(d, "servers")
+	if len(originServers) != 0 {
+		input.OriginServers = createOriginServerInput(originServers)
+	}
 
 	tags := getStringList(d, "tags")
 	if len(tags) != 0 {
@@ -124,7 +130,13 @@ func resourceOriginServerPoolRead(d *schema.ResourceData, meta interface{}) erro
 	name := d.Id()
 
 	var lb lbaas.LoadBalancerContext
-	// TODO lb from id
+	if load_balancer, ok := d.GetOk("load_balancer"); ok {
+		s := strings.Split(load_balancer.(string), "/")
+		lb = lbaas.LoadBalancerContext{
+			Region: s[0],
+			Name:   s[1],
+		}
+	}
 
 	result, err := lbaasClient.GetOriginServerPool(lb, name)
 	if err != nil {
@@ -143,7 +155,7 @@ func resourceOriginServerPoolRead(d *schema.ResourceData, meta interface{}) erro
 
 	d.Set("consumers", result.Consumers)
 	d.Set("name", result.Name)
-	d.Set("enabled", getEnabledState(result.Status))
+	d.Set("enabled", result.Status == lbaas.LBaaSStatusEnabled)
 	d.Set("operation_details", result.OperationDetails)
 	d.Set("reason_for_disabling", result.ReasonForDisabling)
 	d.Set("state", result.State)
@@ -165,19 +177,28 @@ func resourceOriginServerPoolUpdate(d *schema.ResourceData, meta interface{}) er
 	name := d.Id()
 
 	var lb lbaas.LoadBalancerContext
-	// TODO lb from Id
+	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
+		s := strings.Split(loadBalancer.(string), "/")
+		lb = lbaas.LoadBalancerContext{
+			Region: s[0],
+			Name:   s[1],
+		}
+	}
 
 	input := lbaas.UpdateOriginServerPoolInput{}
 
 	if enabled, ok := d.GetOk("enabled"); ok {
-		input.Status = getDisabledStateKeyword(enabled.(bool))
+		if enabled.(bool) {
+			input.Status = lbaas.LBaaSStatusEnabled
+		} else {
+			input.Status = lbaas.LBaaSStatusDisabled
+		}
 	}
 
-	// TODO
-	// originServers := getStringList(d, "servers")
-	// if len(originServers) != 0 {
-	// 	input.originServers = originServers
-	// }
+	originServers := getStringList(d, "servers")
+	if len(originServers) != 0 {
+		input.OriginServers = createOriginServerInput(originServers)
+	}
 
 	tags := getStringList(d, "tags")
 	if len(tags) != 0 {
@@ -200,7 +221,13 @@ func resourceOriginServerPoolDelete(d *schema.ResourceData, meta interface{}) er
 	name := d.Id()
 
 	var lb lbaas.LoadBalancerContext
-	// TODO lb from Id
+	if load_balancer, ok := d.GetOk("load_balancer"); ok {
+		s := strings.Split(load_balancer.(string), "/")
+		lb = lbaas.LoadBalancerContext{
+			Region: s[0],
+			Name:   s[1],
+		}
+	}
 
 	if _, err := lbaasClient.DeleteOriginServerPool(lb, name); err != nil {
 		return fmt.Errorf("Error deleting OriginServerPool")
@@ -208,8 +235,20 @@ func resourceOriginServerPoolDelete(d *schema.ResourceData, meta interface{}) er
 	return nil
 }
 
-// extract region and name from the load balancer idea
-func getLoadBalancerContext(id interface{}) (string, string) {
-	// TODO
-	return "", ""
+func createOriginServerInput(servers []string) []lbaas.CreateOriginServerInput {
+	config := []lbaas.CreateOriginServerInput{}
+	for _, element := range servers {
+		s := strings.Split(element, ":")
+		port, err := strconv.Atoi(s[1])
+		if err != nil {
+			// TODO
+		}
+		server := lbaas.CreateOriginServerInput{
+			Hostname: s[0],
+			Port:     port,
+			Status:   lbaas.LBaaSStatusEnabled,
+		}
+		config = append(config, server)
+	}
+	return config
 }
