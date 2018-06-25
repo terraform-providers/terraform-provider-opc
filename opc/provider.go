@@ -112,6 +112,7 @@ func Provider() terraform.ResourceProvider {
 			"opc_compute_orchestrated_instance":   resourceOPCOrchestratedInstance(),
 			"opc_lbaas_listener":                  resourceLBaaSListener(),
 			"opc_lbaas_load_balancer":             resourceLBaaSLoadBalancer(),
+			"opc_lbaas_policy":                    resourceLBaaSPolicy(),
 			"opc_lbaas_server_pool":               resourceLBaaSOriginServerPool(),
 			"opc_storage_container":               resourceOPCStorageContainer(),
 			"opc_storage_object":                  resourceOPCStorageObject(),

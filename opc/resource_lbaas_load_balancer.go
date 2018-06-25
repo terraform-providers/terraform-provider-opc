@@ -134,7 +134,7 @@ func resourceOPCLoadBalancerCreate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Error creating Load Balancer: %s", err)
 	}
 
-	d.SetId(info.Region + "/" + info.Name)
+	d.SetId(fmt.Sprintf("%s/%s", info.Region, info.Name))
 	return resourceOPCLoadBalancerRead(d, meta)
 }
 
@@ -231,7 +231,7 @@ func resourceOPCLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Error updating LoadBalancer: %s", err)
 	}
 
-	d.SetId(result.Region + "/" + result.Name)
+	d.SetId(fmt.Sprintf("%s/%s", lb.Region, result.Name))
 
 	// TODO instead of re-read, process info from UpdateLoadBalancer()
 	return resourceOPCLoadBalancerRead(d, meta)

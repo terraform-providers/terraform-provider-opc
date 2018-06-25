@@ -85,10 +85,12 @@ func resourceLBaaSListener() *schema.Resource {
 			// 	Elem:     &schema.Schema{Type: schema.TypeString},
 			// },
 			"effective_state": {
+				// TODO not returned from API, Remove?
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"inline_policies": {
+				// TODO not returned from API, Remove?
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -118,8 +120,8 @@ func resourceListenerCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*Client).lbaasClient.ListenerClient()
 
 	var lb lbaas.LoadBalancerContext
-	if load_balancer, ok := d.GetOk("load_balancer"); ok {
-		s := strings.Split(load_balancer.(string), "/")
+	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
+		s := strings.Split(loadBalancer.(string), "/")
 		lb = lbaas.LoadBalancerContext{
 			Region: s[0],
 			Name:   s[1],
@@ -138,7 +140,8 @@ func resourceListenerCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if serverPool, ok := d.GetOk("server_pool"); ok {
-		input.OriginServerPool = fmt.Sprintf("vlbrs/%s/%s/originserverpools/%s", lb.Region, lb.Name, serverPool.(string))
+		// Only the URI Path is need on Create
+		input.OriginServerPool = getURIRequestPath(serverPool.(string))
 	}
 
 	pathPrefixes := getStringList(d, "path_prefixes")
@@ -166,17 +169,17 @@ func resourceListenerCreate(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error creating Load Balancer: %s", err)
 	}
 
-	d.SetId(info.Name)
+	d.SetId(fmt.Sprintf("%s/%s/%s", lb.Region, lb.Name, info.Name))
 	return resourceListenerRead(d, meta)
 }
 
 func resourceListenerRead(d *schema.ResourceData, meta interface{}) error {
 	lbaasClient := meta.(*Client).lbaasClient.ListenerClient()
-	name := d.Id()
+	name := getLastNameInURIPath(d.Id())
 
 	var lb lbaas.LoadBalancerContext
-	if load_balancer, ok := d.GetOk("load_balancer"); ok {
-		s := strings.Split(load_balancer.(string), "/")
+	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
+		s := strings.Split(loadBalancer.(string), "/")
 		lb = lbaas.LoadBalancerContext{
 			Region: s[0],
 			Name:   s[1],
@@ -205,7 +208,7 @@ func resourceListenerRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("operation_details", result.OperationDetails)
 	d.Set("parent_listener", result.ParentListener)
 	d.Set("port", result.Port)
-	d.Set("server_pool", result.OriginServerPool[strings.LastIndex(result.OriginServerPool, "/")+1:len(result.OriginServerPool)])
+	d.Set("server_pool", result.OriginServerPool)
 	d.Set("server_protocol", result.OriginServerProtocol)
 	d.Set("state", result.State)
 	d.Set("uri", result.URI)
@@ -244,7 +247,7 @@ func resourceListenerRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceListenerUpdate(d *schema.ResourceData, meta interface{}) error {
 	lbaasClient := meta.(*Client).lbaasClient.ListenerClient()
-	name := d.Id()
+	name := getLastNameInURIPath(d.Id())
 
 	var lb lbaas.LoadBalancerContext
 	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
@@ -272,7 +275,8 @@ func resourceListenerUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if serverPool, ok := d.GetOk("server_pool"); ok {
-		input.OriginServerPool = fmt.Sprintf("vlbrs/%s/%s/originserverpools/%s", lb.Region, lb.Name, serverPool.(string))
+		// Only the URI Path is need on Update
+		input.OriginServerPool = getURIRequestPath(serverPool.(string))
 	}
 
 	if serverProtocol, ok := d.GetOk("server_protocol"); ok {
@@ -304,7 +308,7 @@ func resourceListenerUpdate(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error updating Listener: %s", err)
 	}
 
-	d.SetId(result.Name)
+	d.SetId(fmt.Sprintf("%s/%s/%s", lb.Region, lb.Name, result.Name))
 
 	// TODO instead of re-read, process info from UpdateListener()
 	return resourceListenerRead(d, meta)
@@ -312,11 +316,11 @@ func resourceListenerUpdate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceListenerDelete(d *schema.ResourceData, meta interface{}) error {
 	lbaasClient := meta.(*Client).lbaasClient.ListenerClient()
-	name := d.Id()
+	name := getLastNameInURIPath(d.Id())
 
 	var lb lbaas.LoadBalancerContext
-	if load_balancer, ok := d.GetOk("load_balancer"); ok {
-		s := strings.Split(load_balancer.(string), "/")
+	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
+		s := strings.Split(loadBalancer.(string), "/")
 		lb = lbaas.LoadBalancerContext{
 			Region: s[0],
 			Name:   s[1],

@@ -1,7 +1,10 @@
 package opc
 
 import (
+	"log"
+	"net/url"
 	"sort"
+	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -44,4 +47,16 @@ func getIntList(d *schema.ResourceData, key string) []int {
 func setIntList(d *schema.ResourceData, key string, value []int) error {
 	sort.Ints(value)
 	return d.Set(key, value)
+}
+
+func getLastNameInURIPath(uri string) string {
+	return uri[strings.LastIndex(uri, "/")+1 : len(uri)]
+}
+
+func getURIRequestPath(uri string) string {
+	u, err := url.Parse(uri)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return u.RequestURI()
 }
