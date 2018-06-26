@@ -47,7 +47,7 @@ func resourceLBaaSOriginServerPool() *schema.Resource {
 				Optional: true,
 			},
 			"tags": {
-				Type:     schema.TypeList, // TODO TypeSet?
+				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
@@ -83,11 +83,7 @@ func resourceOriginServerPoolCreate(d *schema.ResourceData, meta interface{}) er
 
 	var lb lbaas.LoadBalancerContext
 	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
-		s := strings.Split(loadBalancer.(string), "/")
-		lb = lbaas.LoadBalancerContext{
-			Region: s[0],
-			Name:   s[1],
-		}
+		lb = getLoadBalancerContextFromID(loadBalancer.(string))
 	}
 
 	input := lbaas.CreateOriginServerPoolInput{
@@ -127,16 +123,8 @@ func resourceOriginServerPoolCreate(d *schema.ResourceData, meta interface{}) er
 
 func resourceOriginServerPoolRead(d *schema.ResourceData, meta interface{}) error {
 	lbaasClient := meta.(*Client).lbaasClient.OriginServerPoolClient()
-	name := getLastNameInURIPath(d.Id())
-
-	var lb lbaas.LoadBalancerContext
-	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
-		s := strings.Split(loadBalancer.(string), "/")
-		lb = lbaas.LoadBalancerContext{
-			Region: s[0],
-			Name:   s[1],
-		}
-	}
+	name := getLastNameInPath(d.Id())
+	lb := getLoadBalancerContextFromID(d.Id())
 
 	result, err := lbaasClient.GetOriginServerPool(lb, name)
 	if err != nil {
@@ -161,6 +149,7 @@ func resourceOriginServerPoolRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("state", result.State)
 	d.Set("uri", result.URI)
 	d.Set("vnic_set_name", result.VnicSetName)
+	d.Set("load_balancer", fmt.Sprintf("%s/%s", lb.Region, lb.Name))
 
 	if err := setStringList(d, "servers", flattenOriginServerConfig(result.OriginServers)); err != nil {
 		return err
@@ -175,16 +164,8 @@ func resourceOriginServerPoolRead(d *schema.ResourceData, meta interface{}) erro
 
 func resourceOriginServerPoolUpdate(d *schema.ResourceData, meta interface{}) error {
 	lbaasClient := meta.(*Client).lbaasClient.OriginServerPoolClient()
-	name := getLastNameInURIPath(d.Id())
-
-	var lb lbaas.LoadBalancerContext
-	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
-		s := strings.Split(loadBalancer.(string), "/")
-		lb = lbaas.LoadBalancerContext{
-			Region: s[0],
-			Name:   s[1],
-		}
-	}
+	name := getLastNameInPath(d.Id())
+	lb := getLoadBalancerContextFromID(d.Id())
 
 	input := lbaas.UpdateOriginServerPoolInput{}
 
@@ -219,16 +200,8 @@ func resourceOriginServerPoolUpdate(d *schema.ResourceData, meta interface{}) er
 
 func resourceOriginServerPoolDelete(d *schema.ResourceData, meta interface{}) error {
 	lbaasClient := meta.(*Client).lbaasClient.OriginServerPoolClient()
-	name := getLastNameInURIPath(d.Id())
-
-	var lb lbaas.LoadBalancerContext
-	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
-		s := strings.Split(loadBalancer.(string), "/")
-		lb = lbaas.LoadBalancerContext{
-			Region: s[0],
-			Name:   s[1],
-		}
-	}
+	name := getLastNameInPath(d.Id())
+	lb := getLoadBalancerContextFromID(d.Id())
 
 	if _, err := lbaasClient.DeleteOriginServerPool(lb, name); err != nil {
 		return fmt.Errorf("Error deleting OriginServerPool")

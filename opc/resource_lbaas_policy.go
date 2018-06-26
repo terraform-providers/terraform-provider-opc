@@ -2,7 +2,6 @@ package opc
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/lbaas"
@@ -120,13 +119,15 @@ func resourceLBaaSPolicy() *schema.Resource {
 						"logging_level": {
 							Type:     schema.TypeString,
 							Optional: true,
-							Default:  "Warn",
+							Default:  "warn",
+							// TODO validate info, notice, warn, error
 						},
 						"rate_limiting_criteria": {
 							Type:     schema.TypeString,
 							ForceNew: true,
 							Optional: true,
-							Default:  "Server",
+							Default:  "server",
+							// TODO validate server, remote_address, host
 						},
 						"requests_per_second": {
 							Type:     schema.TypeInt,
@@ -141,6 +142,7 @@ func resourceLBaaSPolicy() *schema.Resource {
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
+							// TODO add validation: [a-zA-Z0-9][a-zA-Z0-9_]+
 						},
 					},
 				},
@@ -158,6 +160,7 @@ func resourceLBaaSPolicy() *schema.Resource {
 						"response_code": {
 							Type:     schema.TypeInt,
 							Required: true,
+							// TODO validate 300 to 399
 						},
 					},
 				},
@@ -171,16 +174,19 @@ func resourceLBaaSPolicy() *schema.Resource {
 						"disposition": {
 							Type:     schema.TypeString,
 							Required: true,
+							// TODO validate  DENY_ALL, ALLOW_ALL
 						},
 						"denied_clients": {
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
+							// TODO Validate IP or CIRR
 						},
 						"permitted_clients": {
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
+							// TODO validate IP or CIDR
 						},
 					},
 				},
@@ -194,10 +200,12 @@ func resourceLBaaSPolicy() *schema.Resource {
 						"header_name": {
 							Type:     schema.TypeString,
 							Required: true,
+							// TODO validate ContentType format
 						},
 						"action_when_header_exists": {
 							Type:     schema.TypeString,
 							Optional: true,
+							// TODO validate NOOP, PREPEND, APPEND, OVERWRITE, CLEAR
 						},
 						"action_when_header_value_is": {
 							Type:     schema.TypeList,
@@ -230,11 +238,13 @@ func resourceLBaaSPolicy() *schema.Resource {
 						"server_order_preference": {
 							Type:     schema.TypeString,
 							Optional: true,
+							// TODO validate "Enabled" or "Disabled"
 						},
 						"ssl_protocol": {
 							Type:     schema.TypeList,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
+							// TODO Validate "SSLv2", "SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2
 						},
 						"ssl_ciphers": {
 							Type:     schema.TypeList,
@@ -281,11 +291,7 @@ func resourcePolicyCreate(d *schema.ResourceData, meta interface{}) error {
 
 	var lb lbaas.LoadBalancerContext
 	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
-		s := strings.Split(loadBalancer.(string), "/")
-		lb = lbaas.LoadBalancerContext{
-			Region: s[0],
-			Name:   s[1],
-		}
+		lb = getLoadBalancerContextFromID(loadBalancer.(string))
 	}
 
 	input := lbaas.CreatePolicyInput{
@@ -304,7 +310,7 @@ func resourcePolicyCreate(d *schema.ResourceData, meta interface{}) error {
 		input.Type = "LBCookieStickinessPolicy"
 		input.LoadBalancerCookieStickinessPolicyInfo = expandLoadBalancerCookieStickinessPolicy(d)
 	}
-	if _, ok := d.GetOk("load_balancing_mechanisn_policy"); ok {
+	if _, ok := d.GetOk("load_balancing_mechanism_policy"); ok {
 		input.Type = "LoadBalancingMechanismPolicy"
 		input.LoadBalancingMechanismPolicyInfo = expandLoadBalancingMechanismPolicy(d)
 	}
@@ -344,16 +350,8 @@ func resourcePolicyCreate(d *schema.ResourceData, meta interface{}) error {
 
 func resourcePolicyRead(d *schema.ResourceData, meta interface{}) error {
 	lbaasClient := meta.(*Client).lbaasClient.PolicyClient()
-	name := getLastNameInURIPath(d.Id())
-
-	var lb lbaas.LoadBalancerContext
-	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
-		s := strings.Split(loadBalancer.(string), "/")
-		lb = lbaas.LoadBalancerContext{
-			Region: s[0],
-			Name:   s[1],
-		}
-	}
+	name := getLastNameInPath(d.Id())
+	lb := getLoadBalancerContextFromID(d.Id())
 
 	result, err := lbaasClient.GetPolicy(lb, name)
 	if err != nil {
@@ -362,7 +360,7 @@ func resourcePolicyRead(d *schema.ResourceData, meta interface{}) error {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Error reading Server Pool %s: %s", d.Id(), err)
+		return fmt.Errorf("Error reading Load Balancer Policy %s: %s", d.Id(), err)
 	}
 
 	if result == nil {
@@ -374,6 +372,7 @@ func resourcePolicyRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("state", result.State)
 	d.Set("type", result.Type)
 	d.Set("uri", result.URI)
+	d.Set("load_balancer", fmt.Sprintf("%s/%s", lb.Region, lb.Name))
 
 	if result.Type == "AppCookieStickinessPolicy" {
 		flattenApplicationCookieStickinessPolicy(d, result)
@@ -408,16 +407,8 @@ func resourcePolicyRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourcePolicyUpdate(d *schema.ResourceData, meta interface{}) error {
 	lbaasClient := meta.(*Client).lbaasClient.PolicyClient()
-	name := getLastNameInURIPath(d.Id())
-
-	var lb lbaas.LoadBalancerContext
-	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
-		s := strings.Split(loadBalancer.(string), "/")
-		lb = lbaas.LoadBalancerContext{
-			Region: s[0],
-			Name:   s[1],
-		}
-	}
+	name := getLastNameInPath(d.Id())
+	lb := getLoadBalancerContextFromID(d.Id())
 
 	input := lbaas.UpdatePolicyInput{
 		Name: d.Get("name").(string),
@@ -435,7 +426,7 @@ func resourcePolicyUpdate(d *schema.ResourceData, meta interface{}) error {
 		input.Type = "LBCookieStickinessPolicy"
 		input.LoadBalancerCookieStickinessPolicyInfo = expandLoadBalancerCookieStickinessPolicy(d)
 	}
-	if _, ok := d.GetOk("load_balancing_mechanisn_policy"); ok {
+	if _, ok := d.GetOk("load_balancing_mechanism_policy"); ok {
 		input.Type = "LoadBalancingMechanismPolicy"
 		input.LoadBalancingMechanismPolicyInfo = expandLoadBalancingMechanismPolicy(d)
 	}
@@ -477,16 +468,8 @@ func resourcePolicyUpdate(d *schema.ResourceData, meta interface{}) error {
 
 func resourcePolicyDelete(d *schema.ResourceData, meta interface{}) error {
 	lbaasClient := meta.(*Client).lbaasClient.PolicyClient()
-	name := getLastNameInURIPath(d.Id())
-
-	var lb lbaas.LoadBalancerContext
-	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
-		s := strings.Split(loadBalancer.(string), "/")
-		lb = lbaas.LoadBalancerContext{
-			Region: s[0],
-			Name:   s[1],
-		}
-	}
+	name := getLastNameInPath(d.Id())
+	lb := getLoadBalancerContextFromID(d.Id())
 
 	if _, err := lbaasClient.DeletePolicy(lb, name); err != nil {
 		return fmt.Errorf("Error deleting Policy")
@@ -638,10 +621,10 @@ func expandRateLimitingRequestPolicy(d *schema.ResourceData) lbaas.RateLimitingR
 		BurstSize:                   policy["burst_size"].(int),
 		DoNotDelayExcessiveRequests: policy["do_not_delay_excessive_requests"].(bool),
 		HttpStatusErrorCode:         policy["http_status_error_code"].(int),
-		LogLevel:                    policy["log_level"].(string),
+		LogLevel:                    policy["logging_level"].(string),
 		RateLimitingCriteria:        policy["rate_limiting_criteria"].(string),
 		RequestsPerSecond:           policy["requests_per_second"].(int),
-		StorageSize:                 policy["storage_size"].(int),
+		StorageSize:                 policy["zone_memory_size"].(int),
 		Zone:                        policy["zone"].(string),
 	}
 
@@ -718,7 +701,7 @@ func expandResourceAccessControlPolicy(d *schema.ResourceData) lbaas.ResourceAcc
 		Disposition: policy["disposition"].(string),
 	}
 
-	deniedClients := getStringList(d, "resource_access_control_policy.0.denied_clients.0.ssl_protocol")
+	deniedClients := getStringList(d, "resource_access_control_policy.0.denied_clients")
 	if len(deniedClients) != 0 {
 		info.DeniedClients = deniedClients
 	}
@@ -742,8 +725,8 @@ func flattenResourceAccessControlPolicy(d *schema.ResourceData, result *lbaas.Po
 	}
 
 	attrs["disposition"] = result.Disposition
-	attrs["denied_clients"] = setStringList(d, "denied_clients", result.DeniedClients)
-	attrs["permitted_clients"] = setStringList(d, "permitted_clients", result.PermittedClients)
+	attrs["denied_clients"] = result.DeniedClients
+	attrs["permitted_clients"] = result.PermittedClients
 
 	p = append(p, attrs)
 
@@ -776,7 +759,6 @@ func expandSetRequestHeaderPolicy(d *schema.ResourceData) lbaas.SetRequestHeader
 	if len(actionIsNot) != 0 {
 		info.ActionWhenHeaderValueIsNot = actionIsNot
 	}
-
 	return info
 }
 
@@ -792,15 +774,14 @@ func flattenSetRequestHeaderPolicy(d *schema.ResourceData, result *lbaas.PolicyI
 	}
 
 	attrs["header_name"] = result.HeaderName
-	attrs["value"] = "SOMETHINGELSE" //result.Value
+	attrs["value"] = result.Value
 	attrs["action_when_header_exists"] = result.ActionWhenHeaderExists
-	attrs["action_when_header_value_is"] = setStringList(d, "action_when_header_value_is", result.ActionWhenHeaderValueIs)
-	attrs["action_when_header_value_is_not"] = setStringList(d, "action_when_header_value_is_not", result.ActionWhenHeaderValueIsNot)
+	attrs["action_when_header_value_is"] = result.ActionWhenHeaderValueIs
+	attrs["action_when_header_value_is_not"] = result.ActionWhenHeaderValueIsNot
 
 	p = append(p, attrs)
 
-	d.Set("set_request_header_policy", p)
-	return nil
+	return d.Set("set_request_header_policy", p)
 }
 
 // SSLNegotiationPolicy
@@ -843,8 +824,8 @@ func flattenSSLNegotiationPolicy(d *schema.ResourceData, result *lbaas.PolicyInf
 	attrs["port"] = result.Port
 	attrs["server_order_preference"] = result.Value
 	attrs["action_when_header_exists"] = result.ActionWhenHeaderExists
-	attrs["ssl_protocol"] = setStringList(d, "ssl_protocol", result.SSLProtocol)
-	attrs["ssl_ciphers"] = setStringList(d, "ssl_ciphers", result.SSLCiphers)
+	attrs["ssl_protocol"] = result.SSLProtocol
+	attrs["ssl_ciphers"] = result.SSLCiphers
 
 	p = append(p, attrs)
 

@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/hashicorp/go-oracle-terraform/lbaas"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
@@ -49,14 +50,27 @@ func setIntList(d *schema.ResourceData, key string, value []int) error {
 	return d.Set(key, value)
 }
 
-func getLastNameInURIPath(uri string) string {
+// Return the last element in a Path string
+func getLastNameInPath(uri string) string {
 	return uri[strings.LastIndex(uri, "/")+1 : len(uri)]
 }
 
+// Return just the path component of a URI
 func getURIRequestPath(uri string) string {
 	u, err := url.Parse(uri)
 	if err != nil {
 		log.Fatal(err)
 	}
 	return u.RequestURI()
+}
+
+// Tasks a two or three part Id in the form "region/lb" or "region/lb/resource"
+// and returns the LoadBalancerContext with the region and load balancer name
+func getLoadBalancerContextFromID(id string) lbaas.LoadBalancerContext {
+	ids := strings.Split(id, "/")
+	lb := lbaas.LoadBalancerContext{
+		Region: ids[0],
+		Name:   ids[1],
+	}
+	return lb
 }

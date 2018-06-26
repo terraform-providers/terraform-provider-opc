@@ -43,7 +43,7 @@ func resourceLBaaSLoadBalancer() *schema.Resource {
 				// TODO add valication only supported for INTERNAL load balancer?
 			},
 			"premitted_methods": {
-				Type:     schema.TypeList, // TODO TypeSet? API returns ordered list
+				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				// TODO add validation
@@ -64,7 +64,7 @@ func resourceLBaaSLoadBalancer() *schema.Resource {
 				Optional: true,
 			},
 			"tags": {
-				Type:     schema.TypeList, // TODO TypeSet?
+				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
@@ -187,12 +187,7 @@ func resourceOPCLoadBalancerRead(d *schema.ResourceData, meta interface{}) error
 
 func resourceOPCLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) error {
 	lbaasClient := meta.(*Client).lbaasClient.LoadBalancerClient()
-
-	s := strings.Split(d.Id(), "/")
-	lb := lbaas.LoadBalancerContext{
-		Region: s[0],
-		Name:   s[1],
-	}
+	lb := getLoadBalancerContextFromID(d.Id())
 
 	input := lbaas.UpdateLoadBalancerInput{
 		Name: d.Get("name").(string),
@@ -239,12 +234,7 @@ func resourceOPCLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) err
 
 func resourceOPCLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
 	lbaasClient := meta.(*Client).lbaasClient.LoadBalancerClient()
-
-	s := strings.Split(d.Id(), "/")
-	lb := lbaas.LoadBalancerContext{
-		Region: s[0],
-		Name:   s[1],
-	}
+	lb := getLoadBalancerContextFromID(d.Id())
 
 	if _, err := lbaasClient.DeleteLoadBalancer(lb); err != nil {
 		return fmt.Errorf("Error deleting LoadBalancer")

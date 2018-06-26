@@ -2,7 +2,6 @@ package opc
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/lbaas"
@@ -67,7 +66,7 @@ func resourceLBaaSListener() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"tags": {
-				Type:     schema.TypeList, // TODO TypeSet?
+				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
@@ -78,17 +77,6 @@ func resourceLBaaSListener() *schema.Resource {
 			},
 
 			// Read only attributes
-			// TODO
-			// "effective_origin_servers": {
-			// 	Type:     schema.TypeList,
-			// 	Computed: true,
-			// 	Elem:     &schema.Schema{Type: schema.TypeString},
-			// },
-			"effective_state": {
-				// TODO not returned from API, Remove?
-				Type:     schema.TypeString,
-				Computed: true,
-			},
 			"inline_policies": {
 				// TODO not returned from API, Remove?
 				Type:     schema.TypeList,
@@ -121,11 +109,7 @@ func resourceListenerCreate(d *schema.ResourceData, meta interface{}) error {
 
 	var lb lbaas.LoadBalancerContext
 	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
-		s := strings.Split(loadBalancer.(string), "/")
-		lb = lbaas.LoadBalancerContext{
-			Region: s[0],
-			Name:   s[1],
-		}
+		lb = getLoadBalancerContextFromID(loadBalancer.(string))
 	}
 
 	input := lbaas.CreateListenerInput{
@@ -175,16 +159,8 @@ func resourceListenerCreate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceListenerRead(d *schema.ResourceData, meta interface{}) error {
 	lbaasClient := meta.(*Client).lbaasClient.ListenerClient()
-	name := getLastNameInURIPath(d.Id())
-
-	var lb lbaas.LoadBalancerContext
-	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
-		s := strings.Split(loadBalancer.(string), "/")
-		lb = lbaas.LoadBalancerContext{
-			Region: s[0],
-			Name:   s[1],
-		}
-	}
+	name := getLastNameInPath(d.Id())
+	lb := getLoadBalancerContextFromID(d.Id())
 
 	result, err := lbaasClient.GetListener(lb, name)
 	if err != nil {
@@ -193,7 +169,7 @@ func resourceListenerRead(d *schema.ResourceData, meta interface{}) error {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Error reading Server Pool %s: %s", d.Id(), err)
+		return fmt.Errorf("Error reading Load Balancer Listener %s: %s", d.Id(), err)
 	}
 
 	if result == nil {
@@ -202,7 +178,6 @@ func resourceListenerRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	d.Set("balancer_protocol", result.BalancerProtocol)
-	d.Set("effective_state", getEnabledState(result.EffectiveState))
 	d.Set("enabled", getEnabledState(result.Disabled))
 	d.Set("name", result.Name)
 	d.Set("operation_details", result.OperationDetails)
@@ -212,11 +187,7 @@ func resourceListenerRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("server_protocol", result.OriginServerProtocol)
 	d.Set("state", result.State)
 	d.Set("uri", result.URI)
-
-	// TODO
-	// if err := setStringList(d, "effective_origin_servers", result.EffectiveOriginServers); err != nil {
-	// 	return err
-	// }
+	d.Set("load_balancer", fmt.Sprintf("%s/%s", lb.Region, lb.Name))
 
 	if err := setStringList(d, "inline_policies", result.InlinePolicies); err != nil {
 		return err
@@ -247,16 +218,8 @@ func resourceListenerRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceListenerUpdate(d *schema.ResourceData, meta interface{}) error {
 	lbaasClient := meta.(*Client).lbaasClient.ListenerClient()
-	name := getLastNameInURIPath(d.Id())
-
-	var lb lbaas.LoadBalancerContext
-	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
-		s := strings.Split(loadBalancer.(string), "/")
-		lb = lbaas.LoadBalancerContext{
-			Region: s[0],
-			Name:   s[1],
-		}
-	}
+	name := getLastNameInPath(d.Id())
+	lb := getLoadBalancerContextFromID(d.Id())
 
 	input := lbaas.UpdateListenerInput{
 		Name: d.Get("name").(string),
@@ -316,16 +279,8 @@ func resourceListenerUpdate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceListenerDelete(d *schema.ResourceData, meta interface{}) error {
 	lbaasClient := meta.(*Client).lbaasClient.ListenerClient()
-	name := getLastNameInURIPath(d.Id())
-
-	var lb lbaas.LoadBalancerContext
-	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
-		s := strings.Split(loadBalancer.(string), "/")
-		lb = lbaas.LoadBalancerContext{
-			Region: s[0],
-			Name:   s[1],
-		}
-	}
+	name := getLastNameInPath(d.Id())
+	lb := getLoadBalancerContextFromID(d.Id())
 
 	if _, err := lbaasClient.DeleteListener(lb, name); err != nil {
 		return fmt.Errorf("Error deleting Listener")
