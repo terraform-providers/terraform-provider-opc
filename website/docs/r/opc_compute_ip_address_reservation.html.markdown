@@ -37,6 +37,8 @@ In addition to the above, the following attributes are exported:
 
 * `uri` - The Uniform Resource Identifier of the ip address reservation
 
+* `fqdn` - The Fully Qualified Domain Name
+
 ## Import
 
 IP Address Reservations can be imported using the `resource name`, e.g.

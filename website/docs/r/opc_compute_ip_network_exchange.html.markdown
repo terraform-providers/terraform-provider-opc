@@ -28,6 +28,8 @@ The following arguments are supported:
 
 * `tags` - (Optional) List of tags that may be applied to the IP network exchange.
 
+* `fqdn` - The Fully Qualified Domain Name
+
 ## Import
 
 IP Network Exchange's can be imported using the `resource name`, e.g.

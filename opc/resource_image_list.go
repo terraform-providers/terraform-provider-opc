@@ -30,6 +30,10 @@ func resourceOPCImageList() *schema.Resource {
 				Optional: true,
 				Default:  1,
 			},
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -94,6 +98,7 @@ func resourceOPCImageListRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("name", result.Name)
 	d.Set("description", result.Description)
 	d.Set("default", result.Default)
+	d.Set("fqdn", result.FQDN)
 
 	return nil
 }

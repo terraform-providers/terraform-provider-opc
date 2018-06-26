@@ -63,6 +63,8 @@ In addition to the attributes listed above, the following attributes are exporte
 * `object_manifest` - The dynamic large-object manifest object.
 * `timestamp` - Date and Time in UNIX EPOCH when the account, container, or object was initially created at the current version.
 * `transaction_id` - Transaction ID of the request.
+* `fqdn` - The Fully Qualified Domain Name
+
 
 ## Object Metadata
 

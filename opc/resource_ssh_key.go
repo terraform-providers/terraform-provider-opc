@@ -35,6 +35,11 @@ func resourceOPCSSHKey() *schema.Resource {
 				Optional: true,
 				Default:  true,
 			},
+
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -108,6 +113,7 @@ func resourceOPCSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("name", result.Name)
 	d.Set("key", result.Key)
 	d.Set("enabled", result.Enabled)
+	d.Set("fqdn", result.FQDN)
 
 	return nil
 }

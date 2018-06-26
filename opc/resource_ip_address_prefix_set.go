@@ -42,6 +42,10 @@ func resourceOPCIPAddressPrefixSet() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -101,6 +105,7 @@ func resourceOPCIPAddressPrefixSetRead(d *schema.ResourceData, meta interface{})
 	d.Set("name", result.Name)
 	d.Set("description", result.Description)
 	d.Set("uri", result.URI)
+	d.Set("fqdn", result.FQDN)
 	if err := setStringList(d, "prefixes", result.IPAddressPrefixes); err != nil {
 		return err
 	}

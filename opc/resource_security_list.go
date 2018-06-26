@@ -54,6 +54,11 @@ func resourceOPCSecurityList() *schema.Resource {
 				}, true),
 				DiffSuppressFunc: suppressCaseDifferences,
 			},
+
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -131,6 +136,7 @@ func resourceOPCSecurityListRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("description", result.Description)
 	d.Set("policy", string(result.Policy))
 	d.Set("outbound_cidr_policy", string(result.OutboundCIDRPolicy))
+	d.Set("fqdn", result.FQDN)
 
 	return nil
 }

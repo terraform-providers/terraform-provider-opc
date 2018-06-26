@@ -52,6 +52,10 @@ func resourceOPCSecRule() *schema.Resource {
 				Optional: true,
 				Default:  false,
 			},
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -120,6 +124,7 @@ func resourceOPCSecRuleRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("application", result.Application)
 	d.Set("action", result.Action)
 	d.Set("disabled", result.Disabled)
+	d.Set("fqdn", result.FQDN)
 
 	return nil
 }

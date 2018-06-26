@@ -36,6 +36,8 @@ In addition to the above, the following variables are exported:
 
 * `uri` - (Computed) The Uniform Resource Identifier of the ip address prefix set.
 
+* `fqdn` - The Fully Qualified Domain Name
+
 ## Import
 
 IP Address Prefix Set can be imported using the `resource name`, e.g.

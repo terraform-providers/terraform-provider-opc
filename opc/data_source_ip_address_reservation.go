@@ -35,6 +35,10 @@ func dataSourceIPAddressReservation() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -66,6 +70,7 @@ func dataSourceIPAddressReservationRead(d *schema.ResourceData, meta interface{}
 	d.Set("ip_address_pool", result.IPAddressPool)
 	d.Set("ip_address", result.IPAddress)
 	d.Set("uri", result.URI)
+	d.Set("fqdn", result.FQDN)
 
 	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err

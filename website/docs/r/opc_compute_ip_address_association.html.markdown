@@ -39,6 +39,8 @@ In addition to the above, the following variables are exported:
 
 * `uri` - (Computed) The Uniform Resource Identifier of the ip address association.
 
+* `fqdn` - The Fully Qualified Domain Name
+
 ## Import
 
 IP Address Associations can be imported using the `resource name`, e.g.

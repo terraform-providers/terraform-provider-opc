@@ -27,6 +27,11 @@ func dataSourceSSHKey() *schema.Resource {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
+
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -56,6 +61,7 @@ func dataSourceSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
 	d.SetId(name)
 	d.Set("key", result.Key)
 	d.Set("enabled", result.Enabled)
+	d.Set("fqdn", result.FQDN)
 
 	return nil
 }

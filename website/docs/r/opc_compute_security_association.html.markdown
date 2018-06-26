@@ -31,6 +31,12 @@ The following arguments are supported:
 
 * `seclist` - (Required) The name of the security list to associate the instance to.
 
+## Attribute Reference
+
+The following attributes can be referenced 
+
+* `fqdn` - The Fully Qualified Domain Name
+
 ## Import
 
 Security Association's can be imported using the `resource name`, e.g.

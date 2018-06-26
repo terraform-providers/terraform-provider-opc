@@ -44,6 +44,10 @@ func resourceOPCVNICSet() *schema.Resource {
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -111,6 +115,7 @@ func resourceOPCVNICSetRead(d *schema.ResourceData, meta interface{}) error {
 
 	d.Set("name", result.Name)
 	d.Set("description", result.Description)
+	d.Set("fqdn", result.FQDN)
 	if err := setStringList(d, "applied_acls", result.AppliedACLs); err != nil {
 		return err
 	}

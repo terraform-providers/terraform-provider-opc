@@ -100,6 +100,11 @@ func dataSourceNetworkInterface() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -159,6 +164,7 @@ func dataSourceNetworkInterfaceRead(d *schema.ResourceData, meta interface{}) er
 	d.Set("is_default_gateway", result.IsDefaultGateway)
 	d.Set("model", result.Model)
 	d.Set("vnic", result.Vnic)
+	d.Set("fqdn", result.FQDN)
 
 	if err := setStringList(d, "dns", result.DNS); err != nil {
 		return err

@@ -150,6 +150,10 @@ func resourceOPCStorageObject() *schema.Resource {
 				Computed:    true,
 				Description: "Transaction ID of the request. Used for bug reports",
 			},
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -265,6 +269,7 @@ func resourceOPCStorageObjectRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("metadata", result.ObjectMetadata)
 	d.Set("timestamp", result.Timestamp)
 	d.Set("transaction_id", result.TransactionID)
+	d.Set("fqdn", result.FQDN)
 
 	return nil
 }

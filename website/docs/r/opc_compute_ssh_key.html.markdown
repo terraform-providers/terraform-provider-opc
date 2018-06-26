@@ -31,6 +31,12 @@ The following arguments are supported:
 * `enabled` - (Optional) Whether or not the key is enabled. This is useful if you want to temporarily disable an SSH key,
 without removing it entirely from your Terraform resource definition. Defaults to `true`
 
+## Attribute Reference
+
+The following attributes can be referenced:
+
+* `fqdn` - The Fully Qualified Domain Name
+
 ## Import
 
 SSH Key's can be imported using the `resource name`, e.g.

@@ -32,3 +32,5 @@ output "public_ssh_key" {
 * `key` - The public SSH key.
 
 * `enabled` - Whether or not the key is enabled.
+
+* `fqdn` - The Fully Qualified Domain Name

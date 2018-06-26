@@ -100,6 +100,11 @@ func dataSourceStorageVolumeSnapshot() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -143,6 +148,7 @@ func dataSourceStorageVolumeSnapshotRead(d *schema.ResourceData, meta interface{
 	d.Set("status_detail", result.StatusDetail)
 	d.Set("status_timestamp", result.StatusTimestamp)
 	d.Set("uri", result.URI)
+	d.Set("fqdn", result.FQDN)
 
 	bootable, err := strconv.ParseBool(result.ParentVolumeBootable)
 	if err != nil {

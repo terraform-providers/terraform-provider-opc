@@ -34,6 +34,10 @@ func dataSourceIPReservation() *schema.Resource {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -71,5 +75,6 @@ func dataSourceIPReservationRead(d *schema.ResourceData, meta interface{}) error
 
 	d.Set("ip", result.IP)
 	d.Set("used", result.Used)
+	d.Set("fqdn", result.FQDN)
 	return nil
 }

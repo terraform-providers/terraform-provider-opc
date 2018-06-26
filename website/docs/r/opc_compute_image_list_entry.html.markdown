@@ -49,6 +49,8 @@ In addition to the above arguments, the following attributes are exported
 
 * `uri` - The Unique Resource Identifier for the Image List Entry.
 
+* `fqdn` - The Fully Qualified Domain Name.
+
 ## Import
 
 Image List's can be imported using the Name of the Image List, along with the Version of the Image List Entry,

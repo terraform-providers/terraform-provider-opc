@@ -32,6 +32,12 @@ The following arguments are supported:
 * `output_cidr_policy` - (Required) The policy for outbound traffic from the security list. Must be one of `permit`,
 `reject` (packets are dropped but a reply is sent) and `deny` (packets are dropped and no reply is sent).
 
+## Attribute Reference
+
+The following attributes can be referenced:
+
+* `fqdn` - The Fully Qualified Domain Name
+
 ## Import
 
 Security List's can be imported using the `resource name`, e.g.

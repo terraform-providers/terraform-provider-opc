@@ -148,3 +148,5 @@ In addition to the above, the following values are exported:
 * `uri` - The Uniform Resource Identifier for the Orchestration
 
 * `version` - (Optional) The version of the orchestration.
+
+* `fqdn` - The Fully Qualified Domain Name

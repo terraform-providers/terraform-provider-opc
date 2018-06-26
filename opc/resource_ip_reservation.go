@@ -43,6 +43,10 @@ func resourceOPCIPReservation() *schema.Resource {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -96,6 +100,7 @@ func resourceOPCIPReservationRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("name", result.Name)
 	d.Set("parent_pool", result.ParentPool)
 	d.Set("permanent", result.Permanent)
+	d.Set("fqdn", result.FQDN)
 
 	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err

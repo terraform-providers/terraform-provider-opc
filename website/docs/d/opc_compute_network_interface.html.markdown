@@ -48,3 +48,4 @@ output "vnic" {
 * `shared_network` - Whether or not the interface is inside the Shared Network or an IP Network.
 * `vnic` - The name of the vNIC created for the IP Network.
 * `vnic_sets` - The array of vNIC Sets the interface was added to.
+* `fqdn` - The Fully Qualified Domain Name

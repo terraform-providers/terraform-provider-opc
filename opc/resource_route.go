@@ -47,6 +47,11 @@ func resourceOPCRoute() *schema.Resource {
 			},
 
 			"tags": tagsOptionalSchema(),
+
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -120,6 +125,7 @@ func resourceOPCRouteRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("ip_address_prefix", result.IPAddressPrefix)
 	d.Set("next_hop_vnic_set", result.NextHopVnicSet)
 	d.Set("description", result.Description)
+	d.Set("fqdn", result.FQDN)
 	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err
 	}

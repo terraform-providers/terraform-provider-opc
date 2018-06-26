@@ -504,7 +504,7 @@ func updateInstanceAttributes(d *schema.ResourceData, instance *compute.Instance
 		return fmt.Errorf("Unable to parse hostname: %s", instance.Hostname)
 	}
 	d.Set("hostname", split_hostname[0])
-	d.Set("fqdn", instance.Hostname)
+	d.Set("fqdn", instance.FQDN)
 	d.Set("image_list", instance.ImageList)
 	d.Set("label", instance.Label)
 

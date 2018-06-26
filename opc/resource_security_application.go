@@ -70,6 +70,11 @@ func resourceOPCSecurityApplication() *schema.Resource {
 				}, true),
 				ForceNew: true,
 			},
+
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -129,6 +134,7 @@ func resourceOPCSecurityApplicationRead(d *schema.ResourceData, meta interface{}
 	d.Set("icmptype", result.ICMPType)
 	d.Set("icmpcode", result.ICMPCode)
 	d.Set("description", result.Description)
+	d.Set("fqdn", result.FQDN)
 
 	return nil
 }

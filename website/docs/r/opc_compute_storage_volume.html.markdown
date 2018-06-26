@@ -69,6 +69,8 @@ The following attributes are exported:
 * `status` - The current state of the storage volume.
 * `storage_pool` - The storage pool from which this volume is allocated.
 * `uri` - Unique Resource Identifier of the Storage Volume.
+* `fqdn` - The Fully Qualified Domain Name
+
 
 ## Import
 

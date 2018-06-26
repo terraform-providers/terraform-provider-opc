@@ -41,6 +41,10 @@ func resourceOPCIPAddressAssociation() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -104,6 +108,7 @@ func resourceOPCIPAddressAssociationRead(d *schema.ResourceData, meta interface{
 	d.Set("vnic", result.Vnic)
 	d.Set("description", result.Description)
 	d.Set("uri", result.URI)
+	d.Set("fqdn", result.FQDN)
 	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err
 	}

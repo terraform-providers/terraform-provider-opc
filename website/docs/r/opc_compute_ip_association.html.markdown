@@ -37,6 +37,8 @@ The following attributes are exported:
 
 * `name` The name of the IP Association
 
+* `fqdn` - The Fully Qualified Domain Name
+
 ## Import
 
 IP Associations can be imported using the `resource name`, e.g.

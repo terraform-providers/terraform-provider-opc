@@ -29,6 +29,12 @@ The following arguments are supported:
 
 * `description` - (Optional) The description of the security ip list.
 
+## Attribute Reference
+
+The following attributes can be referenced:
+
+* `fqdn` - The Fully Qualified Domain Name
+
 ## Import
 
 IP List's can be imported using the `resource name`, e.g.

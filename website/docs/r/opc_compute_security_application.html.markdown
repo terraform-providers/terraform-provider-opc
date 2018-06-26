@@ -48,6 +48,13 @@ The following arguments are supported:
 * `icmpcode` - (Optional) The ICMP code to enable for this application, if the `protocol` is `icmp`. Must be one of
 `admin`, `df`, `host`, `network`, `port` or `protocol`.
 
+## Attribute Reference
+
+The following attributes can be referenced:
+
+* `fqdn` - The Fully Qualified Domain Name
+
+
 ## Import
 
 Security Application's can be imported using the `resource name`, e.g.

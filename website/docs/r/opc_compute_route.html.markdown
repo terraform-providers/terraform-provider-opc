@@ -51,6 +51,9 @@ The following attributes are exported:
 
 * `next_hop_vnic_set` - Name of the virtual NIC set to route matching packets to. Routed flows are load-balanced among all the virtual NICs in the virtual NIC set.
 
+* `fqdn` - The Fully Qualified Domain Name
+
+
 ## Import
 
 Route's can be imported using the `resource name`, e.g.

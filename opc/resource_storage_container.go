@@ -71,6 +71,10 @@ func resourceOPCStorageContainer() *schema.Resource {
 				Type:     schema.TypeMap,
 				Optional: true,
 			},
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			// "georeplication_policy": {
 			// 	Type:     schema.TypeList,
 			// 	Optional: true,
@@ -169,6 +173,7 @@ func resourceOPCStorageContainerRead(d *schema.ResourceData, meta interface{}) e
 	d.Set("quota_bytes", result.QuotaBytes)
 	d.Set("quota_count", result.QuotaCount)
 	d.Set("metadata", result.CustomMetadata)
+	d.Set("fqdn", result.FQDN)
 
 	if err := setStringList(d, "read_acls", result.ReadACLs); err != nil {
 		return err

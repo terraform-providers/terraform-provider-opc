@@ -45,6 +45,10 @@ func resourceOPCSnapshot() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -100,6 +104,7 @@ func resourceOPCSnapshotRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("machine_image", result.MachineImage)
 	d.Set("instance", result.Instance)
 	d.Set("uri", result.URI)
+	d.Set("fqdn", result.FQDN)
 
 	return nil
 }

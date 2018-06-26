@@ -47,6 +47,13 @@ The following arguments are supported:
 
 * `metadata` - (Optional) Additional object metadata headers. See [Container Metadata ](#container-metadata) below for more information.
 
+## Attribute Reference
+
+The following attributes can be referenced:
+
+* `fqdn` - The Fully Qualified Domain Name
+
+
 ## Setting Container ACLs
 
 The `read_acl` consists of a list of **roles** or **referrer designations**. The `write_acls` consists of a list of **roles**.

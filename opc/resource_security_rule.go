@@ -69,6 +69,10 @@ func resourceOPCSecurityRule() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -156,6 +160,7 @@ func resourceOPCSecurityRuleRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("dst_vnic_set", result.DstVnicSet)
 	d.Set("description", result.Description)
 	d.Set("uri", result.URI)
+	d.Set("fqdn", result.FQDN)
 
 	if err := setStringList(d, "security_protocols", result.SecProtocols); err != nil {
 		return err

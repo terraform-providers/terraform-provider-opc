@@ -39,3 +39,5 @@ The following arguments are supported:
 * `ip_address` - The reserved IPv4 Public IP address.
 
 * `uri` - The Uniform Resource Identifier of the ip address reservation
+
+* `fqdn` - The Fully Qualified Domain Name

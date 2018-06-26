@@ -54,6 +54,11 @@ func resourceOPCOrchestratedInstance() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
+
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -123,6 +128,7 @@ func resourceOPCOrchestratedInstanceRead(d *schema.ResourceData, meta interface{
 	d.Set("version", result.Version)
 	d.Set("description", result.Description)
 	d.Set("desired_state", result.DesiredState)
+	d.Set("fqdn", result.FQDN)
 
 	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err

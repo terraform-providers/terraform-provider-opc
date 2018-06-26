@@ -53,6 +53,11 @@ func resourceOPCIPNetwork() *schema.Resource {
 			},
 
 			"tags": tagsOptionalSchema(),
+
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -124,6 +129,7 @@ func resourceOPCIPNetworkRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("description", result.Description)
 	d.Set("public_napt_enabled", result.PublicNaptEnabled)
 	d.Set("uri", result.URI)
+	d.Set("fqdn", result.FQDN)
 	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err
 	}

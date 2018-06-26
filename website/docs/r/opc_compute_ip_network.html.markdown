@@ -53,6 +53,8 @@ The following attributes are exported:
 
 * `uri` - Uniform Resource Identifier for the IP Network
 
+* `fqdn` - The Fully Qualified Domain Name
+
 ## Import
 
 IP Networks can be imported using the `resource name`, e.g.

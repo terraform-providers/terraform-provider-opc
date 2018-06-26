@@ -39,3 +39,5 @@ The following arguments are supported:
 * `tags` - List of tags applied to the IP reservation.
 
 * `used` - indicates that the IP reservation is associated with an instance.
+
+* `fqdn` - The Fully Qualified Domain Name

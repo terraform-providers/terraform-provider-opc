@@ -48,3 +48,5 @@ output "attributes" {
 * `state` - The state of the uploaded machine image.
 
 * `uri` - The Uniform Resource Identifier for the Machine Image.
+
+* `fqdn` - The Fully Qualified Domain Name

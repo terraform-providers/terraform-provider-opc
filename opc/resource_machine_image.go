@@ -87,6 +87,11 @@ func resourceOPCMachineImage() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -171,6 +176,7 @@ func resourceOPCMachineImageRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("platform", result.Platform)
 	d.Set("state", result.State)
 	d.Set("uri", result.URI)
+	d.Set("fqdn", result.FQDN)
 
 	if err := d.Set("attributes", attributes); err != nil {
 		return err

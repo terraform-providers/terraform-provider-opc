@@ -37,6 +37,10 @@ func resourceOPCStorageAttachment() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -136,6 +140,7 @@ func resourceOPCStorageAttachmentRead(d *schema.ResourceData, meta interface{}) 
 	d.Set("index", result.Index)
 	d.Set("instance", strings.Split(result.InstanceName, "/")[0])
 	d.Set("storage_volume", result.StorageVolumeName)
+	d.Set("fqdn", result.FQDN)
 	return nil
 }
 

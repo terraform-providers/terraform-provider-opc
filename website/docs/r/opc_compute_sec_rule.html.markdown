@@ -48,6 +48,8 @@ In addition to the above, the following values are exported:
 
 * `uri` - The Uniform Resource Identifier of the sec rule.
 
+* `fqdn` - The Fully Qualified Domain Name
+
 ## Import
 
 Sec Rule's can be imported using the `resource name`, e.g.

@@ -40,3 +40,4 @@ data "opc_compute_storage_volume_snapshot" "foo" {
 * `tags` - Comma-separated strings that tag the storage volume.
 * `uri` - Uniform Resource Identifier
 * `volume_name` - The name of the storage volume that the snapshot was created from
+* `fqdn` - The Fully Qualified Domain Name

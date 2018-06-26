@@ -53,6 +53,8 @@ In addition to the above, the following attributes are exported:
 
 * `uri` - The Uniform Resource Identifier of the security rule.
 
+* `fqdn` - The Fully Qualified Domain Name
+
 ## Import
 
 Security Rule's can be imported using the `resource name`, e.g.

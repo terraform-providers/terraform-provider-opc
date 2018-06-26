@@ -52,6 +52,9 @@ In addition to the above, the following values are exported:
 
 * `uri` - The Uniform Resource Identifier for the Machine Image.
 
+* `fqdn` - The Fully Qualified Domain Name
+
+
 ## Import
 
 Machine Images can be imported using the `resource name`, e.g.

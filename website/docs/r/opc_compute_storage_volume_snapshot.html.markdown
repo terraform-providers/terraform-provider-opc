@@ -49,6 +49,8 @@ In addition to the attributes above, the following attributes are exported:
 * `status_detail` - Details about the latest state of the storage volume snapshot.
 * `status_timestamp` - Indicates the time that the current view of the storage volume snapshot was generated.
 * `uri` - Uniform Resource Identifier
+* `fqdn` - The Fully Qualified Domain Name
+
 
 ## Import
 

@@ -36,6 +36,12 @@ The following arguments are supported:
 
 * `tags` - (Optional) A list of tags to apply to the storage volume.
 
+## Attribute Reference
+
+The following attributes can be referenced:
+
+* `fqdn` - The Fully Qualified Domain Name
+
 ## Import
 
 VNIC Set's can be imported using the `resource name`, e.g.

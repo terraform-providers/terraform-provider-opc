@@ -44,6 +44,10 @@ func resourceOPCACL() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -106,6 +110,7 @@ func resourceOPCACLRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("enabled", result.Enabled)
 	d.Set("description", result.Description)
 	d.Set("uri", result.URI)
+	d.Set("fqdn", result.FQDN)
 	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err
 	}

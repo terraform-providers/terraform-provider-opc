@@ -36,3 +36,5 @@ output "mac_address" {
 * `transit_flag` is `true` if the Virtual NIC is of the type `transit`.
 
 * `uri` is the Unique Resource Locator of the Virtual NIC.
+
+* `fqdn` - The Fully Qualified Domain Name

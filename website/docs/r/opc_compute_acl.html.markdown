@@ -36,6 +36,8 @@ In addition to the above, the following values are exported:
 
 * `uri` - The Uniform Resource Identifier for the ACL
 
+* `fqdn` - The Fully Qualified Domain Name
+
 ## Import
 
 ACL's can be imported using the `resource name`, e.g.

@@ -50,6 +50,10 @@ func resourceOPCSecurityProtocol() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -111,6 +115,7 @@ func resourceOPCSecurityProtocolRead(d *schema.ResourceData, meta interface{}) e
 	d.Set("name", result.Name)
 	d.Set("ip_protocol", result.IPProtocol)
 	d.Set("description", result.Description)
+	d.Set("fqdn", result.FQDN)
 	if err := setStringList(d, "dst_ports", result.DstPortSet); err != nil {
 		return err
 	}

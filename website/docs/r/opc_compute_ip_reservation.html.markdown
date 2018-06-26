@@ -40,6 +40,8 @@ deleted and recreated (if false).
 
 * `used` - indicates that the IP reservation is associated with an instance.
 
+* `fqdn` - The Fully Qualified Domain Name
+
 ## Import
 
 IP Reservations can be imported using the `resource name`, e.g.

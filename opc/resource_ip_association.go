@@ -35,6 +35,11 @@ func resourceOPCIPAssociation() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
+
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -84,6 +89,7 @@ func resourceOPCIPAssociationRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("name", result.Name)
 	d.Set("parent_pool", result.ParentPool)
 	d.Set("vcable", result.VCable)
+	d.Set("fqdn", result.FQDN)
 
 	return nil
 }

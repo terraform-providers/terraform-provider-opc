@@ -34,6 +34,10 @@ func resourceOPCSecurityIPList() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -95,6 +99,7 @@ func resourceOPCSecurityIPListRead(d *schema.ResourceData, meta interface{}) err
 	d.Set("name", result.Name)
 	d.Set("ip_entries", result.SecIPEntries)
 	d.Set("description", result.Description)
+	d.Set("fqdn", result.FQDN)
 	return nil
 }
 

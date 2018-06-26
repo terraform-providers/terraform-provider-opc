@@ -133,6 +133,10 @@ func resourceOPCStorageVolume() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -242,10 +246,10 @@ func resourceOPCStorageVolumeRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("bootable", result.Bootable)
 	d.Set("image_list", result.ImageList)
 	d.Set("image_list_entry", result.ImageListEntry)
-
 	d.Set("snapshot", result.Snapshot)
 	d.Set("snapshot_id", result.SnapshotID)
 	d.Set("snapshot_account", result.SnapshotAccount)
+	d.Set("fqdn", result.FQDN)
 
 	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err

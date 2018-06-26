@@ -42,3 +42,9 @@ The following arguments are supported:
  instance
 
 * `index` - (Required) The index on the instance that the storage volume will be attached to.
+
+## Attribute Reference
+
+The following attributes can be referenced:
+
+* `fqdn` - The Fully Qualified Domain Name

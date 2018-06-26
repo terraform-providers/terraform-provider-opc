@@ -36,6 +36,11 @@ func resourceOPCSecurityAssociation() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
+
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -89,6 +94,7 @@ func resourceOPCSecurityAssociationRead(d *schema.ResourceData, meta interface{}
 	d.Set("name", result.Name)
 	d.Set("seclist", result.SecList)
 	d.Set("vcable", result.VCable)
+	d.Set("fqdn", result.FQDN)
 
 	return nil
 }
