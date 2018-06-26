@@ -118,7 +118,7 @@ func resourceOriginServerPoolCreate(d *schema.ResourceData, meta interface{}) er
 
 	info, err := client.CreateOriginServerPool(lb, &input)
 	if err != nil {
-		return fmt.Errorf("Error creating Load Balancer: %s", err)
+		return fmt.Errorf("Error creating Load Balancer Server Pool: %s", err)
 	}
 
 	d.SetId(fmt.Sprintf("%s/%s/%s", lb.Region, lb.Name, info.Name))

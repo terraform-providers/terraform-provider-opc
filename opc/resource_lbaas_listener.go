@@ -166,7 +166,7 @@ func resourceListenerCreate(d *schema.ResourceData, meta interface{}) error {
 
 	info, err := client.CreateListener(lb, &input)
 	if err != nil {
-		return fmt.Errorf("Error creating Load Balancer: %s", err)
+		return fmt.Errorf("Error creating Load Balancer Listener: %s", err)
 	}
 
 	d.SetId(fmt.Sprintf("%s/%s/%s", lb.Region, lb.Name, info.Name))
