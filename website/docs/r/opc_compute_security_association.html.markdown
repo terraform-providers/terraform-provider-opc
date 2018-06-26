@@ -33,7 +33,7 @@ The following arguments are supported:
 
 ## Attribute Reference
 
-The following attributes can be referenced 
+The following attributes can be referenced: 
 
 * `fqdn` - The Fully Qualified Domain Name
 
