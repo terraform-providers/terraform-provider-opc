@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/lbaas"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 )
 
 func resourceLBaaSPolicy() *schema.Resource {
@@ -20,14 +21,16 @@ func resourceLBaaSPolicy() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"load_balancer": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateLoadBalancerID,
 			},
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateLoadBalancerPolicyName,
 			},
 			"application_cookie_stickiness_policy": {
 				Type:     schema.TypeList,
@@ -93,6 +96,11 @@ func resourceLBaaSPolicy() *schema.Resource {
 						"load_balancing_mechanism": {
 							Type:     schema.TypeString,
 							Required: true,
+							ValidateFunc: validation.StringInSlice([]string{
+								"round_robin",
+								"least_conn",
+								"ip_hash",
+							}, true),
 						},
 					},
 				},
@@ -120,14 +128,23 @@ func resourceLBaaSPolicy() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 							Default:  "warn",
-							// TODO validate info, notice, warn, error
+							ValidateFunc: validation.StringInSlice([]string{
+								"info",
+								"notice",
+								"warn",
+								"error",
+							}, true),
 						},
 						"rate_limiting_criteria": {
 							Type:     schema.TypeString,
 							ForceNew: true,
 							Optional: true,
 							Default:  "server",
-							// TODO validate server, remote_address, host
+							ValidateFunc: validation.StringInSlice([]string{
+								"server",
+								"remote_address",
+								"host",
+							}, true),
 						},
 						"requests_per_second": {
 							Type:     schema.TypeInt,
@@ -139,10 +156,10 @@ func resourceLBaaSPolicy() *schema.Resource {
 							Default:  10,
 						},
 						"zone": {
-							Type:     schema.TypeString,
-							Required: true,
-							ForceNew: true,
-							// TODO add validation: [a-zA-Z0-9][a-zA-Z0-9_]+
+							Type:         schema.TypeString,
+							Required:     true,
+							ForceNew:     true,
+							ValidateFunc: validateLoadBalancerPolicyName,
 						},
 					},
 				},
@@ -158,9 +175,9 @@ func resourceLBaaSPolicy() *schema.Resource {
 							Required: true,
 						},
 						"response_code": {
-							Type:     schema.TypeInt,
-							Required: true,
-							// TODO validate 300 to 399
+							Type:         schema.TypeInt,
+							Required:     true,
+							ValidateFunc: validation.IntBetween(300, 399),
 						},
 					},
 				},
@@ -174,19 +191,22 @@ func resourceLBaaSPolicy() *schema.Resource {
 						"disposition": {
 							Type:     schema.TypeString,
 							Required: true,
-							// TODO validate  DENY_ALL, ALLOW_ALL
+							ValidateFunc: validation.StringInSlice([]string{
+								"DENY_ALL",
+								"ALLOW_ALL",
+							}, true),
 						},
 						"denied_clients": {
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
-							// TODO Validate IP or CIRR
+							// TODO (future) validate list element is IP or CIDR
 						},
 						"permitted_clients": {
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
-							// TODO validate IP or CIDR
+							// TODO (future) validate list element is IP or CIDR
 						},
 					},
 				},
@@ -200,12 +220,17 @@ func resourceLBaaSPolicy() *schema.Resource {
 						"header_name": {
 							Type:     schema.TypeString,
 							Required: true,
-							// TODO validate ContentType format
 						},
 						"action_when_header_exists": {
 							Type:     schema.TypeString,
 							Optional: true,
-							// TODO validate NOOP, PREPEND, APPEND, OVERWRITE, CLEAR
+							ValidateFunc: validation.StringInSlice([]string{
+								"NOOP",
+								"PREPEND",
+								"APPEND",
+								"OVERWRITE",
+								"CLEAR",
+							}, true),
 						},
 						"action_when_header_value_is": {
 							Type:     schema.TypeList,
@@ -238,13 +263,16 @@ func resourceLBaaSPolicy() *schema.Resource {
 						"server_order_preference": {
 							Type:     schema.TypeString,
 							Optional: true,
-							// TODO validate "Enabled" or "Disabled"
+							ValidateFunc: validation.StringInSlice([]string{
+								"Enabled",
+								"Disabled",
+							}, true),
 						},
 						"ssl_protocol": {
 							Type:     schema.TypeList,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
-							// TODO Validate "SSLv2", "SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2
+							// TODO (future) validate list element in "SSLv2", "SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"
 						},
 						"ssl_ciphers": {
 							Type:     schema.TypeList,

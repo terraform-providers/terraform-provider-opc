@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/lbaas"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 )
 
 func resourceLBaaSListener() *schema.Resource {
@@ -20,22 +21,32 @@ func resourceLBaaSListener() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"load_balancer": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateLoadBalancerID,
 			},
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateLoadBalancerResourceName,
 			},
 			"balancer_protocol": {
 				Type:     schema.TypeString,
 				Required: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					"HTTP",
+					"HTTPS",
+				}, true),
 			},
 			"server_protocol": {
 				Type:     schema.TypeString,
 				Required: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					"HTTP",
+					"HTTPS",
+				}, true),
 			},
 			"port": {
 				Type:     schema.TypeInt,
@@ -47,8 +58,9 @@ func resourceLBaaSListener() *schema.Resource {
 				Default:  true,
 			},
 			"server_pool": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateOriginServerPoolURI,
 			},
 			"path_prefixes": {
 				Type:     schema.TypeList,
@@ -59,11 +71,13 @@ func resourceLBaaSListener() *schema.Resource {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				// TODO (future) validate list element is Policy URI
 			},
 			"ssl_certificates": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				// TODO (future) validate list element is Certificate URI
 			},
 			"tags": {
 				Type:     schema.TypeList,
@@ -77,12 +91,6 @@ func resourceLBaaSListener() *schema.Resource {
 			},
 
 			// Read only attributes
-			"inline_policies": {
-				// TODO not returned from API, Remove?
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
 			"operation_details": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -188,10 +196,6 @@ func resourceListenerRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("state", result.State)
 	d.Set("uri", result.URI)
 	d.Set("load_balancer", fmt.Sprintf("%s/%s", lb.Region, lb.Name))
-
-	if err := setStringList(d, "inline_policies", result.InlinePolicies); err != nil {
-		return err
-	}
 
 	if err := setStringList(d, "path_prefixes", result.PathPrefixes); err != nil {
 		return err

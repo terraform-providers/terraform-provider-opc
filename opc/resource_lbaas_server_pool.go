@@ -22,14 +22,16 @@ func resourceLBaaSOriginServerPool() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"load_balancer": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateLoadBalancerID,
 			},
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateLoadBalancerResourceName,
 			},
 			"enabled": {
 				Type:     schema.TypeBool,
@@ -40,11 +42,11 @@ func resourceLBaaSOriginServerPool() *schema.Resource {
 				Type:     schema.TypeList,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
-				// TODO add validation, must be "hostname:port"
 			},
 			"vnic_set": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateComputeResourceFQDN,
 			},
 			"tags": {
 				Type:     schema.TypeList,
@@ -104,7 +106,11 @@ func resourceOriginServerPoolCreate(d *schema.ResourceData, meta interface{}) er
 
 	originServers := getStringList(d, "servers")
 	if len(originServers) != 0 {
-		input.OriginServers = expandOriginServerConfig(originServers)
+		servers, err := expandOriginServerConfig(originServers)
+		if err != nil {
+			return err
+		}
+		input.OriginServers = servers
 	}
 
 	tags := getStringList(d, "tags")
@@ -179,7 +185,11 @@ func resourceOriginServerPoolUpdate(d *schema.ResourceData, meta interface{}) er
 
 	originServers := getStringList(d, "servers")
 	if len(originServers) != 0 {
-		input.OriginServers = expandOriginServerConfig(originServers)
+		servers, err := expandOriginServerConfig(originServers)
+		if err != nil {
+			return err
+		}
+		input.OriginServers = servers
 	}
 
 	tags := getStringList(d, "tags")
@@ -210,13 +220,13 @@ func resourceOriginServerPoolDelete(d *schema.ResourceData, meta interface{}) er
 }
 
 // convert the list of "server:port" strings to a list of CreateOriginServerInput
-func expandOriginServerConfig(servers []string) []lbaas.CreateOriginServerInput {
+func expandOriginServerConfig(servers []string) ([]lbaas.CreateOriginServerInput, error) {
 	config := []lbaas.CreateOriginServerInput{}
 	for _, element := range servers {
 		s := strings.Split(element, ":")
 		port, err := strconv.Atoi(s[1])
 		if err != nil {
-			// TODO
+			return nil, fmt.Errorf("Server Pool servers must be in the format \"host:port\"")
 		}
 		server := lbaas.CreateOriginServerInput{
 			Hostname: s[0],
@@ -225,7 +235,7 @@ func expandOriginServerConfig(servers []string) []lbaas.CreateOriginServerInput 
 		}
 		config = append(config, server)
 	}
-	return config
+	return config, nil
 }
 
 // convert the OriginServerInfo reponse to a listing of "server:port" strings

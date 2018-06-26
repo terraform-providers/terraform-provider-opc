@@ -77,3 +77,58 @@ func validateComputeStorageAccountName(v interface{}, k string) (ws []string, er
 	}
 	return
 }
+
+// Name can contain only alphanumeric characters and hyphens. First and last characters cannot be hyphen.
+func validateLoadBalancerResourceName(v interface{}, k string) (ws []string, errors []error) {
+	value := v.(string)
+
+	if match, _ := regexp.MatchString("^[a-zA-Z0-9](([a-zA-Z0-9-]*)([a-zA-Z0-9]))?$", value); match != true {
+		errors = append(errors, fmt.Errorf(
+			"Name \"%s\" must contain only alphanumeric characters and hyphens. First and last characters cannot be hyphen", value))
+	}
+	return
+}
+
+// Name can contain only alphanumeric characters, hyphens, and underscores. First and last characters cannot be hyphen or underscore.
+func validateLoadBalancerPolicyName(v interface{}, k string) (ws []string, errors []error) {
+	value := v.(string)
+
+	if match, _ := regexp.MatchString("^[a-zA-Z0-9](([a-zA-Z0-9-_]*)([a-zA-Z0-9]))?$", value); match != true {
+		errors = append(errors, fmt.Errorf(
+			"Name \"%s\" contain only alphanumeric characters, hyphens, and underscores. First and last characters cannot be hyphen or underscore", value))
+	}
+	return
+}
+
+// Check Load Balancer refernece matches the two part "Region/Name" format
+func validateLoadBalancerID(v interface{}, k string) (ws []string, errors []error) {
+	value := v.(string)
+
+	if match, _ := regexp.MatchString("^([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)$", value); match != true {
+		errors = append(errors, fmt.Errorf(
+			"Load Balancer ID \"%s\" must be in the format \"region/name\"", value))
+	}
+	return
+}
+
+// Check name matchs the Compute three part name format /Compute-{domain}/{container}/{name}
+func validateComputeResourceFQDN(v interface{}, k string) (ws []string, errors []error) {
+	value := v.(string)
+
+	if match, _ := regexp.MatchString("^/Compute-([a-zA-Z0-9]+)/([^/]+)/([a-zA-Z0-9-_/]+)$", value); match != true {
+		errors = append(errors, fmt.Errorf(
+			"Name \"%s\" must alphanumeric characters and hyphen only, first and last characters cannot be hyphen", value))
+	}
+	return
+}
+
+// Check URI matches the Load Balancer Origin Server Pool URI format
+func validateOriginServerPoolURI(v interface{}, k string) (ws []string, errors []error) {
+	value := v.(string)
+
+	if match, _ := regexp.MatchString("https://([-A-Za-z0-9+@_.]+)/vlbrs/([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)/originserverpool/([a-zA-Z0-9-]+)$", value); match != true {
+		errors = append(errors, fmt.Errorf(
+			"\"%s\" must be a valid URI to an Load Balancer Origin Server Pool resource", value))
+	}
+	return
+}

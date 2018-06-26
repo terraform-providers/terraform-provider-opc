@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/lbaas"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 )
 
 func resourceLBaaSLoadBalancer() *schema.Resource {
@@ -21,32 +22,32 @@ func resourceLBaaSLoadBalancer() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true, // TODO name can be changed
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true, // TODO name can be changed
+				ValidateFunc: validateLoadBalancerResourceName,
 			},
 			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validation.StringLenBetween(1, 1000),
 			},
 			"enabled": {
-				// TODO separate enabled flag (desired state) from DisabledState (current state)
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 			},
 			"ip_network": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-				// TODO add validation for 3 part name
-				// TODO add valication only supported for INTERNAL load balancer?
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validateComputeResourceFQDN,
+				// TODO add constraint, field supported when "scheme = INTERNAL"
 			},
 			"premitted_methods": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
-				// TODO add validation
 			},
 			"region": {
 				Type:     schema.TypeString,
@@ -57,11 +58,15 @@ func resourceLBaaSLoadBalancer() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
-				// TODO add validation
+				ValidateFunc: validation.StringInSlice([]string{
+					"INTERNET_FACING",
+					"INTERNAL",
+				}, true),
 			},
 			"server_pool": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateOriginServerPoolURI,
 			},
 			"tags": {
 				Type:     schema.TypeList,
