@@ -98,7 +98,7 @@ func resourceLBaaSLoadBalancer() *schema.Resource {
 
 func resourceOPCLoadBalancerCreate(d *schema.ResourceData, meta interface{}) error {
 
-	client := meta.(*Client).lbaasClient.LoadBalancerClient()
+	lbClient := meta.(*Client).lbaasClient.LoadBalancerClient()
 	input := lbaas.CreateLoadBalancerInput{
 		Name:   d.Get("name").(string),
 		Region: d.Get("region").(string),
@@ -134,7 +134,7 @@ func resourceOPCLoadBalancerCreate(d *schema.ResourceData, meta interface{}) err
 		input.Tags = tags
 	}
 
-	info, err := client.CreateLoadBalancer(&input)
+	info, err := lbClient.CreateLoadBalancer(&input)
 	if err != nil {
 		return fmt.Errorf("Error creating Load Balancer: %s", err)
 	}
@@ -144,7 +144,7 @@ func resourceOPCLoadBalancerCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
-	lbaasClient := meta.(*Client).lbaasClient.LoadBalancerClient()
+	lbClient := meta.(*Client).lbaasClient.LoadBalancerClient()
 
 	s := strings.Split(d.Id(), "/")
 	lb := lbaas.LoadBalancerContext{
@@ -152,7 +152,7 @@ func resourceOPCLoadBalancerRead(d *schema.ResourceData, meta interface{}) error
 		Name:   s[1],
 	}
 
-	result, err := lbaasClient.GetLoadBalancer(lb)
+	result, err := lbClient.GetLoadBalancer(lb)
 	if err != nil {
 		// LoadBalancer does not exist
 		if client.WasNotFoundError(err) {
@@ -191,7 +191,7 @@ func resourceOPCLoadBalancerRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceOPCLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) error {
-	lbaasClient := meta.(*Client).lbaasClient.LoadBalancerClient()
+	lbClient := meta.(*Client).lbaasClient.LoadBalancerClient()
 	lb := getLoadBalancerContextFromID(d.Id())
 
 	input := lbaas.UpdateLoadBalancerInput{
@@ -226,7 +226,7 @@ func resourceOPCLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) err
 		input.Tags = tags
 	}
 
-	result, err := lbaasClient.UpdateLoadBalancer(lb, &input)
+	result, err := lbClient.UpdateLoadBalancer(lb, &input)
 	if err != nil {
 		return fmt.Errorf("Error updating LoadBalancer: %s", err)
 	}
@@ -238,10 +238,10 @@ func resourceOPCLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
-	lbaasClient := meta.(*Client).lbaasClient.LoadBalancerClient()
+	lbClient := meta.(*Client).lbaasClient.LoadBalancerClient()
 	lb := getLoadBalancerContextFromID(d.Id())
 
-	if _, err := lbaasClient.DeleteLoadBalancer(lb); err != nil {
+	if _, err := lbClient.DeleteLoadBalancer(lb); err != nil {
 		return fmt.Errorf("Error deleting LoadBalancer")
 	}
 	return nil

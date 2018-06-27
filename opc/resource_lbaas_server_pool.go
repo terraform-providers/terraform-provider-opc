@@ -81,7 +81,7 @@ func resourceLBaaSOriginServerPool() *schema.Resource {
 
 func resourceOriginServerPoolCreate(d *schema.ResourceData, meta interface{}) error {
 
-	client := meta.(*Client).lbaasClient.OriginServerPoolClient()
+	serverPoolClient := meta.(*Client).lbaasClient.OriginServerPoolClient()
 
 	var lb lbaas.LoadBalancerContext
 	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
@@ -118,7 +118,7 @@ func resourceOriginServerPoolCreate(d *schema.ResourceData, meta interface{}) er
 		input.Tags = tags
 	}
 
-	info, err := client.CreateOriginServerPool(lb, &input)
+	info, err := serverPoolClient.CreateOriginServerPool(lb, &input)
 	if err != nil {
 		return fmt.Errorf("Error creating Load Balancer Server Pool: %s", err)
 	}
@@ -128,11 +128,11 @@ func resourceOriginServerPoolCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceOriginServerPoolRead(d *schema.ResourceData, meta interface{}) error {
-	lbaasClient := meta.(*Client).lbaasClient.OriginServerPoolClient()
+	serverPoolClient := meta.(*Client).lbaasClient.OriginServerPoolClient()
 	name := getLastNameInPath(d.Id())
 	lb := getLoadBalancerContextFromID(d.Id())
 
-	result, err := lbaasClient.GetOriginServerPool(lb, name)
+	result, err := serverPoolClient.GetOriginServerPool(lb, name)
 	if err != nil {
 		// OriginServerPool does not exist
 		if client.WasNotFoundError(err) {
@@ -169,11 +169,13 @@ func resourceOriginServerPoolRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceOriginServerPoolUpdate(d *schema.ResourceData, meta interface{}) error {
-	lbaasClient := meta.(*Client).lbaasClient.OriginServerPoolClient()
+	serverPoolClient := meta.(*Client).lbaasClient.OriginServerPoolClient()
 	name := getLastNameInPath(d.Id())
 	lb := getLoadBalancerContextFromID(d.Id())
 
-	input := lbaas.UpdateOriginServerPoolInput{}
+	input := lbaas.UpdateOriginServerPoolInput{
+		Name: name,
+	}
 
 	if enabled, ok := d.GetOk("enabled"); ok {
 		if enabled.(bool) {
@@ -197,7 +199,7 @@ func resourceOriginServerPoolUpdate(d *schema.ResourceData, meta interface{}) er
 		input.Tags = tags
 	}
 
-	result, err := lbaasClient.UpdateOriginServerPool(lb, name, &input)
+	result, err := serverPoolClient.UpdateOriginServerPool(lb, name, &input)
 	if err != nil {
 		return fmt.Errorf("Error updating OriginServerPool: %s", err)
 	}

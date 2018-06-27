@@ -259,7 +259,7 @@ func TestValidateComputeResourceName(t *testing.T) {
 
 func TestValidateOriginServerPoolURI(t *testing.T) {
 	validURIs := []string{
-		"https://lbaas-148cba7050494081b95151c522617ba9.balancer.oraclecloud.com/vlbrs/uscom-central-1/lb1/originserverpool/pool1",
+		"https://lbaas-148cba7050494081b95151c522617ba9.balancer.oraclecloud.com/vlbrs/uscom-central-1/lb1/originserverpools/pool1",
 	}
 
 	for _, v := range validURIs {
@@ -270,7 +270,7 @@ func TestValidateOriginServerPoolURI(t *testing.T) {
 	}
 
 	invalidURIs := []string{
-		"https://lbaas-148cba7050494081b95151c522617ba9.balancer.oraclecloud.com/vlbrs/uscom-central-1/lb1/listeners/pool1",
+		"https://lbaas-148cba7050494081b95151c522617ba9.balancer.oraclecloud.com/vlbrs/uscom-central-1/lb1/listeners/listener1",
 	}
 	for _, v := range invalidURIs {
 		_, errors := validateOriginServerPoolURI(v, "account")

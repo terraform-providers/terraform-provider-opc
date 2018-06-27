@@ -126,7 +126,7 @@ func validateComputeResourceFQDN(v interface{}, k string) (ws []string, errors [
 func validateOriginServerPoolURI(v interface{}, k string) (ws []string, errors []error) {
 	value := v.(string)
 
-	if match, _ := regexp.MatchString("https://([-A-Za-z0-9+@_.]+)/vlbrs/([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)/originserverpool/([a-zA-Z0-9-]+)$", value); match != true {
+	if match, _ := regexp.MatchString("https://([-A-Za-z0-9+@_.]+)/vlbrs/([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)/originserverpools/([a-zA-Z0-9-]+)$", value); match != true {
 		errors = append(errors, fmt.Errorf(
 			"\"%s\" must be a valid URI to an Load Balancer Origin Server Pool resource", value))
 	}

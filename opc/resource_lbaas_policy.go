@@ -315,7 +315,7 @@ func resourceLBaaSPolicy() *schema.Resource {
 
 func resourcePolicyCreate(d *schema.ResourceData, meta interface{}) error {
 
-	client := meta.(*Client).lbaasClient.PolicyClient()
+	policyClient := meta.(*Client).lbaasClient.PolicyClient()
 
 	var lb lbaas.LoadBalancerContext
 	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
@@ -367,7 +367,7 @@ func resourcePolicyCreate(d *schema.ResourceData, meta interface{}) error {
 		input.TrustedCertificatePolicyInfo = expandTrustedCertificatePolicy(d)
 	}
 
-	info, err := client.CreatePolicy(lb, &input)
+	info, err := policyClient.CreatePolicy(lb, &input)
 	if err != nil {
 		return fmt.Errorf("Error creating Load Balancer Policy: %s", err)
 	}
@@ -377,11 +377,11 @@ func resourcePolicyCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourcePolicyRead(d *schema.ResourceData, meta interface{}) error {
-	lbaasClient := meta.(*Client).lbaasClient.PolicyClient()
+	policyClient := meta.(*Client).lbaasClient.PolicyClient()
 	name := getLastNameInPath(d.Id())
 	lb := getLoadBalancerContextFromID(d.Id())
 
-	result, err := lbaasClient.GetPolicy(lb, name)
+	result, err := policyClient.GetPolicy(lb, name)
 	if err != nil {
 		// Policy does not exist
 		if client.WasNotFoundError(err) {
@@ -434,7 +434,7 @@ func resourcePolicyRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourcePolicyUpdate(d *schema.ResourceData, meta interface{}) error {
-	lbaasClient := meta.(*Client).lbaasClient.PolicyClient()
+	policyClient := meta.(*Client).lbaasClient.PolicyClient()
 	name := getLastNameInPath(d.Id())
 	lb := getLoadBalancerContextFromID(d.Id())
 
@@ -483,7 +483,7 @@ func resourcePolicyUpdate(d *schema.ResourceData, meta interface{}) error {
 		input.TrustedCertificatePolicyInfo = expandTrustedCertificatePolicy(d)
 	}
 
-	result, err := lbaasClient.UpdatePolicy(lb, name, input.Type, &input)
+	result, err := policyClient.UpdatePolicy(lb, name, input.Type, &input)
 	if err != nil {
 		return fmt.Errorf("Error updating Policy: %s", err)
 	}
@@ -495,11 +495,11 @@ func resourcePolicyUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourcePolicyDelete(d *schema.ResourceData, meta interface{}) error {
-	lbaasClient := meta.(*Client).lbaasClient.PolicyClient()
+	policyClient := meta.(*Client).lbaasClient.PolicyClient()
 	name := getLastNameInPath(d.Id())
 	lb := getLoadBalancerContextFromID(d.Id())
 
-	if _, err := lbaasClient.DeletePolicy(lb, name); err != nil {
+	if _, err := policyClient.DeletePolicy(lb, name); err != nil {
 		return fmt.Errorf("Error deleting Policy")
 	}
 	return nil

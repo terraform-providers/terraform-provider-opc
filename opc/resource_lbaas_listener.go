@@ -113,7 +113,7 @@ func resourceLBaaSListener() *schema.Resource {
 
 func resourceListenerCreate(d *schema.ResourceData, meta interface{}) error {
 
-	client := meta.(*Client).lbaasClient.ListenerClient()
+	listenerClient := meta.(*Client).lbaasClient.ListenerClient()
 
 	var lb lbaas.LoadBalancerContext
 	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
@@ -156,7 +156,7 @@ func resourceListenerCreate(d *schema.ResourceData, meta interface{}) error {
 		input.VirtualHosts = virtualHosts
 	}
 
-	info, err := client.CreateListener(lb, &input)
+	info, err := listenerClient.CreateListener(lb, &input)
 	if err != nil {
 		return fmt.Errorf("Error creating Load Balancer Listener: %s", err)
 	}
@@ -166,11 +166,11 @@ func resourceListenerCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceListenerRead(d *schema.ResourceData, meta interface{}) error {
-	lbaasClient := meta.(*Client).lbaasClient.ListenerClient()
+	listenerClient := meta.(*Client).lbaasClient.ListenerClient()
 	name := getLastNameInPath(d.Id())
 	lb := getLoadBalancerContextFromID(d.Id())
 
-	result, err := lbaasClient.GetListener(lb, name)
+	result, err := listenerClient.GetListener(lb, name)
 	if err != nil {
 		// Listener does not exist
 		if client.WasNotFoundError(err) {
@@ -221,7 +221,7 @@ func resourceListenerRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceListenerUpdate(d *schema.ResourceData, meta interface{}) error {
-	lbaasClient := meta.(*Client).lbaasClient.ListenerClient()
+	listenerClient := meta.(*Client).lbaasClient.ListenerClient()
 	name := getLastNameInPath(d.Id())
 	lb := getLoadBalancerContextFromID(d.Id())
 
@@ -270,7 +270,7 @@ func resourceListenerUpdate(d *schema.ResourceData, meta interface{}) error {
 		input.VirtualHosts = virtualHosts
 	}
 
-	result, err := lbaasClient.UpdateListener(lb, name, &input)
+	result, err := listenerClient.UpdateListener(lb, name, &input)
 	if err != nil {
 		return fmt.Errorf("Error updating Listener: %s", err)
 	}
@@ -282,11 +282,11 @@ func resourceListenerUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceListenerDelete(d *schema.ResourceData, meta interface{}) error {
-	lbaasClient := meta.(*Client).lbaasClient.ListenerClient()
+	listenerClient := meta.(*Client).lbaasClient.ListenerClient()
 	name := getLastNameInPath(d.Id())
 	lb := getLoadBalancerContextFromID(d.Id())
 
-	if _, err := lbaasClient.DeleteListener(lb, name); err != nil {
+	if _, err := listenerClient.DeleteListener(lb, name); err != nil {
 		return fmt.Errorf("Error deleting Listener")
 	}
 	return nil
