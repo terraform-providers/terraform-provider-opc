@@ -44,7 +44,21 @@ func resourceLBaaSLoadBalancer() *schema.Resource {
 				ValidateFunc: validateComputeResourceFQDN,
 				// TODO add constraint, field supported when "scheme = INTERNAL"
 			},
-			"premitted_methods": {
+			"parent_load_balancer": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"permitted_clients": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"permitted_methods": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"policies": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -121,12 +135,26 @@ func resourceOPCLoadBalancerCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if serverPool, ok := d.GetOk("server_pool"); ok {
-		input.ServerPool = serverPool.(string)
+		input.OriginServerPool = serverPool.(string)
 	}
 
-	permittedMethods := getStringList(d, "premitted_methods")
+	if parent, ok := d.GetOk("parent_load_balancer"); ok {
+		input.ParentLoadBalancer = parent.(string)
+	}
+
+	permittedClients := getStringList(d, "permitted_clients")
+	if len(permittedClients) != 0 {
+		input.PermittedClients = permittedClients
+	}
+
+	permittedMethods := getStringList(d, "permitted_methods")
 	if len(permittedMethods) != 0 {
 		input.PermittedMethods = permittedMethods
+	}
+
+	policies := getStringList(d, "policies")
+	if len(policies) != 0 {
+		input.Policies = policies
 	}
 
 	tags := getStringList(d, "tags")
@@ -173,15 +201,22 @@ func resourceOPCLoadBalancerRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("description", result.Description)
 	d.Set("ip_network", result.IPNetworkName)
 	d.Set("name", result.Name)
+	d.Set("parent_load_balancer", result.ParentLoadBalancer)
 	d.Set("region", result.Region)
 	d.Set("scheme", result.Scheme)
-	d.Set("server_pool", result.ServerPool)
+	d.Set("server_pool", result.OriginServerPool)
 	d.Set("uri", result.URI)
 
 	if err := setStringList(d, "balancer_vips", result.BalancerVIPs); err != nil {
 		return err
 	}
-	if err := setStringList(d, "premitted_methods", result.PermittedMethods); err != nil {
+	if err := setStringList(d, "permitted_clients", result.PermittedClients); err != nil {
+		return err
+	}
+	if err := setStringList(d, "permitted_methods", result.PermittedMethods); err != nil {
+		return err
+	}
+	if err := setStringList(d, "policies", result.Policies); err != nil {
 		return err
 	}
 	if err := setStringList(d, "tags", result.Tags); err != nil {
@@ -198,33 +233,19 @@ func resourceOPCLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) err
 		Name: d.Get("name").(string),
 	}
 
-	if description, ok := d.GetOk("description"); ok {
-		input.Description = description.(string)
-	}
-
 	if enabled, ok := d.GetOk("enabled"); ok {
 		input.Disabled = getDisabledStateKeyword(enabled.(bool))
 	}
 
-	// TODO API complains
-	// * opc_lbaas_load_balancer.lb1: Error updating LoadBalancer: 400: ip_network_name should not be specified while updating lb1.
-	// if ipNetwork, ok := d.GetOk("ip_network"); ok {
-	// 	input.IPNetworkName = ipNetwork.(string)
-	// }
+	input.Description = updateOrRemoveStringAttribute(d, "description")
+	input.IPNetworkName = updateOrRemoveStringAttribute(d, "ip_network")
+	input.OriginServerPool = updateOrRemoveStringAttribute(d, "server_pool")
+	input.ParentLoadBalancer = updateOrRemoveStringAttribute(d, "parent_load_balancer")
 
-	if serverPool, ok := d.GetOk("server_pool"); ok {
-		input.ServerPool = serverPool.(string)
-	}
-
-	permittedMethods := getStringList(d, "premitted_methods")
-	if len(permittedMethods) != 0 {
-		input.PermittedMethods = permittedMethods
-	}
-
-	tags := getStringList(d, "tags")
-	if len(tags) != 0 {
-		input.Tags = tags
-	}
+	input.PermittedClients = updateOrRemoveStringListAttribute(d, "permitted_clients")
+	input.PermittedMethods = updateOrRemoveStringListAttribute(d, "permitted_methods")
+	input.Policies = updateOrRemoveStringListAttribute(d, "policies")
+	input.Tags = updateOrRemoveStringListAttribute(d, "tags")
 
 	result, err := lbClient.UpdateLoadBalancer(lb, &input)
 	if err != nil {
@@ -233,7 +254,6 @@ func resourceOPCLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) err
 
 	d.SetId(fmt.Sprintf("%s/%s", lb.Region, result.Name))
 
-	// TODO instead of re-read, process info from UpdateLoadBalancer()
 	return resourceOPCLoadBalancerRead(d, meta)
 }
 
@@ -262,4 +282,30 @@ func getEnabledState(state lbaas.LBaaSDisabled) bool {
 		return true
 	}
 	return false
+}
+
+// return the changed value, empty string if the attribute has been removed or nil if unchanged
+// and optional string trnasformation function to apply to the returned value
+func updateOrRemoveStringAttribute(d *schema.ResourceData, attributeName string) *string {
+	if d.HasChange(attributeName) {
+		val := ""
+		if attribute, ok := d.GetOk(attributeName); ok {
+			val = attribute.(string)
+		}
+		return &val
+	}
+	return nil
+}
+
+// return the updated list, emppty list if attribute has been removed, or nil if unchanged
+func updateOrRemoveStringListAttribute(d *schema.ResourceData, attributeName string) *[]string {
+	if d.HasChange(attributeName) {
+		val := getStringList(d, attributeName)
+		if val == nil {
+			// return an empty list
+			val = []string{}
+		}
+		return &val
+	}
+	return nil
 }

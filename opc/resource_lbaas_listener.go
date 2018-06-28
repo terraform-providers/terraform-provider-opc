@@ -241,34 +241,19 @@ func resourceListenerUpdate(d *schema.ResourceData, meta interface{}) error {
 		input.Port = port.(int)
 	}
 
-	if serverPool, ok := d.GetOk("server_pool"); ok {
-		// Only the URI Path is need on Update
-		input.OriginServerPool = getURIRequestPath(serverPool.(string))
-	}
-
 	if serverProtocol, ok := d.GetOk("server_protocol"); ok {
 		input.OriginServerProtocol = lbaas.Protocol(serverProtocol.(string))
 	}
 
-	pathPrefixes := getStringList(d, "path_prefixes")
-	if len(pathPrefixes) != 0 {
-		input.PathPrefixes = pathPrefixes
-	}
+	// Only the URI Path is need on Update
+	serverPool := updateOrRemoveStringAttribute(d, "server_pool")
+	*serverPool = getURIRequestPath(*serverPool)
+	input.OriginServerPool = serverPool
 
-	policies := getStringList(d, "policies")
-	if len(policies) != 0 {
-		input.Policies = policies
-	}
-
-	tags := getStringList(d, "tags")
-	if len(tags) != 0 {
-		input.Tags = tags
-	}
-
-	virtualHosts := getStringList(d, "virtual_hosts")
-	if len(virtualHosts) != 0 {
-		input.VirtualHosts = virtualHosts
-	}
+	input.PathPrefixes = updateOrRemoveStringListAttribute(d, "path_prefixes")
+	input.Policies = updateOrRemoveStringListAttribute(d, "policies")
+	input.Tags = updateOrRemoveStringListAttribute(d, "tags")
+	input.VirtualHosts = updateOrRemoveStringListAttribute(d, "virtual_hosts")
 
 	result, err := listenerClient.UpdateListener(lb, name, &input)
 	if err != nil {
@@ -277,7 +262,6 @@ func resourceListenerUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	d.SetId(fmt.Sprintf("%s/%s/%s", lb.Region, lb.Name, result.Name))
 
-	// TODO instead of re-read, process info from UpdateListener()
 	return resourceListenerRead(d, meta)
 }
 

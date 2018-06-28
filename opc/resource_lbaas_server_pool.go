@@ -185,19 +185,20 @@ func resourceOriginServerPoolUpdate(d *schema.ResourceData, meta interface{}) er
 		}
 	}
 
-	originServers := getStringList(d, "servers")
-	if len(originServers) != 0 {
-		servers, err := expandOriginServerConfig(originServers)
-		if err != nil {
-			return err
+	if d.HasChange("servers") {
+		originServers := getStringList(d, "servers")
+		servers := []lbaas.CreateOriginServerInput{}
+		if len(originServers) > 0 {
+			expanded, err := expandOriginServerConfig(originServers)
+			if err != nil {
+				return err
+			}
+			servers = expanded
 		}
-		input.OriginServers = servers
+		input.OriginServers = &servers
 	}
 
-	tags := getStringList(d, "tags")
-	if len(tags) != 0 {
-		input.Tags = tags
-	}
+	input.Tags = updateOrRemoveStringListAttribute(d, "tags")
 
 	result, err := serverPoolClient.UpdateOriginServerPool(lb, name, &input)
 	if err != nil {
@@ -206,7 +207,6 @@ func resourceOriginServerPoolUpdate(d *schema.ResourceData, meta interface{}) er
 
 	d.SetId(fmt.Sprintf("%s/%s/%s", lb.Region, lb.Name, result.Name))
 
-	// TODO instead of re-read, process info from UpdateOriginServerPool()
 	return resourceOriginServerPoolRead(d, meta)
 }
 
