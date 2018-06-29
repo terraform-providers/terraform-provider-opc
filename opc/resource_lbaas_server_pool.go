@@ -39,7 +39,7 @@ func resourceLBaaSOriginServerPool() *schema.Resource {
 				Default:  true,
 			},
 			"servers": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
@@ -49,7 +49,7 @@ func resourceLBaaSOriginServerPool() *schema.Resource {
 				ValidateFunc: validateComputeResourceFQDN,
 			},
 			"tags": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},

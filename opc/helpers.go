@@ -24,6 +24,19 @@ func getStringList(d *schema.ResourceData, key string) []string {
 	return res
 }
 
+// Helper function to get a string Set from the schema, and alpha-sort it
+func getStringSet(d *schema.ResourceData, key string) []string {
+	if _, ok := d.GetOk(key); !ok {
+		return nil
+	}
+	l := d.Get(key).(*schema.Set).List()
+	res := make([]string, len(l))
+	for i, v := range l {
+		res[i] = v.(string)
+	}
+	return res
+}
+
 // Helper function to set a string list in the schema, in an alpha-sorted order.
 func setStringList(d *schema.ResourceData, key string, value []string) error {
 	sort.Strings(value)

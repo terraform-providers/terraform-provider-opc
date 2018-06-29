@@ -53,17 +53,17 @@ func resourceLBaaSPolicy() *schema.Resource {
 					Schema: map[string]*schema.Schema{
 						"cloudgate_application": {
 							Type:     schema.TypeString,
-							Required: true,
+							Optional: true,
 							ForceNew: true,
 						},
 						"cloudgate_policy_name": {
 							Type:     schema.TypeString,
-							Required: true,
+							Optional: true,
 							ForceNew: true,
 						},
 						"identity_service_instance_guid": {
 							Type:     schema.TypeString,
-							Required: true,
+							Optional: true,
 							ForceNew: true,
 						},
 						"virtual_hostname_for_policy_attribution": {
@@ -115,14 +115,15 @@ func resourceLBaaSPolicy() *schema.Resource {
 							Type:     schema.TypeInt,
 							Required: true,
 						},
-						"do_not_delay_excessive_requests": {
+						"delay_excessive_requests": {
 							Type:     schema.TypeBool,
 							Required: true,
 						},
-						"http_status_error_code": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							Default:  503,
+						"http_error_code": {
+							Type:         schema.TypeInt,
+							Optional:     true,
+							Default:      503,
+							ValidateFunc: validation.IntBetween(405, 599),
 						},
 						"logging_level": {
 							Type:     schema.TypeString,
@@ -197,13 +198,13 @@ func resourceLBaaSPolicy() *schema.Resource {
 							}, true),
 						},
 						"denied_clients": {
-							Type:     schema.TypeList,
+							Type:     schema.TypeSet,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							// TODO (future) validate list element is IP or CIDR
 						},
 						"permitted_clients": {
-							Type:     schema.TypeList,
+							Type:     schema.TypeSet,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							// TODO (future) validate list element is IP or CIDR
@@ -233,12 +234,12 @@ func resourceLBaaSPolicy() *schema.Resource {
 							}, true),
 						},
 						"action_when_header_value_is": {
-							Type:     schema.TypeList,
+							Type:     schema.TypeSet,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
 						"action_when_header_value_is_not": {
-							Type:     schema.TypeList,
+							Type:     schema.TypeSet,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
@@ -269,13 +270,13 @@ func resourceLBaaSPolicy() *schema.Resource {
 							}, true),
 						},
 						"ssl_protocol": {
-							Type:     schema.TypeList,
+							Type:     schema.TypeSet,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							// TODO (future) validate list element in "SSLv2", "SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"
 						},
 						"ssl_ciphers": {
-							Type:     schema.TypeList,
+							Type:     schema.TypeSet,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
@@ -647,8 +648,8 @@ func expandRateLimitingRequestPolicy(d *schema.ResourceData) lbaas.RateLimitingR
 
 	info := lbaas.RateLimitingRequestPolicyInfo{
 		BurstSize:                   policy["burst_size"].(int),
-		DoNotDelayExcessiveRequests: policy["do_not_delay_excessive_requests"].(bool),
-		HttpStatusErrorCode:         policy["http_status_error_code"].(int),
+		DoNotDelayExcessiveRequests: !policy["delay_excessive_requests"].(bool),
+		HttpStatusErrorCode:         policy["http_error_code"].(int),
 		LogLevel:                    policy["logging_level"].(string),
 		RateLimitingCriteria:        policy["rate_limiting_criteria"].(string),
 		RequestsPerSecond:           policy["requests_per_second"].(int),
@@ -671,8 +672,8 @@ func flattenRateLimitingRequestPolicy(d *schema.ResourceData, result *lbaas.Poli
 	}
 
 	attrs["burst_size"] = result.BurstSize
-	attrs["do_not_delay_excessive_requests"] = result.DoNotDelayExcessiveRequests
-	attrs["http_status_error_code"] = result.HttpStatusErrorCode
+	attrs["delay_excessive_requests"] = !result.DoNotDelayExcessiveRequests
+	attrs["http_error_code"] = result.HttpStatusErrorCode
 	attrs["log_level"] = result.LogLevel
 	attrs["rate_limiting_criteria"] = result.RateLimitingCriteria
 	attrs["requests_per_second"] = result.RequestsPerSecond
@@ -729,11 +730,11 @@ func expandResourceAccessControlPolicy(d *schema.ResourceData) lbaas.ResourceAcc
 		Disposition: policy["disposition"].(string),
 	}
 
-	deniedClients := getStringList(d, "resource_access_control_policy.0.denied_clients")
+	deniedClients := getStringSet(d, "resource_access_control_policy.0.denied_clients")
 	if len(deniedClients) != 0 {
 		info.DeniedClients = deniedClients
 	}
-	permittedClients := getStringList(d, "resource_access_control_policy.0.permitted_clients")
+	permittedClients := getStringSet(d, "resource_access_control_policy.0.permitted_clients")
 	if len(permittedClients) != 0 {
 		info.PermittedClients = permittedClients
 	}
@@ -779,14 +780,9 @@ func expandSetRequestHeaderPolicy(d *schema.ResourceData) lbaas.SetRequestHeader
 		info.ActionWhenHeaderExists = val
 	}
 
-	actionIs := getStringList(d, "set_request_header_policy.0.action_when_header_value_is")
-	if len(actionIs) != 0 {
-		info.ActionWhenHeaderValueIs = actionIs
-	}
-	actionIsNot := getStringList(d, "set_request_header_policy.0.action_when_header_value_is_not")
-	if len(actionIsNot) != 0 {
-		info.ActionWhenHeaderValueIsNot = actionIsNot
-	}
+	info.ActionWhenHeaderValueIs = getStringSet(d, "set_request_header_policy.0.action_when_header_value_is")
+	info.ActionWhenHeaderValueIsNot = getStringSet(d, "set_request_header_policy.0.action_when_header_value_is_not")
+
 	return info
 }
 
@@ -826,11 +822,11 @@ func exapndSSLNegotiationPolicy(d *schema.ResourceData) lbaas.SSLNegotiationPoli
 		info.ServerOrderPreference = val
 	}
 
-	sslProtocol := getStringList(d, "ssl_negotiation_policy.0.ssl_protocol")
+	sslProtocol := getStringSet(d, "ssl_negotiation_policy.0.ssl_protocol")
 	if len(sslProtocol) != 0 {
 		info.SSLProtocol = sslProtocol
 	}
-	sslCiphers := getStringList(d, "ssl_negotiation_policy.0.ssl_ciphers")
+	sslCiphers := getStringSet(d, "ssl_negotiation_policy.0.ssl_ciphers")
 	if len(sslCiphers) != 0 {
 		info.SSLCiphers = sslCiphers
 	}

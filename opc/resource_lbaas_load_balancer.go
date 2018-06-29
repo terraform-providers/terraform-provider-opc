@@ -49,17 +49,17 @@ func resourceLBaaSLoadBalancer() *schema.Resource {
 				Optional: true,
 			},
 			"permitted_clients": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"permitted_methods": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"policies": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
@@ -83,7 +83,7 @@ func resourceLBaaSLoadBalancer() *schema.Resource {
 				ValidateFunc: validateOriginServerPoolURI,
 			},
 			"tags": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
@@ -142,22 +142,22 @@ func resourceOPCLoadBalancerCreate(d *schema.ResourceData, meta interface{}) err
 		input.ParentLoadBalancer = parent.(string)
 	}
 
-	permittedClients := getStringList(d, "permitted_clients")
+	permittedClients := getStringSet(d, "permitted_clients")
 	if len(permittedClients) != 0 {
 		input.PermittedClients = permittedClients
 	}
 
-	permittedMethods := getStringList(d, "permitted_methods")
+	permittedMethods := getStringSet(d, "permitted_methods")
 	if len(permittedMethods) != 0 {
 		input.PermittedMethods = permittedMethods
 	}
 
-	policies := getStringList(d, "policies")
+	policies := getStringSet(d, "policies")
 	if len(policies) != 0 {
 		input.Policies = policies
 	}
 
-	tags := getStringList(d, "tags")
+	tags := getStringSet(d, "tags")
 	if len(tags) != 0 {
 		input.Tags = tags
 	}
