@@ -1,7 +1,7 @@
 ---
 layout: "opc"
 page_title: "Oracle: opc_lbaas_policy"
-sidebar_current: "docs-opc-resource-lbaas_policy"
+sidebar_current: "docs-opc-resource-lbaas-policy"
 description: |-
   Creates an Oracle Load Balancer Classic Policy.
 ---

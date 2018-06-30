@@ -50,6 +50,7 @@ func resourceLBaaSListener() *schema.Resource {
 			},
 			"port": {
 				Type:     schema.TypeInt,
+				ForceNew: true,
 				Required: true,
 			},
 			"enabled": {
@@ -73,7 +74,7 @@ func resourceLBaaSListener() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				// TODO (future) validate list element is Policy URI
 			},
-			"ssl_certificates": {
+			"certificates": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -136,22 +137,27 @@ func resourceListenerCreate(d *schema.ResourceData, meta interface{}) error {
 		input.OriginServerPool = getURIRequestPath(serverPool.(string))
 	}
 
-	pathPrefixes := getStringList(d, "path_prefixes")
+	pathPrefixes := getStringSet(d, "path_prefixes")
 	if len(pathPrefixes) != 0 {
 		input.PathPrefixes = pathPrefixes
 	}
 
-	policies := getStringList(d, "policies")
+	policies := getStringSet(d, "policies")
 	if len(policies) != 0 {
 		input.Policies = policies
 	}
 
-	tags := getStringList(d, "tags")
+	sslCerts := getStringSet(d, "certificates")
+	if len(sslCerts) != 0 {
+		input.SSLCerts = sslCerts
+	}
+
+	tags := getStringSet(d, "tags")
 	if len(tags) != 0 {
 		input.Tags = tags
 	}
 
-	virtualHosts := getStringList(d, "virtual_hosts")
+	virtualHosts := getStringSet(d, "virtual_hosts")
 	if len(virtualHosts) != 0 {
 		input.VirtualHosts = virtualHosts
 	}
@@ -205,7 +211,7 @@ func resourceListenerRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	if err := setStringList(d, "ssl_certificates", result.SSLCerts); err != nil {
+	if err := setStringList(d, "certificates", result.SSLCerts); err != nil {
 		return err
 	}
 
@@ -245,13 +251,21 @@ func resourceListenerUpdate(d *schema.ResourceData, meta interface{}) error {
 		input.OriginServerProtocol = lbaas.Protocol(serverProtocol.(string))
 	}
 
-	// Only the URI Path is need on Update
-	serverPool := updateOrRemoveStringAttribute(d, "server_pool")
-	*serverPool = getURIRequestPath(*serverPool)
-	input.OriginServerPool = serverPool
+	if d.HasChange("server_pool") {
+		if _, ok := d.GetOk("server_pool"); ok {
+			// Only the URI Path is need on Update
+			serverPool := updateOrRemoveStringAttribute(d, "server_pool")
+			*serverPool = getURIRequestPath(*serverPool)
+			input.OriginServerPool = serverPool
+		} else {
+			// server pool removed
+			input.OriginServerPool = nil
+		}
+	}
 
 	input.PathPrefixes = updateOrRemoveStringListAttribute(d, "path_prefixes")
 	input.Policies = updateOrRemoveStringListAttribute(d, "policies")
+	input.SSLCerts = updateOrRemoveStringListAttribute(d, "certificates")
 	input.Tags = updateOrRemoveStringListAttribute(d, "tags")
 	input.VirtualHosts = updateOrRemoveStringListAttribute(d, "virtual_hosts")
 

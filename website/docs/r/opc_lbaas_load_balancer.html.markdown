@@ -1,7 +1,7 @@
 ---
 layout: "opc"
 page_title: "Oracle: opc_lbaas_load_balancer"
-sidebar_current: "docs-opc-resource-lbaas_load_balancer"
+sidebar_current: "docs-opc-resource-lbaas-load-balancer"
 description: |-
   Creates an Oracle Load Balancer Classic instance.
 ---

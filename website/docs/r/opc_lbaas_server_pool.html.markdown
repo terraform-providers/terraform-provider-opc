@@ -1,7 +1,7 @@
 ---
 layout: "opc"
 page_title: "Oracle: opc_lbaas_server_pool"
-sidebar_current: "docs-opc-resource-lbaas_server_pool"
+sidebar_current: "docs-opc-resource-lbaas-server-pool"
 description: |-
   Creates an Oracle Load Balancer Classic Origin Server Pool.
 ---

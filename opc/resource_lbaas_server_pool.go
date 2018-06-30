@@ -104,7 +104,7 @@ func resourceOriginServerPoolCreate(d *schema.ResourceData, meta interface{}) er
 		input.VnicSetName = vnicSet.(string)
 	}
 
-	originServers := getStringList(d, "servers")
+	originServers := getStringSet(d, "servers")
 	if len(originServers) != 0 {
 		servers, err := expandOriginServerConfig(originServers)
 		if err != nil {
@@ -113,7 +113,7 @@ func resourceOriginServerPoolCreate(d *schema.ResourceData, meta interface{}) er
 		input.OriginServers = servers
 	}
 
-	tags := getStringList(d, "tags")
+	tags := getStringSet(d, "tags")
 	if len(tags) != 0 {
 		input.Tags = tags
 	}
@@ -174,7 +174,8 @@ func resourceOriginServerPoolUpdate(d *schema.ResourceData, meta interface{}) er
 	lb := getLoadBalancerContextFromID(d.Id())
 
 	input := lbaas.UpdateOriginServerPoolInput{
-		Name: name,
+		Name:        name,
+		HealthCheck: nil, // TODO
 	}
 
 	if enabled, ok := d.GetOk("enabled"); ok {
@@ -186,7 +187,7 @@ func resourceOriginServerPoolUpdate(d *schema.ResourceData, meta interface{}) er
 	}
 
 	if d.HasChange("servers") {
-		originServers := getStringList(d, "servers")
+		originServers := getStringSet(d, "servers")
 		servers := []lbaas.CreateOriginServerInput{}
 		if len(originServers) > 0 {
 			expanded, err := expandOriginServerConfig(originServers)

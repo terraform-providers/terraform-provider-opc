@@ -297,10 +297,10 @@ func updateOrRemoveStringAttribute(d *schema.ResourceData, attributeName string)
 	return nil
 }
 
-// return the updated list, emppty list if attribute has been removed, or nil if unchanged
+// return the updated list, empty list if attribute has been removed, or nil if unchanged
 func updateOrRemoveStringListAttribute(d *schema.ResourceData, attributeName string) *[]string {
 	if d.HasChange(attributeName) {
-		val := getStringList(d, attributeName)
+		val := getStringSet(d, attributeName)
 		if val == nil {
 			// return an empty list
 			val = []string{}

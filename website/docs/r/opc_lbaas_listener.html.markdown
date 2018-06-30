@@ -1,7 +1,7 @@
 ---
 layout: "opc"
 page_title: "Oracle: opc_lbaas_listener"
-sidebar_current: "docs-opc-resource-opc_lbaas_listener"
+sidebar_current: "docs-opc-resource-opc-lbaas-listener"
 description: |-
   Creates an Oracle Load Balancer Classic Listener.
 ---
@@ -32,7 +32,7 @@ resource "opc_lbaas_listener" "listener1" {
 
 * `load_balancer` - (Required) The parent Load Balancer the Listener.
 
-* `balancer_protocol` - (Required)  transport protocol that will be accepted for all incoming requests to the selected load balancer listener. `HTTP` or `HTTPS`
+* `balancer_protocol` - (Required)  transport protocol that will be accepted for all incoming requests to the selected load balancer listener. `HTTP` or `HTTPS`. If set to HTTPS then you must also set the server `certificates`.
 
 * `enabled` - (Optional) Boolean flag to enable or disable the Listener. Default is `true` (enabled).
 
@@ -44,9 +44,9 @@ resource "opc_lbaas_listener" "listener1" {
 
 * `server_pool` - (Optional) URI of the Server Pool resource to which the load balancer distributes requests.
 
-* `server_protocol` - (Required) The protocol to be used for routing traffic to the origin servers in the server pool. `HTTP` or `HTTPS`
+* `server_protocol` - (Required) The protocol to be used for routing traffic to the origin servers in the server pool. `HTTP` or `HTTPS`. If set to `HTTPS` then you must include a Trusted Certificate Policy in the `policies`
 
-* `ssl_certificates` - (Optional) The URI of the server security certificate. If the `balancer_protocol` is set to either HTTPS or SSL then you must select a server certificate.
+* `certificates` - (Optional) The URI of the server security certificate.
 
 * `tags` - (Optional) List of tags.
 
