@@ -50,7 +50,7 @@ func resourceLBaaSSSLCertificate() *schema.Resource {
 				ForceNew: true,
 				ValidateFunc: validation.StringInSlice([]string{
 					"SERVER",
-					"TRUSTED",
+					// "TRUSTED", TODO disable TRUSTED certs due to deletion issue
 				}, true),
 			},
 
