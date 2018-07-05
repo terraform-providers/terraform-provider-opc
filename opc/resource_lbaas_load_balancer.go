@@ -40,6 +40,7 @@ func resourceLBaaSLoadBalancer() *schema.Resource {
 			"ip_network": {
 				Type:         schema.TypeString,
 				Optional:     true,
+				ForceNew:     true,
 				Computed:     true,
 				ValidateFunc: validateComputeResourceFQDN,
 				// TODO add constraint, field supported when "scheme = INTERNAL"
