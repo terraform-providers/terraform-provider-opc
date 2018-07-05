@@ -2,12 +2,14 @@ package opc
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 
 	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/lbaas"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 )
 
 func resourceLBaaSOriginServerPool() *schema.Resource {
@@ -37,6 +39,70 @@ func resourceLBaaSOriginServerPool() *schema.Resource {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
+			},
+			"health_check": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"accepted_return_codes": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Computed: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+							// TODO ValidateFunc: `2xx`, `3xx`, `4xx`, or `5xx`
+							// Default: ["2xx","3xx"],
+						},
+						"enabled": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Default:  true,
+						},
+						"healthy_threshold": {
+							Type:     schema.TypeInt,
+							Optional: true,
+							// Computed: true,
+							Default:      5,
+							ValidateFunc: validation.IntBetween(2, 10),
+						},
+						"interval": {
+							Type:     schema.TypeInt,
+							Optional: true,
+							// Computed: true,
+							Default:      30,
+							ValidateFunc: validation.IntBetween(5, 300),
+						},
+						"path": {
+							Type:     schema.TypeString,
+							Optional: true,
+							// Computed: true,
+							Default: "",
+						},
+						"timeout": {
+							Type:     schema.TypeInt,
+							Optional: true,
+							// Computed: true,
+							Default:      20,
+							ValidateFunc: validation.IntBetween(2, 60),
+						},
+						"type": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Default:  "http",
+							ValidateFunc: validation.StringInSlice([]string{
+								"http",
+							}, true),
+						},
+						"unhealthy_threshold": {
+							Type:     schema.TypeInt,
+							Optional: true,
+							// Computed: true,
+							Default:      7,
+							ValidateFunc: validation.IntBetween(2, 10),
+						},
+					},
+				},
 			},
 			"servers": {
 				Type:     schema.TypeSet,
@@ -118,6 +184,9 @@ func resourceOriginServerPoolCreate(d *schema.ResourceData, meta interface{}) er
 		input.Tags = tags
 	}
 
+	healthCheck := expandHealthCheckConfig(d)
+	input.HealthCheck = &healthCheck
+
 	info, err := serverPoolClient.CreateOriginServerPool(lb, &input)
 	if err != nil {
 		return fmt.Errorf("Error creating Load Balancer Server Pool: %s", err)
@@ -161,7 +230,9 @@ func resourceOriginServerPoolRead(d *schema.ResourceData, meta interface{}) erro
 		return err
 	}
 
-	if err := setStringList(d, "tags", result.Tags); err != nil {
+	d.Set("tags", result.Tags)
+
+	if err := flattenHealthCheckConfig(d, result.HealthCheck); err != nil {
 		return err
 	}
 
@@ -174,8 +245,7 @@ func resourceOriginServerPoolUpdate(d *schema.ResourceData, meta interface{}) er
 	lb := getLoadBalancerContextFromID(d.Id())
 
 	input := lbaas.UpdateOriginServerPoolInput{
-		Name:        name,
-		HealthCheck: nil, // TODO
+		Name: name,
 	}
 
 	if enabled, ok := d.GetOk("enabled"); ok {
@@ -197,6 +267,15 @@ func resourceOriginServerPoolUpdate(d *schema.ResourceData, meta interface{}) er
 			servers = expanded
 		}
 		input.OriginServers = &servers
+	}
+
+	if d.HasChange("health_check") {
+		if _, ok := d.GetOk("health_check"); ok {
+			helthCheck := expandHealthCheckConfig(d)
+			input.HealthCheck = &helthCheck
+		} else {
+			input.HealthCheck = &lbaas.HealthCheckInfo{}
+		}
 	}
 
 	input.Tags = updateOrRemoveStringListAttribute(d, "tags")
@@ -248,4 +327,67 @@ func flattenOriginServerConfig(info []lbaas.OriginServerInfo) []string {
 		servers = append(servers, fmt.Sprintf("%s:%d", config.Hostname, config.Port))
 	}
 	return servers
+}
+
+func expandHealthCheckConfig(d *schema.ResourceData) lbaas.HealthCheckInfo {
+
+	if v, ok := d.GetOk("health_check"); ok {
+		vL := v.([]interface{})
+		config := vL[0].(map[string]interface{})
+
+		enabled := "FALSE"
+		if config["enabled"].(bool) {
+			enabled = "TRUE"
+		}
+
+		info := lbaas.HealthCheckInfo{
+			Type:               config["type"].(string),
+			Path:               config["path"].(string),
+			Enabled:            enabled,
+			Interval:           config["interval"].(int),
+			Timeout:            config["timeout"].(int),
+			HealthyThreshold:   config["healthy_threshold"].(int),
+			UnhealthyThreshold: config["unhealthy_threshold"].(int),
+		}
+
+		returnCodes := []string{}
+		if codes, ok := config["accepted_return_codes"]; ok && v != nil {
+			for _, code := range codes.([]interface{}) {
+				returnCodes = append(returnCodes, code.(string))
+			}
+			if len(returnCodes) > 0 {
+				sort.Strings(returnCodes)
+				info.AcceptedReturnCodes = returnCodes
+			}
+		}
+
+		return info
+	}
+	return lbaas.HealthCheckInfo{}
+}
+
+func flattenHealthCheckConfig(d *schema.ResourceData, info lbaas.HealthCheckInfo) error {
+
+	config := make([]map[string]interface{}, 0)
+
+	attrs := make(map[string]interface{})
+	attrs["type"] = info.Type
+	attrs["path"] = info.Path
+	attrs["accepted_return_codes"] = info.AcceptedReturnCodes
+	attrs["interval"] = info.Interval
+	attrs["timeout"] = info.Timeout
+	attrs["healthy_threshold"] = info.HealthyThreshold
+	attrs["unhealthy_threshold"] = info.UnhealthyThreshold
+
+	if info.Enabled == "TRUE" {
+		attrs["enabled"] = true
+	} else if info.Enabled == "FALSE" {
+		attrs["enabled"] = false
+	} else {
+		return fmt.Errorf("Unexpected Health Check enabled state %s", info.Enabled)
+	}
+
+	config = append(config, attrs)
+
+	return d.Set("health_check", config)
 }

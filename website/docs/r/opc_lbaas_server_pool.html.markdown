@@ -34,7 +34,7 @@ resource "opc_lbaas_server_pool" "serverpool1" {
 
 * `enabled` - (Optional) Boolean flag to enable or disable the Server Pool. Default is `true` (enabled).
 
-* `health_checks` - (Optional) Enables Load Balancer health checks, see [Health Check Attributes](#health-check-attributes)
+* `health_check` - (Optional) Enables Load Balancer health check, see [Health Check Attributes](#health-check-attributes)
 
 * `servers` - (Required) List of servers in the Server Pool. To define the server in the server pool, provide IP address or DNS name of the compute instances, and port for load balancer to direct traffic to, in the format `host:port`
 
@@ -46,11 +46,9 @@ resource "opc_lbaas_server_pool" "serverpool1" {
 
 The load balancer can perform regular health checks of the origin servers and route inbound traffic to the healthy origin servers.
 
-* `type` - (Optional) Health check mechanism to use to test the origin servers. Options
+* `type` - (Optional) Health check mechanism to use to test the origin servers.   Default is `http`
 
   - `http` - sends an HTTP HEAD to the set `path` and checks response is in one of the `accepted_return_codes`
-
-  Default is `http`
 
 * `path` - (Optional) The path to check. Set the '/' the check all paths. Default is '/'
 
@@ -60,11 +58,11 @@ The load balancer can perform regular health checks of the origin servers and ro
 
 * `interval` - (Optional) The approximate interval, in seconds, that the load balancer will wait before sending the target request to each origin server, in the range 5 to 300 seconds. Default is `30`.
 
-* `timeout` - (Optional) The amount of time, in seconds, that the load balancer will wait without a response before identifying the origin server as unavailable. The timeout value must be less than the `interval` value and it should range between 2 to 60. Default is `60`.
+* `timeout` - (Optional) The amount of time, in seconds, that the load balancer will wait without a response before identifying the origin server as unavailable. The timeout value must be less than the `interval` value and it should range between 2 to 60. Default is `20`.
 
-* `healthy_threshold` - (Optional) The number of consecutive successful health checks required before moving the origin server to the healthy state. The value of healthy threshold ranges from 2 to 10. Default is `6`.
+* `healthy_threshold` - (Optional) The number of consecutive successful health checks required before moving the origin server to the healthy state. The value of healthy threshold ranges from 2 to 10. Default is `5`.
 
-* `unhealthy_threshold` - (Optional) The number of consecutive health check failures required before moving the origin server to the unhealthy state. The value of unhealthy threshold ranges from 2 to 10. Default is `3`.
+* `unhealthy_threshold` - (Optional) The number of consecutive health check failures required before moving the origin server to the unhealthy state. The value of unhealthy threshold ranges from 2 to 10. Default is `7`.
 
 ## Additional Attributes
 
