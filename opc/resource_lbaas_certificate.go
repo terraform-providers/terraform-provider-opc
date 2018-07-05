@@ -2,6 +2,7 @@ package opc
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/lbaas"
@@ -26,22 +27,22 @@ func resourceLBaaSSSLCertificate() *schema.Resource {
 				ValidateFunc: validateLoadBalancerResourceName,
 			},
 			"certificate_body": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-				// TODO ValidateFunc: PEM Key Format
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateIsPEMFormat,
 			},
 			"certificate_chain": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-				// TODO ValidateFunc: PEM Key Format
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateIsPEMFormat,
 			},
 			"private_key": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-				// TODO ValidateFunc:  PEM key format, only required when type = "SERVER"
+				Type:         schema.TypeString,
+				Optional:     true,
+				ForceNew:     true,
+				ValidateFunc: validateIsPEMFormat,
 			},
 			"type": {
 				Type:     schema.TypeString,
@@ -129,4 +130,13 @@ func resourceSSLCertificateDelete(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("Error deleting SSLCertificate")
 	}
 	return nil
+}
+
+// simple check to validate content is in the expected PEM format
+func validateIsPEMFormat(v interface{}, k string) (ws []string, errors []error) {
+	if !strings.HasPrefix(v.(string), "-----BEGIN") {
+		errors = append(errors, fmt.Errorf(
+			"%q must contain a PEM encoded certificate", k))
+	}
+	return
 }
