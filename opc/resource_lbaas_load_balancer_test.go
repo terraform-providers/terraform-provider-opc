@@ -12,8 +12,10 @@ import (
 
 func TestAccLBaaSLoadBalancer_Basic(t *testing.T) {
 
-	ri := acctest.RandInt()
-	config := fmt.Sprintf(testAccLoadBalancerBasic, ri)
+	rInt := acctest.RandInt()
+	config := fmt.Sprintf(testAccLoadBalancerBasic, rInt)
+	resName := "opc_lbaas_load_balancer.test"
+	testName := fmt.Sprintf("acctest-%d", rInt)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -24,6 +26,8 @@ func TestAccLBaaSLoadBalancer_Basic(t *testing.T) {
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckLoadBalancerExists,
+					resource.TestCheckResourceAttr(resName, "name", testName),
+					resource.TestCheckResourceAttr(resName, "scheme", "INTERNET_FACING"),
 				),
 			},
 		},
@@ -75,7 +79,7 @@ func testAccCheckLoadBalancerDestroy(s *terraform.State) error {
 var testAccLoadBalancerBasic = `
 resource "opc_lbaas_load_balancer" "test" {
 	region      = "uscom-central-1"
-  name        = "acctest%d"
+  name        = "acctest-%d"
 	scheme      = "INTERNET_FACING"
 }
 `
