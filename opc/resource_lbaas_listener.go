@@ -72,13 +72,11 @@ func resourceLBaaSListener() *schema.Resource {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
-				// TODO (future) validate list element is Policy URI
 			},
 			"certificates": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
-				// TODO (future) validate list element is Certificate URI
 			},
 			"tags": {
 				Type:     schema.TypeSet,

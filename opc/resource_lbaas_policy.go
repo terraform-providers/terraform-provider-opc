@@ -201,13 +201,11 @@ func resourceLBaaSPolicy() *schema.Resource {
 							Type:     schema.TypeSet,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
-							// TODO (future) validate list element is IP or CIDR
 						},
 						"permitted_clients": {
 							Type:     schema.TypeSet,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
-							// TODO (future) validate list element is IP or CIDR
 						},
 					},
 				},
@@ -273,7 +271,6 @@ func resourceLBaaSPolicy() *schema.Resource {
 							Type:     schema.TypeSet,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
-							// TODO (future) validate list element in "SSLv2", "SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"
 						},
 						"ssl_ciphers": {
 							Type:     schema.TypeSet,
@@ -491,7 +488,6 @@ func resourcePolicyUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	d.SetId(fmt.Sprintf("%s/%s/%s", lb.Region, lb.Name, result.Name))
 
-	// TODO instead of re-read, process info from UpdatePolicy()
 	return resourcePolicyRead(d, meta)
 }
 

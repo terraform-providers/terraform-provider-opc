@@ -24,7 +24,7 @@ func resourceLBaaSLoadBalancer() *schema.Resource {
 			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
-				ForceNew:     true, // TODO name can be changed
+				ForceNew:     true,
 				ValidateFunc: validateLoadBalancerResourceName,
 			},
 			"description": {
@@ -43,7 +43,6 @@ func resourceLBaaSLoadBalancer() *schema.Resource {
 				ForceNew:     true,
 				Computed:     true,
 				ValidateFunc: validateComputeResourceFQDN,
-				// TODO add constraint, field supported when "scheme = INTERNAL"
 			},
 			"parent_load_balancer": {
 				Type:     schema.TypeString,
