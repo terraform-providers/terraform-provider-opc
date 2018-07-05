@@ -35,7 +35,7 @@ func resourceLBaaSLoadBalancer() *schema.Resource {
 			"enabled": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Computed: true,
+				Default:  true,
 			},
 			"ip_network": {
 				Type:         schema.TypeString,
