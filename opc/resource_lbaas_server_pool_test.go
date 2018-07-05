@@ -2,6 +2,7 @@ package opc
 
 import (
 	"fmt"
+	"os"
 	"regexp"
 	"testing"
 
@@ -12,8 +13,15 @@ import (
 func TestAccLBaaSServerPool_Basic(t *testing.T) {
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_server_pool.test"
-	lbID := "uscom-central-1/lb3" // TODO get LB from env or create
 	testName := fmt.Sprintf("acctest-%d", rInt)
+
+	// use existing LB instance from environment if set
+	lbCount := 0
+	lbID := os.Getenv("OPC_TEST_USE_EXISTING_LB")
+	if lbID == "" {
+		lbCount = 1
+		lbID = "${opc_lbaas_load_balancer.test.id}"
+	}
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -21,7 +29,7 @@ func TestAccLBaaSServerPool_Basic(t *testing.T) {
 		CheckDestroy: opcResourceCheck(resName, testAccLBaaSCheckServerPoolDestroyed),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccLBaaSServerPoolConfig_Basic(lbID, rInt),
+				Config: testAccLBaaSServerPoolConfig_Basic(lbID, rInt, lbCount),
 				Check: resource.ComposeTestCheckFunc(
 					opcResourceCheck(resName, testAccLBaaSCheckServerPoolExists),
 					resource.TestCheckResourceAttr(resName, "name", testName),
@@ -41,7 +49,7 @@ func TestAccLBaaSServerPool_Basic(t *testing.T) {
 	})
 }
 
-func testAccLBaaSServerPoolConfig_Basic(lbID string, rInt int) string {
+func testAccLBaaSServerPoolConfig_Basic(lbID string, rInt, lbCount int) string {
 	return fmt.Sprintf(`
 resource "opc_lbaas_server_pool" "test" {
   load_balancer = "%s"
@@ -59,7 +67,8 @@ resource "opc_lbaas_server_pool" "test" {
     accepted_return_codes = [ "2xx", "3xx" ]
   }
 }
-`, lbID, rInt)
+%s
+`, lbID, rInt, testAccParentLoadBalancerConfig(lbCount, rInt))
 }
 
 func testAccLBaaSCheckServerPoolExists(state *OPCResourceState) error {
