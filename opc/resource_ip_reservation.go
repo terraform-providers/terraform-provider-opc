@@ -2,7 +2,6 @@ package opc
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
@@ -40,12 +39,15 @@ func resourceOPCIPReservation() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"used": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
 		},
 	}
 }
 
 func resourceOPCIPReservationCreate(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("[DEBUG] Resource state: %#v", d.State())
 
 	reservation := compute.CreateIPReservationInput{
 		Name:       d.Get("name").(string),
@@ -58,11 +60,12 @@ func resourceOPCIPReservationCreate(d *schema.ResourceData, meta interface{}) er
 		reservation.Tags = tags
 	}
 
-	log.Printf("[DEBUG] Creating ip reservation from parent_pool %s with tags=%s",
-		reservation.ParentPool, reservation.Tags)
-
-	client := meta.(*Client).computeClient.IPReservations()
-	info, err := client.CreateIPReservation(&reservation)
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPReservations()
+	info, err := resClient.CreateIPReservation(&reservation)
 	if err != nil {
 		return fmt.Errorf("Error creating ip reservation from parent_pool %s with tags=%s: %s",
 			reservation.ParentPool, reservation.Tags, err)
@@ -73,15 +76,17 @@ func resourceOPCIPReservationCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceOPCIPReservationRead(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	computeClient := meta.(*Client).computeClient.IPReservations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPReservations()
 
-	log.Printf("[DEBUG] Reading state of ip reservation %s", d.Id())
 	input := compute.GetIPReservationInput{
 		Name: d.Id(),
 	}
 
-	result, err := computeClient.GetIPReservation(&input)
+	result, err := resClient.GetIPReservation(&input)
 	if err != nil {
 		// IP Reservation does not exist
 		if client.WasNotFoundError(err) {
@@ -96,7 +101,6 @@ func resourceOPCIPReservationRead(d *schema.ResourceData, meta interface{}) erro
 		return nil
 	}
 
-	log.Printf("[DEBUG] Read state of ip reservation %s: %#v", d.Id(), result)
 	d.Set("name", result.Name)
 	d.Set("parent_pool", result.ParentPool)
 	d.Set("permanent", result.Permanent)
@@ -106,19 +110,21 @@ func resourceOPCIPReservationRead(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	d.Set("ip", result.IP)
+	d.Set("used", result.Used)
 	return nil
 }
 
 func resourceOPCIPReservationDelete(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	client := meta.(*Client).computeClient.IPReservations()
-
-	log.Printf("[DEBUG] Deleting ip reservation %s", d.Id())
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPReservations()
 
 	input := compute.DeleteIPReservationInput{
 		Name: d.Id(),
 	}
-	if err := client.DeleteIPReservation(&input); err != nil {
+	if err := resClient.DeleteIPReservation(&input); err != nil {
 		return fmt.Errorf("Error deleting ip reservation %s", d.Id())
 	}
 	return nil

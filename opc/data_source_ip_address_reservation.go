@@ -8,9 +8,9 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
-func dataSourceVNIC() *schema.Resource {
+func dataSourceIPAddressReservation() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceVNICRead,
+		Read: dataSourceIPAddressReservationRead,
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -18,23 +18,19 @@ func dataSourceVNIC() *schema.Resource {
 				Required: true,
 			},
 
+			"ip_address_pool": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"description": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-
-			"mac_address": {
+			"tags": tagsComputedSchema(),
+			"ip_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-
-			"tags": tagsComputedSchema(),
-
-			"transit_flag": {
-				Type:     schema.TypeBool,
-				Computed: true,
-			},
-
 			"uri": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -43,40 +39,41 @@ func dataSourceVNIC() *schema.Resource {
 	}
 }
 
-func dataSourceVNICRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceIPAddressReservationRead(d *schema.ResourceData, meta interface{}) error {
 	computeClient, err := meta.(*Client).getComputeClient()
 	if err != nil {
 		return err
 	}
-	resClient := computeClient.VirtNICs()
-
+	resClient := computeClient.IPAddressReservations()
 	name := d.Get("name").(string)
 
-	input := &compute.GetVirtualNICInput{
+	input := compute.GetIPAddressReservationInput{
 		Name: name,
 	}
 
-	vnic, err := resClient.GetVirtualNIC(input)
+	result, err := resClient.GetIPAddressReservation(&input)
 	if err != nil {
 		if client.WasNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Error reading vnic %s: %s", name, err)
+		return fmt.Errorf("Error reading ip address reservation %s: %s", name, err)
 	}
 
-	if vnic == nil {
+	if result == nil {
 		d.SetId("")
 		return nil
 	}
 
 	d.SetId(name)
-	d.Set("description", vnic.Description)
-	d.Set("mac_address", vnic.MACAddress)
-	d.Set("transit_flag", vnic.TransitFlag)
-	d.Set("uri", vnic.URI)
-	if err := setStringList(d, "tags", vnic.Tags); err != nil {
+	d.Set("description", result.Description)
+	d.Set("ip_address_pool", result.IPAddressPool)
+	d.Set("ip_address", result.IPAddress)
+	d.Set("uri", result.URI)
+
+	if err := setStringList(d, "tags", result.Tags); err != nil {
 		return err
 	}
+
 	return nil
 }

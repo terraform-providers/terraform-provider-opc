@@ -105,14 +105,18 @@ func dataSourceStorageVolumeSnapshot() *schema.Resource {
 }
 
 func dataSourceStorageVolumeSnapshotRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.StorageVolumeSnapshots()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.StorageVolumeSnapshots()
 
 	name := d.Get("name").(string)
 	input := &compute.GetStorageVolumeSnapshotInput{
 		Name: name,
 	}
 
-	result, err := computeClient.GetStorageVolumeSnapshot(input)
+	result, err := resClient.GetStorageVolumeSnapshot(input)
 	if err != nil {
 		if client.WasNotFoundError(err) {
 			d.SetId("")

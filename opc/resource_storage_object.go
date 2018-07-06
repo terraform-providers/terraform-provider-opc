@@ -11,8 +11,6 @@ import (
 	"github.com/mitchellh/go-homedir"
 )
 
-const storageClientInitError = "Storage client is not initialized. Make sure to use `storage_endpoint` variable or the `OPC_STORAGE_ENDPOINT` environment variable"
-
 func resourceOPCStorageObject() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceOPCStorageObjectCreate,
@@ -155,10 +153,11 @@ func resourceOPCStorageObject() *schema.Resource {
 }
 
 func resourceOPCStorageObjectCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).storageClient.Objects()
-	if client == nil {
-		return fmt.Errorf(storageClientInitError)
+	storageClient, err := meta.(*Client).getStorageClient()
+	if err != nil {
+		return err
 	}
+	resClient := storageClient.Objects()
 
 	// Populate required attr
 	input := &storage.CreateObjectInput{
@@ -222,7 +221,7 @@ func resourceOPCStorageObjectCreate(d *schema.ResourceData, meta interface{}) er
 		input.TransferEncoding = v.(string)
 	}
 
-	result, err := client.CreateObject(input)
+	result, err := resClient.CreateObject(input)
 	if err != nil {
 		return fmt.Errorf("Error creating Object: %s", err)
 	}
@@ -232,16 +231,17 @@ func resourceOPCStorageObjectCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceOPCStorageObjectRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).storageClient.Objects()
-	if client == nil {
-		return fmt.Errorf(storageClientInitError)
+	storageClient, err := meta.(*Client).getStorageClient()
+	if err != nil {
+		return err
 	}
+	resClient := storageClient.Objects()
 
 	input := &storage.GetObjectInput{
 		ID: d.Id(),
 	}
 
-	result, err := client.GetObject(input)
+	result, err := resClient.GetObject(input)
 	if err != nil {
 		return fmt.Errorf("Error reading Storage Container Object (%s): %s", d.Id(), err)
 	}
@@ -270,15 +270,16 @@ func resourceOPCStorageObjectRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceOPCStorageObjectDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).storageClient.Objects()
-	if client == nil {
-		return fmt.Errorf(storageClientInitError)
+	storageClient, err := meta.(*Client).getStorageClient()
+	if err != nil {
+		return err
 	}
+	resClient := storageClient.Objects()
 
 	input := &storage.DeleteObjectInput{
 		ID: d.Id(),
 	}
-	if err := client.DeleteObject(input); err != nil {
+	if err := resClient.DeleteObject(input); err != nil {
 		return fmt.Errorf("Error deleting Storage Container Object (%s): %s", d.Id(), err)
 	}
 

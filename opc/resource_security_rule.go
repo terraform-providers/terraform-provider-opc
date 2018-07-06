@@ -74,7 +74,12 @@ func resourceOPCSecurityRule() *schema.Resource {
 }
 
 func resourceOPCSecurityRuleCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.SecurityRules()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityRules()
+
 	input := compute.CreateSecurityRuleInput{
 		Name:          d.Get("name").(string),
 		FlowDirection: d.Get("flow_direction").(string),
@@ -117,7 +122,7 @@ func resourceOPCSecurityRuleCreate(d *schema.ResourceData, meta interface{}) err
 		input.Description = description.(string)
 	}
 
-	info, err := client.CreateSecurityRule(&input)
+	info, err := resClient.CreateSecurityRule(&input)
 	if err != nil {
 		return fmt.Errorf("Error creating Security Rule: %s", err)
 	}
@@ -127,13 +132,17 @@ func resourceOPCSecurityRuleCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCSecurityRuleRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.SecurityRules()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityRules()
 
 	input := compute.GetSecurityRuleInput{
 		Name: d.Id(),
 	}
 
-	result, err := computeClient.GetSecurityRule(&input)
+	result, err := resClient.GetSecurityRule(&input)
 	if err != nil {
 		// SecurityRule does not exist
 		if client.WasNotFoundError(err) {
@@ -173,7 +182,12 @@ func resourceOPCSecurityRuleRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceOPCSecurityRuleUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.SecurityRules()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityRules()
+
 	input := compute.UpdateSecurityRuleInput{
 		Name:          d.Get("name").(string),
 		FlowDirection: d.Get("flow_direction").(string),
@@ -215,7 +229,7 @@ func resourceOPCSecurityRuleUpdate(d *schema.ResourceData, meta interface{}) err
 	if description, ok := d.GetOk("description"); ok {
 		input.Description = description.(string)
 	}
-	info, err := client.UpdateSecurityRule(&input)
+	info, err := resClient.UpdateSecurityRule(&input)
 	if err != nil {
 		return fmt.Errorf("Error updating Security Rule: %s", err)
 	}
@@ -225,13 +239,17 @@ func resourceOPCSecurityRuleUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCSecurityRuleDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.SecurityRules()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityRules()
 	name := d.Id()
 
 	input := compute.DeleteSecurityRuleInput{
 		Name: name,
 	}
-	if err := client.DeleteSecurityRule(&input); err != nil {
+	if err := resClient.DeleteSecurityRule(&input); err != nil {
 		return fmt.Errorf("Error deleting Security Rule: %s", err)
 	}
 	return nil

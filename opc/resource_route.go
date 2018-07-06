@@ -52,7 +52,11 @@ func resourceOPCRoute() *schema.Resource {
 }
 
 func resourceOPCRouteCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.Routes()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.Routes()
 
 	// Get Required attributes
 	name := d.Get("name").(string)
@@ -83,7 +87,7 @@ func resourceOPCRouteCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	// Create Route
-	info, err := client.CreateRoute(input)
+	info, err := resClient.CreateRoute(input)
 	if err != nil {
 		return fmt.Errorf("Error creating route '%s': %v", name, err)
 	}
@@ -94,14 +98,18 @@ func resourceOPCRouteCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCRouteRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.Routes()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.Routes()
 
 	name := d.Id()
 	input := &compute.GetRouteInput{
 		Name: name,
 	}
 
-	result, err := computeClient.GetRoute(input)
+	result, err := resClient.GetRoute(input)
 	if err != nil {
 		if client.WasNotFoundError(err) {
 			d.SetId("")
@@ -127,7 +135,11 @@ func resourceOPCRouteRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCRouteUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.Routes()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.Routes()
 
 	// Get Required attributes
 	name := d.Get("name").(string)
@@ -158,7 +170,7 @@ func resourceOPCRouteUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	// Create Route
-	info, err := client.UpdateRoute(input)
+	info, err := resClient.UpdateRoute(input)
 	if err != nil {
 		return fmt.Errorf("Error creating route '%s': %v", name, err)
 	}
@@ -169,13 +181,17 @@ func resourceOPCRouteUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCRouteDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.Routes()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.Routes()
 
 	name := d.Id()
 	input := &compute.DeleteRouteInput{
 		Name: name,
 	}
-	if err := client.DeleteRoute(input); err != nil {
+	if err := resClient.DeleteRoute(input); err != nil {
 		return fmt.Errorf("Error deleting route '%s': %v", name, err)
 	}
 	return nil
