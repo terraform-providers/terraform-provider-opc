@@ -270,6 +270,13 @@
 			"versionExact": "v0.6.7"
 		},
 		{
+			"checksumSHA1": "dgwlXIqeWN5S/8ugHSGmoPHVMYk=",
+			"path": "github.com/hashicorp/go-oracle-terraform/lbaas",
+			"revision": "a4c5913ef701ababa55e85f6270bdf818ba991b7",
+			"revisionTime": "2018-07-06T18:52:26Z",
+			"version": "=v0.10.0"
+		},
+		{
 			"checksumSHA1": "aeXObRk6gAfuvnT+puKaEib7dm0=",
 			"path": "github.com/hashicorp/go-oracle-terraform/opc",
 			"revision": "4bce5c92459e62a1247656f35f7a7e2882c9afaa",
