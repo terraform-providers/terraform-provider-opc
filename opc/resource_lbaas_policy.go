@@ -312,8 +312,11 @@ func resourceLBaaSPolicy() *schema.Resource {
 }
 
 func resourcePolicyCreate(d *schema.ResourceData, meta interface{}) error {
-
-	policyClient := meta.(*Client).lbaasClient.PolicyClient()
+	lbaasClient, err := meta.(*Client).getLBaaSClient()
+	if err != nil {
+		return err
+	}
+	policyClient := lbaasClient.PolicyClient()
 
 	var lb lbaas.LoadBalancerContext
 	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
@@ -375,7 +378,11 @@ func resourcePolicyCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourcePolicyRead(d *schema.ResourceData, meta interface{}) error {
-	policyClient := meta.(*Client).lbaasClient.PolicyClient()
+	lbaasClient, err := meta.(*Client).getLBaaSClient()
+	if err != nil {
+		return err
+	}
+	policyClient := lbaasClient.PolicyClient()
 	name := getLastNameInPath(d.Id())
 	lb := getLoadBalancerContextFromID(d.Id())
 
@@ -432,7 +439,11 @@ func resourcePolicyRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourcePolicyUpdate(d *schema.ResourceData, meta interface{}) error {
-	policyClient := meta.(*Client).lbaasClient.PolicyClient()
+	lbaasClient, err := meta.(*Client).getLBaaSClient()
+	if err != nil {
+		return err
+	}
+	policyClient := lbaasClient.PolicyClient()
 	name := getLastNameInPath(d.Id())
 	lb := getLoadBalancerContextFromID(d.Id())
 
@@ -492,7 +503,11 @@ func resourcePolicyUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourcePolicyDelete(d *schema.ResourceData, meta interface{}) error {
-	policyClient := meta.(*Client).lbaasClient.PolicyClient()
+	lbaasClient, err := meta.(*Client).getLBaaSClient()
+	if err != nil {
+		return err
+	}
+	policyClient := lbaasClient.PolicyClient()
 	name := getLastNameInPath(d.Id())
 	lb := getLoadBalancerContextFromID(d.Id())
 

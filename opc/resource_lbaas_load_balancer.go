@@ -111,8 +111,12 @@ func resourceLBaaSLoadBalancer() *schema.Resource {
 }
 
 func resourceOPCLoadBalancerCreate(d *schema.ResourceData, meta interface{}) error {
+	lbaasClient, err := meta.(*Client).getLBaaSClient()
+	if err != nil {
+		return err
+	}
+	lbClient := lbaasClient.LoadBalancerClient()
 
-	lbClient := meta.(*Client).lbaasClient.LoadBalancerClient()
 	input := lbaas.CreateLoadBalancerInput{
 		Name:   d.Get("name").(string),
 		Region: d.Get("region").(string),
@@ -172,7 +176,11 @@ func resourceOPCLoadBalancerCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
-	lbClient := meta.(*Client).lbaasClient.LoadBalancerClient()
+	lbaasClient, err := meta.(*Client).getLBaaSClient()
+	if err != nil {
+		return err
+	}
+	lbClient := lbaasClient.LoadBalancerClient()
 
 	s := strings.Split(d.Id(), "/")
 	lb := lbaas.LoadBalancerContext{
@@ -226,7 +234,11 @@ func resourceOPCLoadBalancerRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceOPCLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) error {
-	lbClient := meta.(*Client).lbaasClient.LoadBalancerClient()
+	lbaasClient, err := meta.(*Client).getLBaaSClient()
+	if err != nil {
+		return err
+	}
+	lbClient := lbaasClient.LoadBalancerClient()
 	lb := getLoadBalancerContextFromID(d.Id())
 
 	input := lbaas.UpdateLoadBalancerInput{
@@ -258,7 +270,11 @@ func resourceOPCLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
-	lbClient := meta.(*Client).lbaasClient.LoadBalancerClient()
+	lbaasClient, err := meta.(*Client).getLBaaSClient()
+	if err != nil {
+		return err
+	}
+	lbClient := lbaasClient.LoadBalancerClient()
 	lb := getLoadBalancerContextFromID(d.Id())
 
 	if _, err := lbClient.DeleteLoadBalancer(lb); err != nil {

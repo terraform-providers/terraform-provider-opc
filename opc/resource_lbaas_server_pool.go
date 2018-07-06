@@ -144,8 +144,11 @@ func resourceLBaaSOriginServerPool() *schema.Resource {
 }
 
 func resourceOriginServerPoolCreate(d *schema.ResourceData, meta interface{}) error {
-
-	serverPoolClient := meta.(*Client).lbaasClient.OriginServerPoolClient()
+	lbaasClient, err := meta.(*Client).getLBaaSClient()
+	if err != nil {
+		return err
+	}
+	serverPoolClient := lbaasClient.OriginServerPoolClient()
 
 	var lb lbaas.LoadBalancerContext
 	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
@@ -195,7 +198,11 @@ func resourceOriginServerPoolCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceOriginServerPoolRead(d *schema.ResourceData, meta interface{}) error {
-	serverPoolClient := meta.(*Client).lbaasClient.OriginServerPoolClient()
+	lbaasClient, err := meta.(*Client).getLBaaSClient()
+	if err != nil {
+		return err
+	}
+	serverPoolClient := lbaasClient.OriginServerPoolClient()
 	name := getLastNameInPath(d.Id())
 	lb := getLoadBalancerContextFromID(d.Id())
 
@@ -238,7 +245,11 @@ func resourceOriginServerPoolRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceOriginServerPoolUpdate(d *schema.ResourceData, meta interface{}) error {
-	serverPoolClient := meta.(*Client).lbaasClient.OriginServerPoolClient()
+	lbaasClient, err := meta.(*Client).getLBaaSClient()
+	if err != nil {
+		return err
+	}
+	serverPoolClient := lbaasClient.OriginServerPoolClient()
 	name := getLastNameInPath(d.Id())
 	lb := getLoadBalancerContextFromID(d.Id())
 
@@ -289,11 +300,15 @@ func resourceOriginServerPoolUpdate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceOriginServerPoolDelete(d *schema.ResourceData, meta interface{}) error {
-	lbaasClient := meta.(*Client).lbaasClient.OriginServerPoolClient()
+	lbaasClient, err := meta.(*Client).getLBaaSClient()
+	if err != nil {
+		return err
+	}
+	serverPoolClient := lbaasClient.OriginServerPoolClient()
 	name := getLastNameInPath(d.Id())
 	lb := getLoadBalancerContextFromID(d.Id())
 
-	if _, err := lbaasClient.DeleteOriginServerPool(lb, name); err != nil {
+	if _, err := serverPoolClient.DeleteOriginServerPool(lb, name); err != nil {
 		return fmt.Errorf("Error deleting OriginServerPool")
 	}
 	return nil

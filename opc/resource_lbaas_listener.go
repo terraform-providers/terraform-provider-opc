@@ -111,8 +111,11 @@ func resourceLBaaSListener() *schema.Resource {
 }
 
 func resourceListenerCreate(d *schema.ResourceData, meta interface{}) error {
-
-	listenerClient := meta.(*Client).lbaasClient.ListenerClient()
+	lbaasClient, err := meta.(*Client).getLBaaSClient()
+	if err != nil {
+		return err
+	}
+	listenerClient := lbaasClient.ListenerClient()
 
 	var lb lbaas.LoadBalancerContext
 	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
@@ -170,7 +173,11 @@ func resourceListenerCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceListenerRead(d *schema.ResourceData, meta interface{}) error {
-	listenerClient := meta.(*Client).lbaasClient.ListenerClient()
+	lbaasClient, err := meta.(*Client).getLBaaSClient()
+	if err != nil {
+		return err
+	}
+	listenerClient := lbaasClient.ListenerClient()
 	name := getLastNameInPath(d.Id())
 	lb := getLoadBalancerContextFromID(d.Id())
 
@@ -225,7 +232,11 @@ func resourceListenerRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceListenerUpdate(d *schema.ResourceData, meta interface{}) error {
-	listenerClient := meta.(*Client).lbaasClient.ListenerClient()
+	lbaasClient, err := meta.(*Client).getLBaaSClient()
+	if err != nil {
+		return err
+	}
+	listenerClient := lbaasClient.ListenerClient()
 	name := getLastNameInPath(d.Id())
 	lb := getLoadBalancerContextFromID(d.Id())
 
@@ -278,7 +289,11 @@ func resourceListenerUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceListenerDelete(d *schema.ResourceData, meta interface{}) error {
-	listenerClient := meta.(*Client).lbaasClient.ListenerClient()
+	lbaasClient, err := meta.(*Client).getLBaaSClient()
+	if err != nil {
+		return err
+	}
+	listenerClient := lbaasClient.ListenerClient()
 	name := getLastNameInPath(d.Id())
 	lb := getLoadBalancerContextFromID(d.Id())
 

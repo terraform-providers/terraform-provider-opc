@@ -69,7 +69,11 @@ func resourceLBaaSSSLCertificate() *schema.Resource {
 
 func resourceSSLCertificateCreate(d *schema.ResourceData, meta interface{}) error {
 
-	sslCertClient := meta.(*Client).lbaasClient.SSLCertificateClient()
+	lbaasClient, err := meta.(*Client).getLBaaSClient()
+	if err != nil {
+		return err
+	}
+	sslCertClient := lbaasClient.SSLCertificateClient()
 
 	input := lbaas.CreateSSLCertificateInput{
 		Name:             d.Get("name").(string),
@@ -89,7 +93,11 @@ func resourceSSLCertificateCreate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSSLCertificateRead(d *schema.ResourceData, meta interface{}) error {
-	sslCertClient := meta.(*Client).lbaasClient.SSLCertificateClient()
+	lbaasClient, err := meta.(*Client).getLBaaSClient()
+	if err != nil {
+		return err
+	}
+	sslCertClient := lbaasClient.SSLCertificateClient()
 	name := d.Id()
 
 	result, err := sslCertClient.GetSSLCertificate(name)
@@ -123,10 +131,14 @@ func resourceSSLCertificateRead(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceSSLCertificateDelete(d *schema.ResourceData, meta interface{}) error {
-	lbaasClient := meta.(*Client).lbaasClient.SSLCertificateClient()
+	lbaasClient, err := meta.(*Client).getLBaaSClient()
+	if err != nil {
+		return err
+	}
+	sslCertClient := lbaasClient.SSLCertificateClient()
 	name := d.Id()
 
-	if _, err := lbaasClient.DeleteSSLCertificate(name); err != nil {
+	if _, err := sslCertClient.DeleteSSLCertificate(name); err != nil {
 		return fmt.Errorf("Error deleting SSLCertificate")
 	}
 	return nil

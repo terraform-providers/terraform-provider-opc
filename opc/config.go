@@ -130,3 +130,10 @@ func (l opcLogger) Log(args ...interface{}) {
 	log.SetFlags(0)
 	log.Print(fmt.Sprintf("go-oracle-terraform: %s", strings.Join(tokens, " ")))
 }
+
+func (c *Client) getLBaaSClient() (*lbaas.Client, error) {
+	if c.lbaasClient == nil {
+		return nil, fmt.Errorf("Load Balancer API client has not been initialized. Ensure the `lbaas_endpoint` for the Load Balancer Classic REST API Endpoint has been declared in the provider configuration.")
+	}
+	return c.lbaasClient, nil
+}
