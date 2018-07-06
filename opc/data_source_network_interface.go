@@ -105,7 +105,11 @@ func dataSourceNetworkInterface() *schema.Resource {
 }
 
 func dataSourceNetworkInterfaceRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.Instances()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.Instances()
 
 	// Get required attributes
 	instance_name := d.Get("instance_name").(string)
@@ -118,7 +122,7 @@ func dataSourceNetworkInterfaceRead(d *schema.ResourceData, meta interface{}) er
 		ID:   instance_id,
 	}
 
-	instance, err := computeClient.GetInstance(input)
+	instance, err := resClient.GetInstance(input)
 	if err != nil {
 		if client.WasNotFoundError(err) {
 			d.SetId("")

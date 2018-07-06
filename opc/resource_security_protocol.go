@@ -55,7 +55,12 @@ func resourceOPCSecurityProtocol() *schema.Resource {
 }
 
 func resourceOPCSecurityProtocolCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.SecurityProtocols()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityProtocols()
+
 	input := compute.CreateSecurityProtocolInput{
 		Name:       d.Get("name").(string),
 		IPProtocol: d.Get("ip_protocol").(string),
@@ -77,7 +82,7 @@ func resourceOPCSecurityProtocolCreate(d *schema.ResourceData, meta interface{})
 		input.Description = description.(string)
 	}
 
-	info, err := client.CreateSecurityProtocol(&input)
+	info, err := resClient.CreateSecurityProtocol(&input)
 	if err != nil {
 		return fmt.Errorf("Error creating Security Protocol: %s", err)
 	}
@@ -87,13 +92,17 @@ func resourceOPCSecurityProtocolCreate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceOPCSecurityProtocolRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.SecurityProtocols()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityProtocols()
 
 	input := compute.GetSecurityProtocolInput{
 		Name: d.Id(),
 	}
 
-	result, err := computeClient.GetSecurityProtocol(&input)
+	result, err := resClient.GetSecurityProtocol(&input)
 	if err != nil {
 		// Security Protocol does not exist
 		if client.WasNotFoundError(err) {
@@ -124,7 +133,12 @@ func resourceOPCSecurityProtocolRead(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceOPCSecurityProtocolUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.SecurityProtocols()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityProtocols()
+
 	input := compute.UpdateSecurityProtocolInput{
 		Name:       d.Get("name").(string),
 		IPProtocol: d.Get("ip_protocol").(string),
@@ -145,7 +159,7 @@ func resourceOPCSecurityProtocolUpdate(d *schema.ResourceData, meta interface{})
 		input.Description = description.(string)
 	}
 
-	info, err := client.UpdateSecurityProtocol(&input)
+	info, err := resClient.UpdateSecurityProtocol(&input)
 	if err != nil {
 		return fmt.Errorf("Error updating Security Protocol: %s", err)
 	}
@@ -155,13 +169,17 @@ func resourceOPCSecurityProtocolUpdate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceOPCSecurityProtocolDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.SecurityProtocols()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityProtocols()
 	name := d.Id()
 
 	input := compute.DeleteSecurityProtocolInput{
 		Name: name,
 	}
-	if err := client.DeleteSecurityProtocol(&input); err != nil {
+	if err := resClient.DeleteSecurityProtocol(&input); err != nil {
 		return fmt.Errorf("Error deleting Security Protocol: %s", err)
 	}
 	return nil

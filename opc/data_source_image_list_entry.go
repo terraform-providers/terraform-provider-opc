@@ -49,7 +49,11 @@ func dataSourceImageListEntry() *schema.Resource {
 }
 
 func dataSourceImageListEntryRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.ImageListEntries()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.ImageListEntries()
 
 	// Get required attributes
 	image_list := d.Get("image_list").(string)
@@ -61,7 +65,7 @@ func dataSourceImageListEntryRead(d *schema.ResourceData, meta interface{}) erro
 		Version: version,
 	}
 
-	result, err := client.GetImageListEntry(&input)
+	result, err := resClient.GetImageListEntry(&input)
 	if err != nil {
 		return err
 	}

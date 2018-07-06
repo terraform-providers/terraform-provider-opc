@@ -109,3 +109,17 @@ func (l opcLogger) Log(args ...interface{}) {
 	log.SetFlags(0)
 	log.Print(fmt.Sprintf("go-oracle-terraform: %s", strings.Join(tokens, " ")))
 }
+
+func (c *Client) getComputeClient() (*compute.Client, error) {
+	if c.computeClient == nil {
+		return nil, fmt.Errorf("Compute API client has not been initialized. Ensure the `endpoint` for the Compute Classic REST API Endpoint has been declared in the provider configuration.")
+	}
+	return c.computeClient, nil
+}
+
+func (c *Client) getStorageClient() (*storage.Client, error) {
+	if c.storageClient == nil {
+		return nil, fmt.Errorf("Storage API client has not been initialized. Ensure the `storage_endpoint` for the Object Storage Classic REST API Endpoint has been declared in the provider configuration.")
+	}
+	return c.storageClient, nil
+}

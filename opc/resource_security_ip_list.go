@@ -40,7 +40,11 @@ func resourceOPCSecurityIPList() *schema.Resource {
 
 func resourceOPCSecurityIPListCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	client := meta.(*Client).computeClient.SecurityIPLists()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityIPLists()
 
 	ipEntries := d.Get("ip_entries").([]interface{})
 	ipEntryStrings := []string{}
@@ -57,7 +61,7 @@ func resourceOPCSecurityIPListCreate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	log.Printf("[DEBUG] Creating security IP list with %+v", input)
-	info, err := client.CreateSecurityIPList(&input)
+	info, err := resClient.CreateSecurityIPList(&input)
 	if err != nil {
 		return fmt.Errorf("Error creating security IP list %s: %s", input.Name, err)
 	}
@@ -68,7 +72,11 @@ func resourceOPCSecurityIPListCreate(d *schema.ResourceData, meta interface{}) e
 
 func resourceOPCSecurityIPListRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	computeClient := meta.(*Client).computeClient.SecurityIPLists()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityIPLists()
 	name := d.Id()
 
 	log.Printf("[DEBUG] Reading state of security IP list %s", name)
@@ -76,7 +84,7 @@ func resourceOPCSecurityIPListRead(d *schema.ResourceData, meta interface{}) err
 		Name: name,
 	}
 
-	result, err := computeClient.GetSecurityIPList(&input)
+	result, err := resClient.GetSecurityIPList(&input)
 	if err != nil {
 		// Security IP List does not exist
 		if client.WasNotFoundError(err) {
@@ -101,7 +109,11 @@ func resourceOPCSecurityIPListRead(d *schema.ResourceData, meta interface{}) err
 func resourceOPCSecurityIPListUpdate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
 
-	client := meta.(*Client).computeClient.SecurityIPLists()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityIPLists()
 
 	ipEntries := d.Get("ip_entries").([]interface{})
 	ipEntryStrings := []string{}
@@ -117,7 +129,7 @@ func resourceOPCSecurityIPListUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	log.Printf("[DEBUG] Updating security IP list with %+v", input)
-	info, err := client.UpdateSecurityIPList(&input)
+	info, err := resClient.UpdateSecurityIPList(&input)
 	if err != nil {
 		return fmt.Errorf("Error updating security IP list %s: %s", input.Name, err)
 	}
@@ -128,14 +140,18 @@ func resourceOPCSecurityIPListUpdate(d *schema.ResourceData, meta interface{}) e
 
 func resourceOPCSecurityIPListDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	client := meta.(*Client).computeClient.SecurityIPLists()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityIPLists()
 	name := d.Id()
 
 	log.Printf("[DEBUG] Deleting security IP list %s", name)
 	input := compute.DeleteSecurityIPListInput{
 		Name: name,
 	}
-	if err := client.DeleteSecurityIPList(&input); err != nil {
+	if err := resClient.DeleteSecurityIPList(&input); err != nil {
 		return fmt.Errorf("Error deleting security IP list %s: %s", name, err)
 	}
 	return nil

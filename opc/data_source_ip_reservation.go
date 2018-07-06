@@ -39,14 +39,18 @@ func dataSourceIPReservation() *schema.Resource {
 }
 
 func dataSourceIPReservationRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.IPReservations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPReservations()
 	name := d.Get("name").(string)
 
 	input := compute.GetIPReservationInput{
 		Name: name,
 	}
 
-	result, err := computeClient.GetIPReservation(&input)
+	result, err := resClient.GetIPReservation(&input)
 	if err != nil {
 		// IP Reservation does not exist
 		if client.WasNotFoundError(err) {

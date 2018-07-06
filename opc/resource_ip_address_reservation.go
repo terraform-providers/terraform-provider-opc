@@ -52,7 +52,11 @@ func resourceOPCIPAddressReservation() *schema.Resource {
 }
 
 func resourceOPCIPAddressReservationCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.IPAddressReservations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPAddressReservations()
 
 	input := compute.CreateIPAddressReservationInput{
 		Name:          d.Get("name").(string),
@@ -66,7 +70,7 @@ func resourceOPCIPAddressReservationCreate(d *schema.ResourceData, meta interfac
 		input.Description = description.(string)
 	}
 
-	info, err := client.CreateIPAddressReservation(&input)
+	info, err := resClient.CreateIPAddressReservation(&input)
 	if err != nil {
 		return fmt.Errorf("Error creating IP Address Reservation: %s", err)
 	}
@@ -75,13 +79,17 @@ func resourceOPCIPAddressReservationCreate(d *schema.ResourceData, meta interfac
 }
 
 func resourceOPCIPAddressReservationRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.IPAddressReservations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPAddressReservations()
 
 	input := compute.GetIPAddressReservationInput{
 		Name: d.Id(),
 	}
 
-	result, err := computeClient.GetIPAddressReservation(&input)
+	result, err := resClient.GetIPAddressReservation(&input)
 	if err != nil {
 		// IP Address Reservation does not exist
 		if client.WasNotFoundError(err) {
@@ -109,7 +117,11 @@ func resourceOPCIPAddressReservationRead(d *schema.ResourceData, meta interface{
 }
 
 func resourceOPCIPAddressReservationUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.IPAddressReservations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPAddressReservations()
 
 	input := compute.UpdateIPAddressReservationInput{
 		Name:          d.Get("name").(string),
@@ -123,7 +135,7 @@ func resourceOPCIPAddressReservationUpdate(d *schema.ResourceData, meta interfac
 		input.Description = description.(string)
 	}
 
-	info, err := client.UpdateIPAddressReservation(&input)
+	info, err := resClient.UpdateIPAddressReservation(&input)
 	if err != nil {
 		return fmt.Errorf("Error updating IP Address Reservation: %s", err)
 	}
@@ -132,13 +144,17 @@ func resourceOPCIPAddressReservationUpdate(d *schema.ResourceData, meta interfac
 }
 
 func resourceOPCIPAddressReservationDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.IPAddressReservations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPAddressReservations()
 	name := d.Id()
 
 	input := compute.DeleteIPAddressReservationInput{
 		Name: name,
 	}
-	if err := client.DeleteIPAddressReservation(&input); err != nil {
+	if err := resClient.DeleteIPAddressReservation(&input); err != nil {
 		return fmt.Errorf("Error deleting IP Address Reservation: %+v", err)
 	}
 	return nil

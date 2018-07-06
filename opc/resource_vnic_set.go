@@ -49,7 +49,11 @@ func resourceOPCVNICSet() *schema.Resource {
 }
 
 func resourceOPCVNICSetCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.VirtNICSets()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.VirtNICSets()
 
 	name := d.Get("name").(string)
 	desc, descOk := d.GetOk("description")
@@ -77,7 +81,7 @@ func resourceOPCVNICSetCreate(d *schema.ResourceData, meta interface{}) error {
 		input.Tags = tags
 	}
 
-	vnicSet, err := client.CreateVirtualNICSet(input)
+	vnicSet, err := resClient.CreateVirtualNICSet(input)
 	if err != nil {
 		return fmt.Errorf("Error creating Virtual NIC Set: %s", err)
 	}
@@ -88,14 +92,18 @@ func resourceOPCVNICSetCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCVNICSetRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.VirtNICSets()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.VirtNICSets()
 
 	name := d.Id()
 	input := &compute.GetVirtualNICSetInput{
 		Name: name,
 	}
 
-	result, err := computeClient.GetVirtualNICSet(input)
+	result, err := resClient.GetVirtualNICSet(input)
 	if err != nil {
 		if client.WasNotFoundError(err) {
 			d.SetId("")
@@ -124,7 +132,11 @@ func resourceOPCVNICSetRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCVNICSetUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.VirtNICSets()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.VirtNICSets()
 
 	name := d.Id()
 	desc, descOk := d.GetOk("description")
@@ -152,7 +164,7 @@ func resourceOPCVNICSetUpdate(d *schema.ResourceData, meta interface{}) error {
 		input.Tags = tags
 	}
 
-	info, err := client.UpdateVirtualNICSet(input)
+	info, err := resClient.UpdateVirtualNICSet(input)
 	if err != nil {
 		return fmt.Errorf("Error updating Virtual NIC Set: %s", err)
 	}
@@ -162,14 +174,18 @@ func resourceOPCVNICSetUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCVNICSetDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.VirtNICSets()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.VirtNICSets()
 
 	name := d.Id()
 	input := &compute.DeleteVirtualNICSetInput{
 		Name: name,
 	}
 
-	if err := client.DeleteVirtualNICSet(input); err != nil {
+	if err := resClient.DeleteVirtualNICSet(input); err != nil {
 		return fmt.Errorf("Error deleting Virtual NIC Set '%s': %s", name, err)
 	}
 	return nil

@@ -40,7 +40,11 @@ func resourceOPCSSHKey() *schema.Resource {
 }
 
 func resourceOPCSSHKeyCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.SSHKeys()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SSHKeys()
 
 	name := d.Get("name").(string)
 	key := d.Get("key").(string)
@@ -52,7 +56,7 @@ func resourceOPCSSHKeyCreate(d *schema.ResourceData, meta interface{}) error {
 		Enabled: enabled,
 	}
 
-	info, err := client.CreateSSHKey(&input)
+	info, err := resClient.CreateSSHKey(&input)
 	if err != nil {
 		return fmt.Errorf("Error creating ssh key %s: %s", name, err)
 	}
@@ -63,7 +67,11 @@ func resourceOPCSSHKeyCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSSHKeyUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.SSHKeys()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SSHKeys()
 
 	name := d.Get("name").(string)
 	key := d.Get("key").(string)
@@ -75,7 +83,7 @@ func resourceOPCSSHKeyUpdate(d *schema.ResourceData, meta interface{}) error {
 		Enabled: enabled,
 	}
 
-	_, err := client.UpdateSSHKey(&input)
+	_, err = resClient.UpdateSSHKey(&input)
 	if err != nil {
 		return fmt.Errorf("Error updating ssh key %s: %s", name, err)
 	}
@@ -84,14 +92,18 @@ func resourceOPCSSHKeyUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.SSHKeys()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SSHKeys()
 	name := d.Id()
 
 	input := compute.GetSSHKeyInput{
 		Name: name,
 	}
 
-	result, err := computeClient.GetSSHKey(&input)
+	result, err := resClient.GetSSHKey(&input)
 	if err != nil {
 		if client.WasNotFoundError(err) {
 			d.SetId("")
@@ -113,13 +125,17 @@ func resourceOPCSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSSHKeyDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.SSHKeys()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SSHKeys()
 	name := d.Id()
 
 	input := compute.DeleteSSHKeyInput{
 		Name: name,
 	}
-	if err := client.DeleteSSHKey(&input); err != nil {
+	if err := resClient.DeleteSSHKey(&input); err != nil {
 		return fmt.Errorf("Error deleting ssh key %s: %s", name, err)
 	}
 

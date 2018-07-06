@@ -32,14 +32,18 @@ func dataSourceSSHKey() *schema.Resource {
 }
 
 func dataSourceSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.SSHKeys()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SSHKeys()
 	name := d.Get("name").(string)
 
 	input := compute.GetSSHKeyInput{
 		Name: name,
 	}
 
-	result, err := computeClient.GetSSHKey(&input)
+	result, err := resClient.GetSSHKey(&input)
 	if err != nil {
 		if client.WasNotFoundError(err) {
 			d.SetId("")
