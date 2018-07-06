@@ -2,7 +2,7 @@
 
 BUG FIXES: 
 
-* all resources confirm that the client has been properly initialized [GH-136]
+* All resources confirm that the client has been properly initialized [GH-136]
 
 ## 1.1.2 (June 20, 2018)
 
