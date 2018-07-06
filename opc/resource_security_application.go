@@ -82,7 +82,12 @@ func resourceOPCSecurityApplicationCreate(d *schema.ResourceData, meta interface
 	icmpcode := d.Get("icmpcode").(string)
 	description := d.Get("description").(string)
 
-	client := meta.(*Client).computeClient.SecurityApplications()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityApplications()
+
 	input := compute.CreateSecurityApplicationInput{
 		Name:        name,
 		Description: description,
@@ -91,7 +96,7 @@ func resourceOPCSecurityApplicationCreate(d *schema.ResourceData, meta interface
 		ICMPCode:    compute.SecurityApplicationICMPCode(icmpcode),
 		ICMPType:    compute.SecurityApplicationICMPType(icmptype),
 	}
-	info, err := client.CreateSecurityApplication(&input)
+	info, err := resClient.CreateSecurityApplication(&input)
 	if err != nil {
 		return fmt.Errorf("Error creating security application %s: %s", name, err)
 	}
@@ -102,14 +107,18 @@ func resourceOPCSecurityApplicationCreate(d *schema.ResourceData, meta interface
 }
 
 func resourceOPCSecurityApplicationRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.SecurityApplications()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityApplications()
 	name := d.Id()
 
 	input := compute.GetSecurityApplicationInput{
 		Name: name,
 	}
 
-	result, err := computeClient.GetSecurityApplication(&input)
+	result, err := resClient.GetSecurityApplication(&input)
 	if err != nil {
 		if client.WasNotFoundError(err) {
 			d.SetId("")
@@ -134,13 +143,17 @@ func resourceOPCSecurityApplicationRead(d *schema.ResourceData, meta interface{}
 }
 
 func resourceOPCSecurityApplicationDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.SecurityApplications()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityApplications()
 	name := d.Id()
 
 	input := compute.DeleteSecurityApplicationInput{
 		Name: name,
 	}
-	if err := client.DeleteSecurityApplication(&input); err != nil {
+	if err := resClient.DeleteSecurityApplication(&input); err != nil {
 		return fmt.Errorf("Error deleting security application '%s': %s", name, err)
 	}
 	return nil

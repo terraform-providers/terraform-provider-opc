@@ -64,14 +64,19 @@ func resourceOPCSecurityListCreate(d *schema.ResourceData, meta interface{}) err
 	policy := d.Get("policy").(string)
 	outboundCIDRPolicy := d.Get("outbound_cidr_policy").(string)
 
-	client := meta.(*Client).computeClient.SecurityLists()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityLists()
+
 	input := compute.CreateSecurityListInput{
 		Name:               name,
 		Description:        description,
 		Policy:             compute.SecurityListPolicy(policy),
 		OutboundCIDRPolicy: compute.SecurityListPolicy(outboundCIDRPolicy),
 	}
-	info, err := client.CreateSecurityList(&input)
+	info, err := resClient.CreateSecurityList(&input)
 	if err != nil {
 		return fmt.Errorf("Error creating security list %s: %s", name, err)
 	}
@@ -82,7 +87,11 @@ func resourceOPCSecurityListCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCSecurityListUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.SecurityLists()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityLists()
 
 	name := d.Get("name").(string)
 	description := d.Get("description").(string)
@@ -95,7 +104,7 @@ func resourceOPCSecurityListUpdate(d *schema.ResourceData, meta interface{}) err
 		Policy:             compute.SecurityListPolicy(policy),
 		OutboundCIDRPolicy: compute.SecurityListPolicy(outboundCIDRPolicy),
 	}
-	_, err := client.UpdateSecurityList(&input)
+	_, err = resClient.UpdateSecurityList(&input)
 	if err != nil {
 		return fmt.Errorf("Error updating security list %s: %s", name, err)
 	}
@@ -104,7 +113,11 @@ func resourceOPCSecurityListUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCSecurityListRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.SecurityLists()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityLists()
 
 	name := d.Id()
 
@@ -112,7 +125,7 @@ func resourceOPCSecurityListRead(d *schema.ResourceData, meta interface{}) error
 		Name: name,
 	}
 
-	result, err := computeClient.GetSecurityList(&input)
+	result, err := resClient.GetSecurityList(&input)
 	if err != nil {
 		// Security List does not exist
 		if client.WasNotFoundError(err) {
@@ -136,13 +149,17 @@ func resourceOPCSecurityListRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceOPCSecurityListDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.SecurityLists()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityLists()
 
 	name := d.Id()
 	input := compute.DeleteSecurityListInput{
 		Name: name,
 	}
-	if err := client.DeleteSecurityList(&input); err != nil {
+	if err := resClient.DeleteSecurityList(&input); err != nil {
 		return fmt.Errorf("Error deleting security list %s: %s", name, err)
 	}
 

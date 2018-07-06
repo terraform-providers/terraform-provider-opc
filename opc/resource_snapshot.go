@@ -50,7 +50,11 @@ func resourceOPCSnapshot() *schema.Resource {
 }
 
 func resourceOPCSnapshotCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.Snapshots()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.Snapshots()
 
 	instance := d.Get("instance").(string)
 
@@ -66,7 +70,7 @@ func resourceOPCSnapshotCreate(d *schema.ResourceData, meta interface{}) error {
 		input.MachineImage = machineImage.(string)
 	}
 
-	info, err := client.CreateSnapshot(&input)
+	info, err := resClient.CreateSnapshot(&input)
 	if err != nil {
 		return fmt.Errorf("Error creating snapshot %s: %s", instance, err)
 	}
@@ -77,14 +81,18 @@ func resourceOPCSnapshotCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSnapshotRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.Snapshots()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.Snapshots()
 
 	name := d.Id()
 
 	input := compute.GetSnapshotInput{
 		Name: name,
 	}
-	result, err := computeClient.GetSnapshot(&input)
+	result, err := resClient.GetSnapshot(&input)
 	if err != nil {
 		// Sec Rule does not exist
 		if client.WasNotFoundError(err) {
@@ -105,14 +113,18 @@ func resourceOPCSnapshotRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSnapshotDelete(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.Snapshots()
-	machineImageClient := meta.(*Client).computeClient.MachineImages()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	snapshotClient := computeClient.Snapshots()
+	machineImageClient := computeClient.MachineImages()
 	name := d.Id()
 
 	getInput := compute.GetSnapshotInput{
 		Name: name,
 	}
-	result, err := computeClient.GetSnapshot(&getInput)
+	result, err := snapshotClient.GetSnapshot(&getInput)
 	if err != nil {
 		// Snapshot does not exist
 		if client.WasNotFoundError(err) {
@@ -126,7 +138,7 @@ func resourceOPCSnapshotDelete(d *schema.ResourceData, meta interface{}) error {
 		Snapshot:     name,
 		MachineImage: result.MachineImage,
 	}
-	if err := computeClient.DeleteSnapshot(machineImageClient, &input); err != nil {
+	if err := snapshotClient.DeleteSnapshot(machineImageClient, &input); err != nil {
 		return fmt.Errorf("Error deleting snapshot %s: %s", name, err)
 	}
 

@@ -138,7 +138,11 @@ func resourceOPCStorageVolume() *schema.Resource {
 }
 
 func resourceOPCStorageVolumeCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.StorageVolumes()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.StorageVolumes()
 
 	name := d.Get("name").(string)
 	description := d.Get("description").(string)
@@ -170,7 +174,7 @@ func resourceOPCStorageVolumeCreate(d *schema.ResourceData, meta interface{}) er
 		input.SnapshotID = v.(string)
 	}
 
-	info, err := client.CreateStorageVolume(&input)
+	info, err := resClient.CreateStorageVolume(&input)
 	if err != nil {
 		return fmt.Errorf("Error creating storage volume %s: %s", name, err)
 	}
@@ -180,7 +184,11 @@ func resourceOPCStorageVolumeCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceOPCStorageVolumeUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.StorageVolumes()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.StorageVolumes()
 
 	name := d.Id()
 	description := d.Get("description").(string)
@@ -199,7 +207,7 @@ func resourceOPCStorageVolumeUpdate(d *schema.ResourceData, meta interface{}) er
 		Tags:           getStringList(d, "tags"),
 		Timeout:        d.Timeout(schema.TimeoutUpdate),
 	}
-	_, err := client.UpdateStorageVolume(&input)
+	_, err = resClient.UpdateStorageVolume(&input)
 	if err != nil {
 		return fmt.Errorf("Error updating storage volume %s: %s", name, err)
 	}
@@ -208,14 +216,18 @@ func resourceOPCStorageVolumeUpdate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceOPCStorageVolumeRead(d *schema.ResourceData, meta interface{}) error {
-	sv := meta.(*Client).computeClient.StorageVolumes()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.StorageVolumes()
 
 	name := d.Id()
 	input := compute.GetStorageVolumeInput{
 		Name: name,
 	}
 
-	result, err := sv.GetStorageVolume(&input)
+	result, err := resClient.GetStorageVolume(&input)
 	if err != nil {
 		// Volume doesn't exist
 		if client.WasNotFoundError(err) {
@@ -257,14 +269,18 @@ func resourceOPCStorageVolumeRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceOPCStorageVolumeDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.StorageVolumes()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.StorageVolumes()
 	name := d.Id()
 
 	input := compute.DeleteStorageVolumeInput{
 		Name:    name,
 		Timeout: d.Timeout(schema.TimeoutDelete),
 	}
-	err := client.DeleteStorageVolume(&input)
+	err = resClient.DeleteStorageVolume(&input)
 	if err != nil {
 		return fmt.Errorf("Error deleting storage volume %s: %s", name, err)
 	}

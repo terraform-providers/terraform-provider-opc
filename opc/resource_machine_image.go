@@ -92,7 +92,11 @@ func resourceOPCMachineImage() *schema.Resource {
 }
 
 func resourceOPCMachineImageCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.MachineImages()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.MachineImages()
 
 	// Get required attributes
 	name := d.Get("name").(string)
@@ -121,7 +125,7 @@ func resourceOPCMachineImageCreate(d *schema.ResourceData, meta interface{}) err
 		input.Attributes = attributes
 	}
 
-	info, err := client.CreateMachineImage(input)
+	info, err := resClient.CreateMachineImage(input)
 	if err != nil {
 		return fmt.Errorf("Error creating Machine Image '%s': %v", name, err)
 	}
@@ -132,14 +136,18 @@ func resourceOPCMachineImageCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCMachineImageRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.MachineImages()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.MachineImages()
 
 	name := d.Id()
 	input := &compute.GetMachineImageInput{
 		Name: name,
 	}
 
-	result, err := computeClient.GetMachineImage(input)
+	result, err := resClient.GetMachineImage(input)
 	if err != nil {
 		if client.WasNotFoundError(err) {
 			d.SetId("")
@@ -180,14 +188,18 @@ func resourceOPCMachineImageRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceOPCMachineImageDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.MachineImages()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.MachineImages()
 
 	name := d.Id()
 	input := &compute.DeleteMachineImageInput{
 		Name: name,
 	}
 
-	if err := client.DeleteMachineImage(input); err != nil {
+	if err := resClient.DeleteMachineImage(input); err != nil {
 		return fmt.Errorf("Error deleting Machine Image '%s': %v", name, err)
 	}
 	return nil

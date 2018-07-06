@@ -47,11 +47,15 @@ func resourceOPCStorageAttachmentCreate(d *schema.ResourceData, meta interface{}
 	log.Print("[DEBUG] Creating storage_attachment")
 
 	volumeName := d.Get("storage_volume").(string)
-	volumeClient := meta.(*Client).computeClient.StorageVolumes()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.StorageVolumes()
 	getVolumeInput := compute.GetStorageVolumeInput{
 		Name: volumeName,
 	}
-	storageVolume, err := volumeClient.GetStorageVolume(&getVolumeInput)
+	storageVolume, err := resClient.GetStorageVolume(&getVolumeInput)
 	if err != nil {
 		if client.WasNotFoundError(err) {
 			return fmt.Errorf("Unable to find storage volume: %s", volumeName)
@@ -110,14 +114,18 @@ func checkForEmptyIndex(attachments []compute.StorageAttachment, index int) bool
 
 func resourceOPCStorageAttachmentRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	computeClient := meta.(*Client).computeClient.StorageAttachments()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.StorageAttachments()
 
 	log.Printf("[DEBUG] Reading state of ip reservation %s", d.Id())
 	getInput := compute.GetStorageAttachmentInput{
 		Name: d.Id(),
 	}
 
-	result, err := computeClient.GetStorageAttachment(&getInput)
+	result, err := resClient.GetStorageAttachment(&getInput)
 	if err != nil {
 		// StorageAttachment does not exist
 		if client.WasNotFoundError(err) {
@@ -141,7 +149,11 @@ func resourceOPCStorageAttachmentRead(d *schema.ResourceData, meta interface{}) 
 
 func resourceOPCStorageAttachmentDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	client := meta.(*Client).computeClient.StorageAttachments()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.StorageAttachments()
 	name := d.Id()
 
 	log.Printf("[DEBUG] Deleting StorageAttachment: %v", name)
@@ -149,7 +161,7 @@ func resourceOPCStorageAttachmentDelete(d *schema.ResourceData, meta interface{}
 	input := compute.DeleteStorageAttachmentInput{
 		Name: name,
 	}
-	if err := client.DeleteStorageAttachment(&input); err != nil {
+	if err := resClient.DeleteStorageAttachment(&input); err != nil {
 		return fmt.Errorf("Error deleting StorageAttachment")
 	}
 	return nil

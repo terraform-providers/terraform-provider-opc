@@ -47,7 +47,11 @@ func resourceOPCIPAddressPrefixSet() *schema.Resource {
 }
 
 func resourceOPCIPAddressPrefixSetCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.IPAddressPrefixSets()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPAddressPrefixSets()
 
 	input := compute.CreateIPAddressPrefixSetInput{
 		Name: d.Get("name").(string),
@@ -67,7 +71,7 @@ func resourceOPCIPAddressPrefixSetCreate(d *schema.ResourceData, meta interface{
 		input.Description = description.(string)
 	}
 
-	info, err := client.CreateIPAddressPrefixSet(&input)
+	info, err := resClient.CreateIPAddressPrefixSet(&input)
 	if err != nil {
 		return fmt.Errorf("Error creating IP Address Prefix Set: %s", err)
 	}
@@ -77,13 +81,17 @@ func resourceOPCIPAddressPrefixSetCreate(d *schema.ResourceData, meta interface{
 }
 
 func resourceOPCIPAddressPrefixSetRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.IPAddressPrefixSets()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPAddressPrefixSets()
 
 	input := compute.GetIPAddressPrefixSetInput{
 		Name: d.Id(),
 	}
 
-	result, err := computeClient.GetIPAddressPrefixSet(&input)
+	result, err := resClient.GetIPAddressPrefixSet(&input)
 	if err != nil {
 		// IP Address Prefix Set does not exist
 		if client.WasNotFoundError(err) {
@@ -111,7 +119,11 @@ func resourceOPCIPAddressPrefixSetRead(d *schema.ResourceData, meta interface{})
 }
 
 func resourceOPCIPAddressPrefixSetUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.IPAddressPrefixSets()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPAddressPrefixSets()
 
 	input := compute.UpdateIPAddressPrefixSetInput{
 		Name: d.Get("name").(string),
@@ -131,7 +143,7 @@ func resourceOPCIPAddressPrefixSetUpdate(d *schema.ResourceData, meta interface{
 		input.Description = description.(string)
 	}
 
-	info, err := client.UpdateIPAddressPrefixSet(&input)
+	info, err := resClient.UpdateIPAddressPrefixSet(&input)
 	if err != nil {
 		return fmt.Errorf("Error updating IP Address Prefix Set: %s", err)
 	}
@@ -141,13 +153,17 @@ func resourceOPCIPAddressPrefixSetUpdate(d *schema.ResourceData, meta interface{
 }
 
 func resourceOPCIPAddressPrefixSetDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.IPAddressPrefixSets()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPAddressPrefixSets()
 	name := d.Id()
 
 	input := compute.DeleteIPAddressPrefixSetInput{
 		Name: name,
 	}
-	if err := client.DeleteIPAddressPrefixSet(&input); err != nil {
+	if err := resClient.DeleteIPAddressPrefixSet(&input); err != nil {
 		return fmt.Errorf("Error deleting IP Address Prefix Set: %s", err)
 	}
 	return nil

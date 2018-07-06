@@ -46,7 +46,11 @@ func resourceOPCIPAddressAssociation() *schema.Resource {
 }
 
 func resourceOPCIPAddressAssociationCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.IPAddressAssociations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPAddressAssociations()
 
 	input := compute.CreateIPAddressAssociationInput{
 		Name: d.Get("name").(string),
@@ -69,7 +73,7 @@ func resourceOPCIPAddressAssociationCreate(d *schema.ResourceData, meta interfac
 		input.Description = description.(string)
 	}
 
-	info, err := client.CreateIPAddressAssociation(&input)
+	info, err := resClient.CreateIPAddressAssociation(&input)
 	if err != nil {
 		return fmt.Errorf("Error creating IP Address Association: %s", err)
 	}
@@ -79,13 +83,17 @@ func resourceOPCIPAddressAssociationCreate(d *schema.ResourceData, meta interfac
 }
 
 func resourceOPCIPAddressAssociationRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.IPAddressAssociations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPAddressAssociations()
 	name := d.Id()
 
 	getInput := compute.GetIPAddressAssociationInput{
 		Name: name,
 	}
-	result, err := computeClient.GetIPAddressAssociation(&getInput)
+	result, err := resClient.GetIPAddressAssociation(&getInput)
 	if err != nil {
 		// IP Address Association does not exist
 		if client.WasNotFoundError(err) {
@@ -111,7 +119,11 @@ func resourceOPCIPAddressAssociationRead(d *schema.ResourceData, meta interface{
 }
 
 func resourceOPCIPAddressAssociationUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.IPAddressAssociations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPAddressAssociations()
 
 	input := compute.UpdateIPAddressAssociationInput{
 		Name: d.Get("name").(string),
@@ -134,7 +146,7 @@ func resourceOPCIPAddressAssociationUpdate(d *schema.ResourceData, meta interfac
 		input.Description = description.(string)
 	}
 
-	info, err := client.UpdateIPAddressAssociation(&input)
+	info, err := resClient.UpdateIPAddressAssociation(&input)
 	if err != nil {
 		return fmt.Errorf("Error updating IP Address Association: %s", err)
 	}
@@ -144,13 +156,17 @@ func resourceOPCIPAddressAssociationUpdate(d *schema.ResourceData, meta interfac
 }
 
 func resourceOPCIPAddressAssociationDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.IPAddressAssociations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPAddressAssociations()
 	name := d.Id()
 
 	input := compute.DeleteIPAddressAssociationInput{
 		Name: name,
 	}
-	if err := client.DeleteIPAddressAssociation(&input); err != nil {
+	if err := resClient.DeleteIPAddressAssociation(&input); err != nil {
 		return fmt.Errorf("Error deleting IP Address Association: %s", err)
 	}
 	return nil

@@ -57,7 +57,11 @@ func resourceOPCSecRule() *schema.Resource {
 }
 
 func resourceOPCSecRuleCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.SecRules()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecRules()
 
 	name := d.Get("name").(string)
 	sourceList := d.Get("source_list").(string)
@@ -79,7 +83,7 @@ func resourceOPCSecRuleCreate(d *schema.ResourceData, meta interface{}) error {
 		input.Description = desc.(string)
 	}
 
-	info, err := client.CreateSecRule(&input)
+	info, err := resClient.CreateSecRule(&input)
 	if err != nil {
 		return fmt.Errorf("Error creating sec rule %s: %s", name, err)
 	}
@@ -90,7 +94,11 @@ func resourceOPCSecRuleCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSecRuleRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.SecRules()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecRules()
 
 	name := d.Id()
 
@@ -98,7 +106,7 @@ func resourceOPCSecRuleRead(d *schema.ResourceData, meta interface{}) error {
 		Name: name,
 	}
 
-	result, err := computeClient.GetSecRule(&input)
+	result, err := resClient.GetSecRule(&input)
 	if err != nil {
 		// Sec Rule does not exist
 		if client.WasNotFoundError(err) {
@@ -125,7 +133,11 @@ func resourceOPCSecRuleRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSecRuleUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.SecRules()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecRules()
 
 	name := d.Get("name").(string)
 	sourceList := d.Get("source_list").(string)
@@ -147,7 +159,7 @@ func resourceOPCSecRuleUpdate(d *schema.ResourceData, meta interface{}) error {
 		input.Description = desc.(string)
 	}
 
-	_, err := client.UpdateSecRule(&input)
+	_, err = resClient.UpdateSecRule(&input)
 	if err != nil {
 		return fmt.Errorf("Error updating sec rule %s: %s", name, err)
 	}
@@ -156,13 +168,17 @@ func resourceOPCSecRuleUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCSecRuleDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.SecRules()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecRules()
 	name := d.Id()
 
 	input := compute.DeleteSecRuleInput{
 		Name: name,
 	}
-	if err := client.DeleteSecRule(&input); err != nil {
+	if err := resClient.DeleteSecRule(&input); err != nil {
 		return fmt.Errorf("Error deleting sec rule %s: %s", name, err)
 	}
 

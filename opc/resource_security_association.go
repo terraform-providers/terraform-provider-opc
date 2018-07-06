@@ -41,7 +41,11 @@ func resourceOPCSecurityAssociation() *schema.Resource {
 }
 
 func resourceOPCSecurityAssociationCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.SecurityAssociations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityAssociations()
 
 	name := d.Get("name").(string)
 	vcable := d.Get("vcable").(string)
@@ -52,7 +56,7 @@ func resourceOPCSecurityAssociationCreate(d *schema.ResourceData, meta interface
 		SecList: seclist,
 		VCable:  vcable,
 	}
-	info, err := client.CreateSecurityAssociation(&input)
+	info, err := resClient.CreateSecurityAssociation(&input)
 	if err != nil {
 		return fmt.Errorf("Error creating security association between vcable %s and security list %s: %s", vcable, seclist, err)
 	}
@@ -63,7 +67,11 @@ func resourceOPCSecurityAssociationCreate(d *schema.ResourceData, meta interface
 }
 
 func resourceOPCSecurityAssociationRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.SecurityAssociations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityAssociations()
 
 	name := d.Id()
 
@@ -71,7 +79,7 @@ func resourceOPCSecurityAssociationRead(d *schema.ResourceData, meta interface{}
 		Name: name,
 	}
 
-	result, err := computeClient.GetSecurityAssociation(&input)
+	result, err := resClient.GetSecurityAssociation(&input)
 	if err != nil {
 		// Security Association does not exist
 		if client.WasNotFoundError(err) {
@@ -94,14 +102,18 @@ func resourceOPCSecurityAssociationRead(d *schema.ResourceData, meta interface{}
 }
 
 func resourceOPCSecurityAssociationDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.SecurityAssociations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.SecurityAssociations()
 
 	name := d.Id()
 
 	input := compute.DeleteSecurityAssociationInput{
 		Name: name,
 	}
-	if err := client.DeleteSecurityAssociation(&input); err != nil {
+	if err := resClient.DeleteSecurityAssociation(&input); err != nil {
 		return fmt.Errorf("Error deleting Security Association '%s': %v", name, err)
 	}
 	return nil

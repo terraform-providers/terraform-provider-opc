@@ -44,7 +44,11 @@ func dataSourceVNIC() *schema.Resource {
 }
 
 func dataSourceVNICRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.VirtNICs()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.VirtNICs()
 
 	name := d.Get("name").(string)
 
@@ -52,7 +56,7 @@ func dataSourceVNICRead(d *schema.ResourceData, meta interface{}) error {
 		Name: name,
 	}
 
-	vnic, err := computeClient.GetVirtualNIC(input)
+	vnic, err := resClient.GetVirtualNIC(input)
 	if err != nil {
 		if client.WasNotFoundError(err) {
 			d.SetId("")

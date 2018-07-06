@@ -377,7 +377,11 @@ func resourceInstance() *schema.Resource {
 }
 
 func resourceInstanceCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.Instances()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.Instances()
 
 	// Get Required Attributes
 	input := &compute.CreateInstanceInput{
@@ -437,7 +441,7 @@ func resourceInstanceCreate(d *schema.ResourceData, meta interface{}) error {
 		input.Tags = tags
 	}
 
-	result, err := client.CreateInstance(input)
+	result, err := resClient.CreateInstance(input)
 	if err != nil {
 		return fmt.Errorf("Error creating instance %s: %s", input.Name, err)
 	}
@@ -450,7 +454,11 @@ func resourceInstanceCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceInstanceRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.Instances()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.Instances()
 
 	name := d.Get("name").(string)
 
@@ -460,7 +468,7 @@ func resourceInstanceRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	log.Printf("[DEBUG] Reading state of instance %s", name)
-	result, err := computeClient.GetInstance(input)
+	result, err := resClient.GetInstance(input)
 	if err != nil {
 		// Instance doesn't exist
 		if client.WasNotFoundError(err) {
@@ -564,7 +572,11 @@ func updateInstanceAttributes(d *schema.ResourceData, instance *compute.Instance
 }
 
 func resourceInstanceUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.Instances()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.Instances()
 
 	name := d.Get("name").(string)
 
@@ -584,7 +596,7 @@ func resourceInstanceUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	}
 
-	result, err := client.UpdateInstance(input)
+	result, err := resClient.UpdateInstance(input)
 	if err != nil {
 		return fmt.Errorf("Error updating instance %s: %s", input.Name, err)
 	}
@@ -595,7 +607,11 @@ func resourceInstanceUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceInstanceDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.Instances()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.Instances()
 
 	name := d.Get("name").(string)
 
@@ -606,7 +622,7 @@ func resourceInstanceDelete(d *schema.ResourceData, meta interface{}) error {
 	}
 	log.Printf("[DEBUG] Deleting instance %s", name)
 
-	if err := client.DeleteInstance(input); err != nil {
+	if err := resClient.DeleteInstance(input); err != nil {
 		return fmt.Errorf("Error deleting instance %s: %s", name, err)
 	}
 

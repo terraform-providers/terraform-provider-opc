@@ -58,7 +58,11 @@ func resourceOPCIPNetwork() *schema.Resource {
 }
 
 func resourceOPCIPNetworkCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.IPNetworks()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPNetworks()
 
 	// Get required attributes
 	name := d.Get("name").(string)
@@ -86,7 +90,7 @@ func resourceOPCIPNetworkCreate(d *schema.ResourceData, meta interface{}) error 
 		input.Tags = tags
 	}
 
-	info, err := client.CreateIPNetwork(input)
+	info, err := resClient.CreateIPNetwork(input)
 	if err != nil {
 		return fmt.Errorf("Error creating IP Network '%s': %v", name, err)
 	}
@@ -97,14 +101,18 @@ func resourceOPCIPNetworkCreate(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceOPCIPNetworkRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.IPNetworks()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPNetworks()
 
 	name := d.Id()
 	input := &compute.GetIPNetworkInput{
 		Name: name,
 	}
 
-	result, err := computeClient.GetIPNetwork(input)
+	result, err := resClient.GetIPNetwork(input)
 	if err != nil {
 		if client.WasNotFoundError(err) {
 			d.SetId("")
@@ -131,7 +139,11 @@ func resourceOPCIPNetworkRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCIPNetworkUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.IPNetworks()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPNetworks()
 
 	// Get required attributes
 	name := d.Get("name").(string)
@@ -161,7 +173,7 @@ func resourceOPCIPNetworkUpdate(d *schema.ResourceData, meta interface{}) error 
 		input.Tags = tags
 	}
 
-	info, err := client.UpdateIPNetwork(input)
+	info, err := resClient.UpdateIPNetwork(input)
 	if err != nil {
 		return fmt.Errorf("Error updating IP Network '%s': %v", name, err)
 	}
@@ -172,14 +184,18 @@ func resourceOPCIPNetworkUpdate(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceOPCIPNetworkDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.IPNetworks()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPNetworks()
 
 	name := d.Id()
 	input := &compute.DeleteIPNetworkInput{
 		Name: name,
 	}
 
-	if err := client.DeleteIPNetwork(input); err != nil {
+	if err := resClient.DeleteIPNetwork(input); err != nil {
 		return fmt.Errorf("Error deleting IP Network '%s': %v", name, err)
 	}
 	return nil

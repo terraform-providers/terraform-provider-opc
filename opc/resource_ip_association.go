@@ -43,12 +43,16 @@ func resourceOPCIPAssociationCreate(d *schema.ResourceData, meta interface{}) er
 	vCable := d.Get("vcable").(string)
 	parentPool := d.Get("parent_pool").(string)
 
-	client := meta.(*Client).computeClient.IPAssociations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPAssociations()
 	input := compute.CreateIPAssociationInput{
 		ParentPool: parentPool,
 		VCable:     vCable,
 	}
-	info, err := client.CreateIPAssociation(&input)
+	info, err := resClient.CreateIPAssociation(&input)
 	if err != nil {
 		return fmt.Errorf("Error creating ip association between vcable %s and parent pool %s: %s", vCable, parentPool, err)
 	}
@@ -59,14 +63,18 @@ func resourceOPCIPAssociationCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceOPCIPAssociationRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.IPAssociations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPAssociations()
 
 	name := d.Id()
 	input := compute.GetIPAssociationInput{
 		Name: name,
 	}
 
-	result, err := computeClient.GetIPAssociation(&input)
+	result, err := resClient.GetIPAssociation(&input)
 	if err != nil {
 		// IP Association does not exist
 		if client.WasNotFoundError(err) {
@@ -89,13 +97,17 @@ func resourceOPCIPAssociationRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceOPCIPAssociationDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.IPAssociations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPAssociations()
 
 	name := d.Id()
 	input := compute.DeleteIPAssociationInput{
 		Name: name,
 	}
-	if err := client.DeleteIPAssociation(&input); err != nil {
+	if err := resClient.DeleteIPAssociation(&input); err != nil {
 		return fmt.Errorf("Error deleting ip association '%s': %s", name, err)
 	}
 
