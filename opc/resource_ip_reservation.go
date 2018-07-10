@@ -60,8 +60,12 @@ func resourceOPCIPReservationCreate(d *schema.ResourceData, meta interface{}) er
 		reservation.Tags = tags
 	}
 
-	client := meta.(*Client).computeClient.IPReservations()
-	info, err := client.CreateIPReservation(&reservation)
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPReservations()
+	info, err := resClient.CreateIPReservation(&reservation)
 	if err != nil {
 		return fmt.Errorf("Error creating ip reservation from parent_pool %s with tags=%s: %s",
 			reservation.ParentPool, reservation.Tags, err)
@@ -72,13 +76,17 @@ func resourceOPCIPReservationCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceOPCIPReservationRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.IPReservations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPReservations()
 
 	input := compute.GetIPReservationInput{
 		Name: d.Id(),
 	}
 
-	result, err := computeClient.GetIPReservation(&input)
+	result, err := resClient.GetIPReservation(&input)
 	if err != nil {
 		// IP Reservation does not exist
 		if client.WasNotFoundError(err) {
@@ -107,12 +115,16 @@ func resourceOPCIPReservationRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceOPCIPReservationDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.IPReservations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPReservations()
 
 	input := compute.DeleteIPReservationInput{
 		Name: d.Id(),
 	}
-	if err := client.DeleteIPReservation(&input); err != nil {
+	if err := resClient.DeleteIPReservation(&input); err != nil {
 		return fmt.Errorf("Error deleting ip reservation %s", d.Id())
 	}
 	return nil

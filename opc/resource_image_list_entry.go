@@ -62,7 +62,11 @@ func resourceOPCImageListEntry() *schema.Resource {
 }
 
 func resourceOPCImageListEntryCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.ImageListEntries()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.ImageListEntries()
 
 	name := d.Get("name").(string)
 	machineImages := expandOPCImageListEntryMachineImages(d)
@@ -84,7 +88,7 @@ func resourceOPCImageListEntryCreate(d *schema.ResourceData, meta interface{}) e
 		createInput.Attributes = attributes
 	}
 
-	_, err := client.CreateImageListEntry(createInput)
+	_, err = resClient.CreateImageListEntry(createInput)
 	if err != nil {
 		return err
 	}
@@ -95,7 +99,11 @@ func resourceOPCImageListEntryCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceOPCImageListEntryRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.ImageListEntries()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.ImageListEntries()
 
 	// Only parse image list entry ID if delimiter exists
 	name, version, err := parseOPCImageListEntryID(d.Id())
@@ -108,7 +116,7 @@ func resourceOPCImageListEntryRead(d *schema.ResourceData, meta interface{}) err
 		Version: *version,
 	}
 
-	result, err := client.GetImageListEntry(&input)
+	result, err := resClient.GetImageListEntry(&input)
 	if err != nil {
 		return err
 	}
@@ -133,7 +141,11 @@ func resourceOPCImageListEntryRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceOPCImageListEntryDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.ImageListEntries()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.ImageListEntries()
 
 	name, version, err := parseOPCImageListEntryID(d.Id())
 	if err != nil {
@@ -144,7 +156,7 @@ func resourceOPCImageListEntryDelete(d *schema.ResourceData, meta interface{}) e
 		Name:    *name,
 		Version: *version,
 	}
-	err = client.DeleteImageListEntry(deleteInput)
+	err = resClient.DeleteImageListEntry(deleteInput)
 	if err != nil {
 		return err
 	}

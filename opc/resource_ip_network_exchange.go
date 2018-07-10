@@ -39,7 +39,11 @@ func resourceOPCIPNetworkExchange() *schema.Resource {
 }
 
 func resourceOPCIPNetworkExchangeCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.IPNetworkExchanges()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPNetworkExchanges()
 	input := compute.CreateIPNetworkExchangeInput{
 		Name: d.Get("name").(string),
 	}
@@ -54,7 +58,7 @@ func resourceOPCIPNetworkExchangeCreate(d *schema.ResourceData, meta interface{}
 		input.Description = description.(string)
 	}
 
-	info, err := client.CreateIPNetworkExchange(&input)
+	info, err := resClient.CreateIPNetworkExchange(&input)
 	if err != nil {
 		return fmt.Errorf("Error creating IP Network Exchange: %s", err)
 	}
@@ -64,14 +68,18 @@ func resourceOPCIPNetworkExchangeCreate(d *schema.ResourceData, meta interface{}
 }
 
 func resourceOPCIPNetworkExchangeRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.IPNetworkExchanges()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPNetworkExchanges()
 
 	log.Printf("[DEBUG] Reading state of IP Network Exchange %s", d.Id())
 	input := compute.GetIPNetworkExchangeInput{
 		Name: d.Id(),
 	}
 
-	result, err := computeClient.GetIPNetworkExchange(&input)
+	result, err := resClient.GetIPNetworkExchange(&input)
 	if err != nil {
 		// IP NetworkExchange does not exist
 		if client.WasNotFoundError(err) {
@@ -98,14 +106,18 @@ func resourceOPCIPNetworkExchangeRead(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceOPCIPNetworkExchangeDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.IPNetworkExchanges()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.IPNetworkExchanges()
 	name := d.Id()
 
 	log.Printf("[DEBUG] Deleting IP Network Exchange '%s'", name)
 	input := compute.DeleteIPNetworkExchangeInput{
 		Name: name,
 	}
-	if err := client.DeleteIPNetworkExchange(&input); err != nil {
+	if err := resClient.DeleteIPNetworkExchange(&input); err != nil {
 		return fmt.Errorf("Error deleting IP Network Exchange '%s': %+v", name, err)
 	}
 	return nil

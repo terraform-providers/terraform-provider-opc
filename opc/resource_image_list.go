@@ -35,7 +35,11 @@ func resourceOPCImageList() *schema.Resource {
 }
 
 func resourceOPCImageListCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.ImageList()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.ImageList()
 
 	name := d.Get("name").(string)
 
@@ -45,7 +49,7 @@ func resourceOPCImageListCreate(d *schema.ResourceData, meta interface{}) error 
 		Default:     d.Get("default").(int),
 	}
 
-	createResult, err := client.CreateImageList(createInput)
+	createResult, err := resClient.CreateImageList(createInput)
 	if err != nil {
 		return err
 	}
@@ -56,7 +60,11 @@ func resourceOPCImageListCreate(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceOPCImageListUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.ImageList()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.ImageList()
 
 	name := d.Id()
 
@@ -66,7 +74,7 @@ func resourceOPCImageListUpdate(d *schema.ResourceData, meta interface{}) error 
 		Default:     d.Get("default").(int),
 	}
 
-	_, err := client.UpdateImageList(updateInput)
+	_, err = resClient.UpdateImageList(updateInput)
 	if err != nil {
 		return err
 	}
@@ -75,13 +83,17 @@ func resourceOPCImageListUpdate(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceOPCImageListRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.ImageList()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.ImageList()
 
 	input := &compute.GetImageListInput{
 		Name: d.Id(),
 	}
 
-	result, err := client.GetImageList(input)
+	result, err := resClient.GetImageList(input)
 	if err != nil {
 		return err
 	}
@@ -99,12 +111,16 @@ func resourceOPCImageListRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceOPCImageListDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.ImageList()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.ImageList()
 
 	deleteInput := &compute.DeleteImageListInput{
 		Name: d.Id(),
 	}
-	err := client.DeleteImageList(deleteInput)
+	err = resClient.DeleteImageList(deleteInput)
 	if err != nil {
 		return err
 	}

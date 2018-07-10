@@ -53,7 +53,11 @@ func resourceOPCACLCreate(d *schema.ResourceData, meta interface{}) error {
 
 	log.Print("[DEBUG] Creating acl")
 
-	client := meta.(*Client).computeClient.ACLs()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.ACLs()
 	input := compute.CreateACLInput{
 		Name:    d.Get("name").(string),
 		Enabled: d.Get("enabled").(bool),
@@ -68,7 +72,7 @@ func resourceOPCACLCreate(d *schema.ResourceData, meta interface{}) error {
 		input.Description = description.(string)
 	}
 
-	info, err := client.CreateACL(&input)
+	info, err := resClient.CreateACL(&input)
 	if err != nil {
 		return fmt.Errorf("Error creating ACL: %s", err)
 	}
@@ -79,14 +83,18 @@ func resourceOPCACLCreate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceOPCACLRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	computeClient := meta.(*Client).computeClient.ACLs()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.ACLs()
 
 	log.Printf("[DEBUG] Reading state of ip reservation %s", d.Id())
 	getInput := compute.GetACLInput{
 		Name: d.Id(),
 	}
 
-	result, err := computeClient.GetACL(&getInput)
+	result, err := resClient.GetACL(&getInput)
 	if err != nil {
 		// ACL does not exist
 		if client.WasNotFoundError(err) {
@@ -117,7 +125,11 @@ func resourceOPCACLUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	log.Print("[DEBUG] Updating acl")
 
-	client := meta.(*Client).computeClient.ACLs()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.ACLs()
 	input := compute.UpdateACLInput{
 		Name:    d.Get("name").(string),
 		Enabled: d.Get("enabled").(bool),
@@ -132,7 +144,7 @@ func resourceOPCACLUpdate(d *schema.ResourceData, meta interface{}) error {
 		input.Description = description.(string)
 	}
 
-	info, err := client.UpdateACL(&input)
+	info, err := resClient.UpdateACL(&input)
 	if err != nil {
 		return fmt.Errorf("Error updating ACL: %s", err)
 	}
@@ -143,7 +155,11 @@ func resourceOPCACLUpdate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceOPCACLDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	client := meta.(*Client).computeClient.ACLs()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.ACLs()
 	name := d.Id()
 
 	log.Printf("[DEBUG] Deleting ACL: %v", name)
@@ -151,7 +167,7 @@ func resourceOPCACLDelete(d *schema.ResourceData, meta interface{}) error {
 	input := compute.DeleteACLInput{
 		Name: name,
 	}
-	if err := client.DeleteACL(&input); err != nil {
+	if err := resClient.DeleteACL(&input); err != nil {
 		return fmt.Errorf("Error deleting ACL")
 	}
 	return nil

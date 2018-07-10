@@ -128,7 +128,11 @@ func resourceOPCStorageVolumeSnapshot() *schema.Resource {
 }
 
 func resourceOPCStorageVolumeSnapshotCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.StorageVolumeSnapshots()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.StorageVolumeSnapshots()
 
 	// Get required attribute
 	input := &compute.CreateStorageVolumeSnapshotInput{
@@ -160,7 +164,7 @@ func resourceOPCStorageVolumeSnapshotCreate(d *schema.ResourceData, meta interfa
 		input.Tags = tags
 	}
 
-	info, err := client.CreateStorageVolumeSnapshot(input)
+	info, err := resClient.CreateStorageVolumeSnapshot(input)
 	if err != nil {
 		return fmt.Errorf("Error creating snapshot '%s': %v", input.Name, err)
 	}
@@ -170,14 +174,18 @@ func resourceOPCStorageVolumeSnapshotCreate(d *schema.ResourceData, meta interfa
 }
 
 func resourceOPCStorageVolumeSnapshotRead(d *schema.ResourceData, meta interface{}) error {
-	computeClient := meta.(*Client).computeClient.StorageVolumeSnapshots()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.StorageVolumeSnapshots()
 
 	name := d.Id()
 	input := &compute.GetStorageVolumeSnapshotInput{
 		Name: name,
 	}
 
-	result, err := computeClient.GetStorageVolumeSnapshot(input)
+	result, err := resClient.GetStorageVolumeSnapshot(input)
 	if err != nil {
 		if client.WasNotFoundError(err) {
 			d.SetId("")
@@ -228,7 +236,11 @@ func resourceOPCStorageVolumeSnapshotRead(d *schema.ResourceData, meta interface
 }
 
 func resourceOPCStorageVolumeSnapshotDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.StorageVolumeSnapshots()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.StorageVolumeSnapshots()
 
 	name := d.Id()
 
@@ -237,7 +249,7 @@ func resourceOPCStorageVolumeSnapshotDelete(d *schema.ResourceData, meta interfa
 		Timeout: d.Timeout(schema.TimeoutDelete),
 	}
 
-	if err := client.DeleteStorageVolumeSnapshot(input); err != nil {
+	if err := resClient.DeleteStorageVolumeSnapshot(input); err != nil {
 		return fmt.Errorf("Error deleting storage volume snapshot '%s': %v", name, err)
 	}
 

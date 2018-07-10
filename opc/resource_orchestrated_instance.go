@@ -63,7 +63,11 @@ func resourceOPCOrchestratedInstanceCreate(d *schema.ResourceData, meta interfac
 
 	log.Print("[DEBUG] Creating Orchestration")
 
-	client := meta.(*Client).computeClient.Orchestrations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.Orchestrations()
 	input := compute.CreateOrchestrationInput{
 		Name:         d.Get("name").(string),
 		DesiredState: compute.OrchestrationDesiredState(d.Get("desired_state").(string)),
@@ -85,7 +89,7 @@ func resourceOPCOrchestratedInstanceCreate(d *schema.ResourceData, meta interfac
 	}
 	input.Objects = instances
 
-	info, err := client.CreateOrchestration(&input)
+	info, err := resClient.CreateOrchestration(&input)
 	if err != nil {
 		return fmt.Errorf("Error creating Orchestration: %s", err)
 	}
@@ -96,14 +100,18 @@ func resourceOPCOrchestratedInstanceCreate(d *schema.ResourceData, meta interfac
 
 func resourceOPCOrchestratedInstanceRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Resource state: %#v", d.State())
-	computeClient := meta.(*Client).computeClient.Orchestrations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.Orchestrations()
 
 	log.Printf("[DEBUG] Reading state of orchestrated instance %s", d.Id())
 	getInput := compute.GetOrchestrationInput{
 		Name: d.Id(),
 	}
 
-	result, err := computeClient.GetOrchestration(&getInput)
+	result, err := resClient.GetOrchestration(&getInput)
 	if err != nil {
 		// Orchestration does not exist
 		if client.WasNotFoundError(err) {
@@ -146,14 +154,18 @@ func resourceOPCOrchestratedInstanceUpdate(d *schema.ResourceData, meta interfac
 
 	log.Print("[DEBUG] Updating Orchestration")
 
-	computeClient := meta.(*Client).computeClient.Orchestrations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.Orchestrations()
 
 	// Obtain orchestration so we can grab the instance information
 	getInput := compute.GetOrchestrationInput{
 		Name: d.Id(),
 	}
 
-	result, err := computeClient.GetOrchestration(&getInput)
+	result, err := resClient.GetOrchestration(&getInput)
 	if err != nil {
 		// Orchestration does not exist
 		if client.WasNotFoundError(err) {
@@ -186,7 +198,7 @@ func resourceOPCOrchestratedInstanceUpdate(d *schema.ResourceData, meta interfac
 
 	input.Objects = result.Objects
 
-	info, err := computeClient.UpdateOrchestration(&input)
+	info, err := resClient.UpdateOrchestration(&input)
 	if err != nil {
 		return fmt.Errorf("Error updating Orchestration: %s", err)
 	}
@@ -196,7 +208,11 @@ func resourceOPCOrchestratedInstanceUpdate(d *schema.ResourceData, meta interfac
 }
 
 func resourceOPCOrchestratedInstanceDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*Client).computeClient.Orchestrations()
+	computeClient, err := meta.(*Client).getComputeClient()
+	if err != nil {
+		return err
+	}
+	resClient := computeClient.Orchestrations()
 
 	name := d.Id()
 
@@ -206,7 +222,7 @@ func resourceOPCOrchestratedInstanceDelete(d *schema.ResourceData, meta interfac
 	}
 	log.Printf("[DEBUG] Deleting orchestration %s", name)
 
-	if err := client.DeleteOrchestration(input); err != nil {
+	if err := resClient.DeleteOrchestration(input); err != nil {
 		return fmt.Errorf("Error deleting orchestration %s for instance %s: %s", name, d.Id(), err)
 	}
 

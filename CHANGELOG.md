@@ -1,4 +1,9 @@
 ## 1.1.3 (Unreleased)
+
+BUG FIXES: 
+
+* All resources confirm that the client has been properly initialized [GH-136]
+
 ## 1.1.2 (June 20, 2018)
 
 FEATURES:
