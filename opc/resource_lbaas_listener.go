@@ -116,21 +116,14 @@ func resourceListenerCreate(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	listenerClient := lbaasClient.ListenerClient()
-
-	var lb lbaas.LoadBalancerContext
-	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
-		lb = getLoadBalancerContextFromID(loadBalancer.(string))
-	}
+	lb := getLoadBalancerContextFromID(d.Get("load_balancer").(string))
 
 	input := lbaas.CreateListenerInput{
 		Name:                 d.Get("name").(string),
 		BalancerProtocol:     lbaas.Protocol(d.Get("balancer_protocol").(string)),
 		OriginServerProtocol: lbaas.Protocol(d.Get("server_protocol").(string)),
 		Port:                 d.Get("port").(int),
-	}
-
-	if enabled, ok := d.GetOk("enabled"); ok {
-		input.Disabled = getDisabledStateKeyword(enabled.(bool))
+		Disabled:             getDisabledStateKeyword(d.Get("enabled").(bool)),
 	}
 
 	if serverPool, ok := d.GetOk("server_pool"); ok {
@@ -208,25 +201,11 @@ func resourceListenerRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("uri", result.URI)
 	d.Set("load_balancer", fmt.Sprintf("%s/%s", lb.Region, lb.Name))
 
-	if err := setStringList(d, "path_prefixes", result.PathPrefixes); err != nil {
-		return err
-	}
-
-	if err := setStringList(d, "policies", result.Policies); err != nil {
-		return err
-	}
-
-	if err := setStringList(d, "certificates", result.SSLCerts); err != nil {
-		return err
-	}
-
-	if err := setStringList(d, "tags", result.Tags); err != nil {
-		return err
-	}
-
-	if err := setStringList(d, "virtual_hosts", result.VirtualHosts); err != nil {
-		return err
-	}
+	d.Set("path_prefixes", result.PathPrefixes)
+	d.Set("policies", result.Policies)
+	d.Set("certificates", result.SSLCerts)
+	d.Set("tags", result.Tags)
+	d.Set("virtual_hosts", result.VirtualHosts)
 
 	return nil
 }
@@ -298,7 +277,7 @@ func resourceListenerDelete(d *schema.ResourceData, meta interface{}) error {
 	lb := getLoadBalancerContextFromID(d.Id())
 
 	if _, err := listenerClient.DeleteListener(lb, name); err != nil {
-		return fmt.Errorf("Error deleting Listener")
+		return fmt.Errorf("Error deleting Listener: %v", err)
 	}
 	return nil
 }

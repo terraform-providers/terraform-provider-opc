@@ -149,22 +149,16 @@ func resourceOriginServerPoolCreate(d *schema.ResourceData, meta interface{}) er
 		return err
 	}
 	serverPoolClient := lbaasClient.OriginServerPoolClient()
+	lb := getLoadBalancerContextFromID(d.Get("load_balancer").(string))
 
-	var lb lbaas.LoadBalancerContext
-	if loadBalancer, ok := d.GetOk("load_balancer"); ok {
-		lb = getLoadBalancerContextFromID(loadBalancer.(string))
+	status := lbaas.LBaaSStatusEnabled
+	if !d.Get("enabled").(bool) {
+		status = lbaas.LBaaSStatusDisabled
 	}
 
 	input := lbaas.CreateOriginServerPoolInput{
-		Name: d.Get("name").(string),
-	}
-
-	if enabled, ok := d.GetOk("enabled"); ok {
-		if enabled.(bool) {
-			input.Status = lbaas.LBaaSStatusEnabled
-		} else {
-			input.Status = lbaas.LBaaSStatusDisabled
-		}
+		Name:   d.Get("name").(string),
+		Status: status,
 	}
 
 	if vnicSet, ok := d.GetOk("vnic_set_name"); ok {
@@ -280,8 +274,8 @@ func resourceOriginServerPoolUpdate(d *schema.ResourceData, meta interface{}) er
 
 	if d.HasChange("health_check") {
 		if _, ok := d.GetOk("health_check"); ok {
-			helthCheck := expandHealthCheckConfig(d)
-			input.HealthCheck = &helthCheck
+			healthCheck := expandHealthCheckConfig(d)
+			input.HealthCheck = &healthCheck
 		} else {
 			input.HealthCheck = &lbaas.HealthCheckInfo{}
 		}
@@ -309,7 +303,7 @@ func resourceOriginServerPoolDelete(d *schema.ResourceData, meta interface{}) er
 	lb := getLoadBalancerContextFromID(d.Id())
 
 	if _, err := serverPoolClient.DeleteOriginServerPool(lb, name); err != nil {
-		return fmt.Errorf("Error deleting OriginServerPool")
+		return fmt.Errorf("Error deleting Server Pool: %v", err)
 	}
 	return nil
 }

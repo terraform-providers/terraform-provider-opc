@@ -29,11 +29,12 @@ resource "opc_lbaas_certificate" "example" {
 
 * `certificate_body` - (Required) The Certificate data in PEM format.
 
+* `type` - (Required) Sets the Certificate Type. `TRUSTED` or `SERVER`.
+
 * `certificate_chain` - (Optional) PEM encoded bodies of all certificates in the chain up to and including the CA certificate. This is not need when the certificate is self signed.
 
 * `private_key` - (Optional) The private key data in PEM format. Only required for Server Certificates
 
-* `type` - (Required) Sets the Certificate Type. `TRUSTED` or `SERVER`.
 
 
 ## Additional Attributes

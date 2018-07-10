@@ -351,6 +351,119 @@ func TestAccLBaaSPolicy_SSLNegotiationPolicy(t *testing.T) {
 // 	})
 // }
 
+func TestAccLBaaSPolicy_ApplicationCookieStickinessPolicy_Update(t *testing.T) {
+	rInt := acctest.RandInt()
+	resName := "opc_lbaas_policy.application_cookie_stickiness_policy"
+	testName := fmt.Sprintf("acctest-%d", rInt)
+
+	// use existing LB instance from environment if set
+	lbCount := 0
+	lbID := os.Getenv("OPC_TEST_USE_EXISTING_LB")
+	if lbID == "" {
+		lbCount = 1
+		lbID = "${opc_lbaas_load_balancer.test.id}"
+	}
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: opcResourceCheck(resName, testAccLBaaSCheckPolicyDestroyed),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccLBaaSPolicyConfig_ApplicationCookieStickinessPolicy(lbID, rInt, lbCount),
+				Check: resource.ComposeTestCheckFunc(
+					opcResourceCheck(resName, testAccLBaaSCheckPolicyExists),
+					resource.TestCheckResourceAttr(resName, "name", testName),
+					resource.TestMatchResourceAttr(resName, "uri", regexp.MustCompile(testName)),
+					resource.TestCheckResourceAttr(resName, "application_cookie_stickiness_policy.#", "1"),
+					resource.TestCheckResourceAttr(resName, "application_cookie_stickiness_policy.0.cookie_name", "MY_APP_COOKIE"),
+				),
+			},
+			{
+				Config: testAccLBaaSPolicyConfig_ApplicationCookieStickinessPolicyUpdate(lbID, rInt, lbCount),
+				Check: resource.ComposeTestCheckFunc(
+					opcResourceCheck(resName, testAccLBaaSCheckPolicyExists),
+					resource.TestCheckResourceAttr(resName, "name", testName),
+					resource.TestMatchResourceAttr(resName, "uri", regexp.MustCompile(testName)),
+					resource.TestCheckResourceAttr(resName, "application_cookie_stickiness_policy.#", "1"),
+					resource.TestCheckResourceAttr(resName, "application_cookie_stickiness_policy.0.cookie_name", "MY_APP_COOKIE_UPDATED"),
+				),
+			},
+		},
+	})
+}
+
+// Test to check that policy type can be completely changed successfully
+func TestAccLBaaSPolicy_Update_ChangePolicyType(t *testing.T) {
+	rInt := acctest.RandInt()
+	resName := "opc_lbaas_policy.update_policy_type"
+	testName := fmt.Sprintf("acctest-%d", rInt)
+
+	// use existing LB instance from environment if set
+	lbCount := 0
+	lbID := os.Getenv("OPC_TEST_USE_EXISTING_LB")
+	if lbID == "" {
+		lbCount = 1
+		lbID = "${opc_lbaas_load_balancer.test.id}"
+	}
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: opcResourceCheck(resName, testAccLBaaSCheckPolicyDestroyed),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccLBaaSPolicyConfig_UpdatePolicyType_Create(lbID, rInt, lbCount),
+				Check: resource.ComposeTestCheckFunc(
+					opcResourceCheck(resName, testAccLBaaSCheckPolicyExists),
+					resource.TestCheckResourceAttr(resName, "name", testName),
+					resource.TestMatchResourceAttr(resName, "uri", regexp.MustCompile(testName)),
+					resource.TestCheckResourceAttr(resName, "application_cookie_stickiness_policy.#", "1"),
+					resource.TestCheckResourceAttr(resName, "application_cookie_stickiness_policy.0.cookie_name", "MY_APP_COOKIE"),
+				),
+			},
+			{
+				Config: testAccLBaaSPolicyConfig_UpdatePolicyType_Update(lbID, rInt, lbCount),
+				Check: resource.ComposeTestCheckFunc(
+					opcResourceCheck(resName, testAccLBaaSCheckPolicyExists),
+					opcResourceCheck(resName, testAccLBaaSCheckPolicyExists),
+					resource.TestCheckResourceAttr(resName, "name", testName),
+					resource.TestMatchResourceAttr(resName, "uri", regexp.MustCompile(testName)),
+					resource.TestCheckResourceAttr(resName, "redirect_policy.#", "1"),
+					resource.TestCheckResourceAttr(resName, "redirect_policy.0.redirect_uri", "https://redirect.example.com"),
+					resource.TestCheckResourceAttr(resName, "redirect_policy.0.response_code", "306"),
+				),
+			},
+		},
+	})
+}
+
+// Check for error if more that one policy type defined
+func TestAccLBaaSPolicy_InvalidPolicy(t *testing.T) {
+	rInt := acctest.RandInt()
+	// resName := "opc_lbaas_policy.invaild_policy"
+	// testName := fmt.Sprintf("acctest-%d", rInt)
+
+	// use existing LB instance from environment if set
+	lbCount := 0
+	lbID := os.Getenv("OPC_TEST_USE_EXISTING_LB")
+	if lbID == "" {
+		lbCount = 1
+		lbID = "${opc_lbaas_load_balancer.test.id}"
+	}
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccLBaaSPolicyConfig_Invalid(lbID, rInt, lbCount),
+				Check:  resource.ComposeTestCheckFunc(),
+			},
+		},
+	})
+}
+
 func testAccLBaaSPolicyConfig_ApplicationCookieStickinessPolicy(lbID string, rInt, lbCount int) string {
 	return fmt.Sprintf(`
 resource "opc_lbaas_policy" "application_cookie_stickiness_policy" {
@@ -359,6 +472,20 @@ resource "opc_lbaas_policy" "application_cookie_stickiness_policy" {
 
   application_cookie_stickiness_policy {
     cookie_name = "MY_APP_COOKIE"
+  }
+}
+%s
+`, lbID, rInt, testAccParentLoadBalancerConfig(lbCount, rInt))
+}
+
+func testAccLBaaSPolicyConfig_ApplicationCookieStickinessPolicyUpdate(lbID string, rInt, lbCount int) string {
+	return fmt.Sprintf(`
+resource "opc_lbaas_policy" "application_cookie_stickiness_policy" {
+  load_balancer = "%s"
+  name          = "acctest-%d"
+
+  application_cookie_stickiness_policy {
+    cookie_name = "MY_APP_COOKIE_UPDATED"
   }
 }
 %s
@@ -515,6 +642,54 @@ resource "opc_lbaas_certificate" "trusted-cert" {
 }
 %s
 `, lbID, rInt, rInt, testAccParentLoadBalancerConfig(lbCount, rInt))
+}
+
+func testAccLBaaSPolicyConfig_UpdatePolicyType_Create(lbID string, rInt, lbCount int) string {
+	return fmt.Sprintf(`
+resource "opc_lbaas_policy" "update_policy_type" {
+  load_balancer = "%s"
+  name          = "acctest-%d"
+
+  application_cookie_stickiness_policy {
+    cookie_name = "MY_APP_COOKIE"
+  }
+}
+%s
+`, lbID, rInt, testAccParentLoadBalancerConfig(lbCount, rInt))
+}
+
+func testAccLBaaSPolicyConfig_UpdatePolicyType_Update(lbID string, rInt, lbCount int) string {
+	return fmt.Sprintf(`
+resource "opc_lbaas_policy" "update_policy_type" {
+  load_balancer = "%s"
+  name          = "acctest-%d"
+
+	redirect_policy {
+    redirect_uri = "https://redirect.example.com"
+    response_code = 306
+  }
+}
+%s
+`, lbID, rInt, testAccParentLoadBalancerConfig(lbCount, rInt))
+}
+
+func testAccLBaaSPolicyConfig_Invalid(lbID string, rInt, lbCount int) string {
+	return fmt.Sprintf(`
+resource "opc_lbaas_policy" "invaild_policy" {
+  load_balancer = "%s"
+  name          = "acctest-%d"
+
+	redirect_policy {
+    redirect_uri = "https://redirect.example.com"
+    response_code = 306
+  }
+
+	application_cookie_stickiness_policy {
+    cookie_name = "MY_APP_COOKIE"
+  }
+}
+%s
+`, lbID, rInt, testAccParentLoadBalancerConfig(lbCount, rInt))
 }
 
 func testAccLBaaSCheckPolicyExists(state *OPCResourceState) error {

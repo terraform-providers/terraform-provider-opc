@@ -34,17 +34,17 @@ resource "opc_lbaas_listener" "listener1" {
 
 * `balancer_protocol` - (Required)  transport protocol that will be accepted for all incoming requests to the selected load balancer listener. `HTTP` or `HTTPS`. If set to HTTPS then you must also set the server `certificates`.
 
+* `port` - (Required) The port on which the Load Balancer is listening.
+
+* `server_protocol` - (Required) The protocol to be used for routing traffic to the origin servers in the server pool. `HTTP` or `HTTPS`. If set to `HTTPS` then you must include a Trusted Certificate Policy in the `policies`
+
 * `enabled` - (Optional) Boolean flag to enable or disable the Listener. Default is `true` (enabled).
 
 * `path_prefixes` - (Optional) List of paths to configure the listener to accept only requests that are targeted to a specific path within the URI of the request.
 
 * `polices` - (Optional) List of the Load Balancer Policy URIs to apply to the listener.
 
-* `port` - (Required) The port on which the Load Balancer is listening.
-
 * `server_pool` - (Optional) URI of the Server Pool resource to which the load balancer distributes requests.
-
-* `server_protocol` - (Required) The protocol to be used for routing traffic to the origin servers in the server pool. `HTTP` or `HTTPS`. If set to `HTTPS` then you must include a Trusted Certificate Policy in the `policies`
 
 * `certificates` - (Optional) The URI of the server security certificate.
 

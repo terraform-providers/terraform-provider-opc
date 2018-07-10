@@ -15,9 +15,6 @@ func resourceLBaaSSSLCertificate() *schema.Resource {
 		Create: resourceSSLCertificateCreate,
 		Read:   resourceSSLCertificateRead,
 		Delete: resourceSSLCertificateDelete,
-		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
-		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -42,6 +39,7 @@ func resourceLBaaSSSLCertificate() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
+				Sensitive:    true,
 				ValidateFunc: validateIsPEMFormat,
 			},
 			"type": {
@@ -79,8 +77,11 @@ func resourceSSLCertificateCreate(d *schema.ResourceData, meta interface{}) erro
 		Name:             d.Get("name").(string),
 		Certificate:      d.Get("certificate_body").(string),
 		CertificateChain: d.Get("certificate_chain").(string),
-		PrivateKey:       d.Get("private_key").(string),
 		Trusted:          d.Get("type").(string) == "TRUSTED",
+	}
+
+	if key, ok := d.GetOk("private_key"); ok {
+		input.PrivateKey = key.(string)
 	}
 
 	info, err := sslCertClient.CreateSSLCertificate(&input)
@@ -139,7 +140,7 @@ func resourceSSLCertificateDelete(d *schema.ResourceData, meta interface{}) erro
 	name := d.Id()
 
 	if _, err := sslCertClient.DeleteSSLCertificate(name); err != nil {
-		return fmt.Errorf("Error deleting SSLCertificate")
+		return fmt.Errorf("Error deleting SSLCertificate: %v", err)
 	}
 	return nil
 }

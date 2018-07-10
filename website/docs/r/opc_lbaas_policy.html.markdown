@@ -177,19 +177,19 @@ resource "opc_lbaas_policy" "rate_limiting_request_policy" {
 
 * `delay_excessive_requests` - (Required) delay excessive requests while requests are being limited.
 
+* `requests_per_second` - (Required) Maximum number of requests per second.
+
+* `zone` - (Required) Name of the shared memory zone.
+
 * `http_error_code` - (Optional) Status code to return in response to rejected requests. You can specify any status code between 405 to 599. Default is `503`
 
-* logging_level - (Optional) Logging level for cases when the server refuses to process requests due to rate exceeding, or delays request processing. Can be one of `info`, `notice`, `warn`, or `error`.  Default is `warn`
+* `logging_level` - (Optional) Logging level for cases when the server refuses to process requests due to rate exceeding, or delays request processing. Can be one of `info`, `notice`, `warn`, or `error`.  Default is `warn`
 
 * `rate_limiting_criteria` - (Optional) Criteria based on which requests will be throttled. Default is `server`
 
   - `server` - limit the requests processed by the virtual server
   - `remote_address` - limit the processing rate of requests coming from a single IP address.
   - `host` - limit the processing rate of requests coming from a host.
-
-* `requests_per_second` - (Required) Maximum number of requests per second.
-
-* `zone` - (Required) Name of the shared memory zone.
 
 * `zone_memory_size` - (Optional) Size of the shared memory occupied by the zone. Default is `10`
 
@@ -297,11 +297,11 @@ resource "opc_lbaas_policy" "ssl_negotiation_policy" {
 
 #### Attributes
 
+* `ssl_protocol` - (Required) Security protocols supported for incoming secure client connections to the associated listener. Supported options are `SSLv2`, `SSLv3`, `TLSv1`, `TLSv1.1`, `TLSv1.2`
+
 * `port` - (Optional) The load balancer port for the the SSL protocols and the SSL ciphers.
 
 * `server_order_preference` - (Optional) enable or disable the server order preference for secure connections to associated Listener. `Enabled` or `Disabled`.
-
-* `ssl_protocol` - (Required) Security protocols supported for incoming secure client connections to the associated listener. Supported options are `SSLv2`, `SSLv3`, `TLSv1`, `TLSv1.1`, `TLSv1.2`
 
 * `ssl_ciphers` - (Optional) List of SSL ciphers supported for incoming secure client connections to the associated Listener.
 

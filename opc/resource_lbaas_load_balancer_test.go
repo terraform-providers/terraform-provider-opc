@@ -34,6 +34,38 @@ func TestAccLBaaSLoadBalancer_Basic(t *testing.T) {
 	})
 }
 
+func TestAccLBaaSLoadBalancer_BasicUpdate(t *testing.T) {
+
+	rInt := acctest.RandInt()
+	resName := "opc_lbaas_load_balancer.test"
+	testName := fmt.Sprintf("acctest-%d", rInt)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckLoadBalancerDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(testAccLoadBalancerBasic, rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckLoadBalancerExists,
+					resource.TestCheckResourceAttr(resName, "name", testName),
+					resource.TestCheckResourceAttr(resName, "scheme", "INTERNET_FACING"),
+				),
+			},
+			{
+				Config: fmt.Sprintf(testAccLoadBalancerBasicUpdate, rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckLoadBalancerExists,
+					resource.TestCheckResourceAttr(resName, "name", testName),
+					resource.TestCheckResourceAttr(resName, "scheme", "INTERNET_FACING"),
+					resource.TestCheckResourceAttr(resName, "description", "Terraform Acceptance Test Update"),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckLoadBalancerExists(s *terraform.State) error {
 	client := testAccProvider.Meta().(*Client).lbaasClient.LoadBalancerClient()
 
@@ -80,6 +112,15 @@ var testAccLoadBalancerBasic = `
 resource "opc_lbaas_load_balancer" "test" {
 	region      = "uscom-central-1"
   name        = "acctest-%d"
+	scheme      = "INTERNET_FACING"
+}
+`
+
+var testAccLoadBalancerBasicUpdate = `
+resource "opc_lbaas_load_balancer" "test" {
+	region      = "uscom-central-1"
+  name        = "acctest-%d"
+	description = "Terraform Acceptance Test Update"
 	scheme      = "INTERNET_FACING"
 }
 `

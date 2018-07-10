@@ -32,11 +32,11 @@ resource "opc_lbaas_server_pool" "serverpool1" {
 
 * `load_balancer` - (Required) The parent Load Balancer the Origin Server Pool.
 
+* `servers` - (Required) List of servers in the Server Pool. To define the server in the server pool, provide IP address or DNS name of the compute instances, and port for load balancer to direct traffic to, in the format `host:port`
+
 * `enabled` - (Optional) Boolean flag to enable or disable the Server Pool. Default is `true` (enabled).
 
 * `health_check` - (Optional) Enables Load Balancer health check, see [Health Check Attributes](#health-check-attributes)
-
-* `servers` - (Required) List of servers in the Server Pool. To define the server in the server pool, provide IP address or DNS name of the compute instances, and port for load balancer to direct traffic to, in the format `host:port`
 
 * `tags` - (Optional) List of tags.
 

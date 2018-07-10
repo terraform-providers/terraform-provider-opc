@@ -118,24 +118,18 @@ func resourceOPCLoadBalancerCreate(d *schema.ResourceData, meta interface{}) err
 	lbClient := lbaasClient.LoadBalancerClient()
 
 	input := lbaas.CreateLoadBalancerInput{
-		Name:   d.Get("name").(string),
-		Region: d.Get("region").(string),
+		Name:     d.Get("name").(string),
+		Region:   d.Get("region").(string),
+		Scheme:   lbaas.LoadBalancerScheme(d.Get("scheme").(string)),
+		Disabled: getDisabledStateKeyword(d.Get("enabled").(bool)),
 	}
 
 	if description, ok := d.GetOk("description"); ok {
 		input.Description = description.(string)
 	}
 
-	if enabled, ok := d.GetOk("enabled"); ok {
-		input.Disabled = getDisabledStateKeyword(enabled.(bool))
-	}
-
 	if ipNetwork, ok := d.GetOk("ip_network"); ok {
 		input.IPNetworkName = ipNetwork.(string)
-	}
-
-	if scheme, ok := d.GetOk("scheme"); ok {
-		input.Scheme = lbaas.LoadBalancerScheme(scheme.(string))
 	}
 
 	if serverPool, ok := d.GetOk("server_pool"); ok {
@@ -278,7 +272,7 @@ func resourceOPCLoadBalancerDelete(d *schema.ResourceData, meta interface{}) err
 	lb := getLoadBalancerContextFromID(d.Id())
 
 	if _, err := lbClient.DeleteLoadBalancer(lb); err != nil {
-		return fmt.Errorf("Error deleting LoadBalancer")
+		return fmt.Errorf("Error deleting LoadBalancer: %v", err)
 	}
 	return nil
 }
