@@ -45,7 +45,7 @@ func dataSourceSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Error reading vnic %s: %s", name, err)
+		return fmt.Errorf("Error reading ssh key %s: %s", name, err)
 	}
 
 	if result == nil {

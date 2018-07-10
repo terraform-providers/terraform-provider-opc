@@ -34,6 +34,12 @@ deleted and recreated (if false).
 
 * `tags` - (Optional) List of tags that may be applied to the IP reservation.
 
+## Attributes Reference
+
+* `ip` - The Public IP address.
+
+* `used` - indicates that the IP reservation is associated with an instance.
+
 ## Import
 
 IP Reservations can be imported using the `resource name`, e.g.

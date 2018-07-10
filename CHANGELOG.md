@@ -1,8 +1,11 @@
-## 1.1.2 (Unreleased)
+## 1.1.3 (Unreleased)
+## 1.1.2 (June 20, 2018)
 
 FEATURES:
 
-* **New Datasource:** `d/opc_compute_ssh_key` [GH-129]
+* **New Datasource:** `d/opc_compute_ssh_key` ([#129](https://github.com/terraform-providers/terraform-provider-opc/issues/129))
+* **New Datasource:** `d/opc_compute_ip_reservation` ([#130](https://github.com/terraform-providers/terraform-provider-opc/issues/130))
+* **New Datasource:** `d/opc_compute_ip_address_reservation ` ([#130](https://github.com/terraform-providers/terraform-provider-opc/issues/130))
 
 ## 1.1.1 (May 24, 2018)
 

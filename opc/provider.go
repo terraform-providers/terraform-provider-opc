@@ -75,6 +75,8 @@ func Provider() terraform.ResourceProvider {
 
 		DataSourcesMap: map[string]*schema.Resource{
 			"opc_compute_image_list_entry":        dataSourceImageListEntry(),
+			"opc_compute_ip_address_reservation":  dataSourceIPAddressReservation(),
+			"opc_compute_ip_reservation":          dataSourceIPReservation(),
 			"opc_compute_machine_image":           dataSourceMachineImage(),
 			"opc_compute_network_interface":       dataSourceNetworkInterface(),
 			"opc_compute_ssh_key":                 dataSourceSSHKey(),
