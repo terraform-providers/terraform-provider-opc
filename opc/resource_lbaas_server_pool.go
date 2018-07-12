@@ -179,8 +179,10 @@ func resourceOriginServerPoolCreate(d *schema.ResourceData, meta interface{}) er
 		input.Tags = tags
 	}
 
-	healthCheck := expandHealthCheckConfig(d)
-	input.HealthCheck = &healthCheck
+	if _, ok := d.GetOk("health_check"); ok {
+		healthCheck := expandHealthCheckConfig(d)
+		input.HealthCheck = &healthCheck
+	}
 
 	info, err := serverPoolClient.CreateOriginServerPool(lb, &input)
 	if err != nil {
@@ -231,8 +233,10 @@ func resourceOriginServerPoolRead(d *schema.ResourceData, meta interface{}) erro
 
 	d.Set("tags", result.Tags)
 
-	if err := flattenHealthCheckConfig(d, result.HealthCheck); err != nil {
-		return err
+	if result.HealthCheck.Enabled != "" {
+		if err := flattenHealthCheckConfig(d, result.HealthCheck); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -388,10 +392,8 @@ func flattenHealthCheckConfig(d *schema.ResourceData, info lbaas.HealthCheckInfo
 
 	if info.Enabled == "TRUE" {
 		attrs["enabled"] = true
-	} else if info.Enabled == "FALSE" {
-		attrs["enabled"] = false
 	} else {
-		return fmt.Errorf("Unexpected Health Check enabled state %s", info.Enabled)
+		attrs["enabled"] = false
 	}
 
 	config = append(config, attrs)
