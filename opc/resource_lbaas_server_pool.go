@@ -285,6 +285,16 @@ func resourceOriginServerPoolUpdate(d *schema.ResourceData, meta interface{}) er
 		}
 	}
 
+	if d.HasChange("vnic_set_name") {
+		if vnicSet, ok := d.GetOk("vnic_set_name"); ok {
+			newVnicSet := vnicSet.(string)
+			input.VnicSetName = &newVnicSet
+		} else {
+			emptyVnicSet := ""
+			input.VnicSetName = &emptyVnicSet
+		}
+	}
+
 	input.Tags = updateOrRemoveStringListAttribute(d, "tags")
 
 	result, err := serverPoolClient.UpdateOriginServerPool(lb, name, &input)
