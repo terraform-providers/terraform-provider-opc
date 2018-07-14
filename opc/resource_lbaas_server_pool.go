@@ -161,7 +161,7 @@ func resourceOriginServerPoolCreate(d *schema.ResourceData, meta interface{}) er
 		Status: status,
 	}
 
-	if vnicSet, ok := d.GetOk("vnic_set_name"); ok {
+	if vnicSet, ok := d.GetOk("vnic_set"); ok {
 		input.VnicSetName = vnicSet.(string)
 	}
 
@@ -224,7 +224,7 @@ func resourceOriginServerPoolRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("reason_for_disabling", result.ReasonForDisabling)
 	d.Set("state", result.State)
 	d.Set("uri", result.URI)
-	d.Set("vnic_set_name", result.VnicSetName)
+	d.Set("vnic_set", result.VnicSetName)
 	d.Set("load_balancer", fmt.Sprintf("%s/%s", lb.Region, lb.Name))
 
 	if err := setStringList(d, "servers", flattenOriginServerConfig(result.OriginServers)); err != nil {
@@ -285,8 +285,8 @@ func resourceOriginServerPoolUpdate(d *schema.ResourceData, meta interface{}) er
 		}
 	}
 
-	if d.HasChange("vnic_set_name") {
-		if vnicSet, ok := d.GetOk("vnic_set_name"); ok {
+	if d.HasChange("vnic_set") {
+		if vnicSet, ok := d.GetOk("vnic_set"); ok {
 			newVnicSet := vnicSet.(string)
 			input.VnicSetName = &newVnicSet
 		} else {
