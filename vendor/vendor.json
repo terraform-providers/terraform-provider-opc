@@ -781,10 +781,10 @@
 			"revisionTime": "2017-03-07T20:11:23Z"
 		},
 		{
-			"checksumSHA1": "vBpuqNfSTZcAR/0tP8tNYacySGs=",
+			"checksumSHA1": "AMU63CNOg4XmIhVR/S/Xttt1/f0=",
 			"path": "github.com/mitchellh/reflectwalk",
-			"revision": "92573fe8d000a145bfebc03a16bc22b34945867f",
-			"revisionTime": "2016-10-03T17:45:16Z"
+			"revision": "63d60e9d0dbc60cf9164e6510889b0db6683d98c",
+			"revisionTime": "2017-07-26T20:21:17Z"
 		},
 		{
 			"checksumSHA1": "nf3UoPNBIut7BL9nWE8Fw2X2j+Q=",
