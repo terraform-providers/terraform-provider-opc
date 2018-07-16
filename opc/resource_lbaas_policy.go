@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/lbaas"
+	"github.com/hashicorp/terraform/helper/customdiff"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 )
@@ -19,13 +20,15 @@ func resourceLBaaSPolicy() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 
-		CustomizeDiff: func(diff *schema.ResourceDiff, v interface{}) error {
-			// ForceNew when changing parent load_balancer
-			if diff.HasChange("load_balancer") {
-				diff.ForceNew("load_balancer")
-			}
-			return nil
-		},
+		CustomizeDiff: customdiff.Sequence(
+			func(diff *schema.ResourceDiff, v interface{}) error {
+				// ForceNew when changing parent load_balancer
+				if diff.HasChange("load_balancer") {
+					diff.ForceNew("load_balancer")
+				}
+				return nil
+			},
+		),
 
 		Schema: map[string]*schema.Schema{
 			"load_balancer": {
