@@ -19,11 +19,18 @@ func resourceLBaaSPolicy() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 
+		CustomizeDiff: func(diff *schema.ResourceDiff, v interface{}) error {
+			// ForceNew when changing parent load_balancer
+			if diff.HasChange("load_balancer") {
+				diff.ForceNew("load_balancer")
+			}
+			return nil
+		},
+
 		Schema: map[string]*schema.Schema{
 			"load_balancer": {
 				Type:         schema.TypeString,
 				Required:     true,
-				ForceNew:     true,
 				ValidateFunc: validateLoadBalancerID,
 			},
 			"name": {
@@ -412,13 +419,6 @@ func resourceLBaaSPolicy() *schema.Resource {
 					"set_request_header_policy",
 					"ssl_negotiation_policy",
 				},
-			},
-
-			// not a real attribute
-			// Hack to get around the "All fields are ForceNew or Computed w/out Optional" validation
-			"hack": {
-				Type:     schema.TypeBool,
-				Optional: true,
 			},
 
 			// Read only attributes
