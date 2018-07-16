@@ -288,7 +288,7 @@ resource "opc_lbaas_policy" "ssl_negotiation_policy" {
 
   ssl_negotiation_policy {
     port = 8022
-    server_order_preference = "Enabled"
+    server_order_preference = "ENABLED"
     ssl_protocol = ["SSLv3", "TLSv1.2"]
     ssl_ciphers = ["AES256-SHA"]
   }
@@ -301,7 +301,7 @@ resource "opc_lbaas_policy" "ssl_negotiation_policy" {
 
 * `port` - (Optional) The load balancer port for the the SSL protocols and the SSL ciphers.
 
-* `server_order_preference` - (Optional) enable or disable the server order preference for secure connections to associated Listener. `Enabled` or `Disabled`.
+* `server_order_preference` - (Optional) enable or disable the server order preference for secure connections to associated Listener. `ENABLED` or `DISABLED`.
 
 * `ssl_ciphers` - (Optional) List of SSL ciphers supported for incoming secure client connections to the associated Listener.
 

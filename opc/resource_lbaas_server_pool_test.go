@@ -34,7 +34,7 @@ func TestAccLBaaSServerPool_Basic(t *testing.T) {
 					opcResourceCheck(resName, testAccLBaaSCheckServerPoolExists),
 					resource.TestCheckResourceAttr(resName, "name", testName),
 					resource.TestMatchResourceAttr(resName, "uri", regexp.MustCompile(testName)),
-					resource.TestCheckNoResourceAttr(resName, "vnic_set"),
+					resource.TestCheckResourceAttr(resName, "vnic_set", ""),
 					resource.TestCheckResourceAttr(resName, "servers.#", "2"),
 					resource.TestCheckResourceAttr(resName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resName, "health_check.0.type", "http"),

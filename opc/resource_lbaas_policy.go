@@ -10,6 +10,20 @@ import (
 	"github.com/hashicorp/terraform/helper/validation"
 )
 
+// Policy type constants
+const (
+	applicationCookieStickinessPolicy  string = "application_cookie_stickiness_policy"
+	cloudgatePolicy                    string = "cloudgate_policy"
+	loadBalancerCookieStickinessPolicy string = "load_balancer_cookie_stickiness_policy"
+	loadBalancingMechanismPolicy       string = "load_balancing_mechanism_policy"
+	rateLimitingRequestPolicy          string = "rate_limiting_request_policy"
+	redirectPolicy                     string = "redirect_policy"
+	resourceAccessControlPolicy        string = "resource_access_control_policy"
+	setRequestHeaderPolicy             string = "set_request_header_policy"
+	sslNegotiationPolicy               string = "ssl_negotiation_policy"
+	trustedCertificatePolicy           string = "trusted_certificate_policy"
+)
+
 func resourceLBaaSPolicy() *schema.Resource {
 	return &schema.Resource{
 		Create: resourcePolicyCreate,
@@ -42,7 +56,7 @@ func resourceLBaaSPolicy() *schema.Resource {
 				ForceNew:     true,
 				ValidateFunc: validateLoadBalancerPolicyName,
 			},
-			"application_cookie_stickiness_policy": {
+			applicationCookieStickinessPolicy: {
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
@@ -56,18 +70,18 @@ func resourceLBaaSPolicy() *schema.Resource {
 					},
 				},
 				ConflictsWith: []string{
-					"cloudgate_policy",
-					"load_balancer_cookie_stickiness_policy",
-					"load_balancing_mechanism_policy",
-					"rate_limiting_request_policy",
-					"redirect_policy",
-					"resource_access_control_policy",
-					"set_request_header_policy",
-					"ssl_negotiation_policy",
-					"trusted_certificate_policy",
+					cloudgatePolicy,
+					loadBalancerCookieStickinessPolicy,
+					loadBalancingMechanismPolicy,
+					rateLimitingRequestPolicy,
+					redirectPolicy,
+					resourceAccessControlPolicy,
+					setRequestHeaderPolicy,
+					sslNegotiationPolicy,
+					trustedCertificatePolicy,
 				},
 			},
-			"cloudgate_policy": {
+			cloudgatePolicy: {
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
@@ -97,18 +111,18 @@ func resourceLBaaSPolicy() *schema.Resource {
 					},
 				},
 				ConflictsWith: []string{
-					"application_cookie_stickiness_policy",
-					"load_balancer_cookie_stickiness_policy",
-					"load_balancing_mechanism_policy",
-					"rate_limiting_request_policy",
-					"redirect_policy",
-					"resource_access_control_policy",
-					"set_request_header_policy",
-					"ssl_negotiation_policy",
-					"trusted_certificate_policy",
+					applicationCookieStickinessPolicy,
+					loadBalancerCookieStickinessPolicy,
+					loadBalancingMechanismPolicy,
+					rateLimitingRequestPolicy,
+					redirectPolicy,
+					resourceAccessControlPolicy,
+					setRequestHeaderPolicy,
+					sslNegotiationPolicy,
+					trustedCertificatePolicy,
 				},
 			},
-			"load_balancer_cookie_stickiness_policy": {
+			loadBalancerCookieStickinessPolicy: {
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
@@ -122,18 +136,18 @@ func resourceLBaaSPolicy() *schema.Resource {
 					},
 				},
 				ConflictsWith: []string{
-					"application_cookie_stickiness_policy",
-					"cloudgate_policy",
-					"load_balancing_mechanism_policy",
-					"rate_limiting_request_policy",
-					"redirect_policy",
-					"resource_access_control_policy",
-					"set_request_header_policy",
-					"ssl_negotiation_policy",
-					"trusted_certificate_policy",
+					applicationCookieStickinessPolicy,
+					cloudgatePolicy,
+					loadBalancingMechanismPolicy,
+					rateLimitingRequestPolicy,
+					redirectPolicy,
+					resourceAccessControlPolicy,
+					setRequestHeaderPolicy,
+					sslNegotiationPolicy,
+					trustedCertificatePolicy,
 				},
 			},
-			"load_balancing_mechanism_policy": {
+			loadBalancingMechanismPolicy: {
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
@@ -152,18 +166,18 @@ func resourceLBaaSPolicy() *schema.Resource {
 					},
 				},
 				ConflictsWith: []string{
-					"application_cookie_stickiness_policy",
-					"cloudgate_policy",
-					"load_balancer_cookie_stickiness_policy",
-					"rate_limiting_request_policy",
-					"redirect_policy",
-					"resource_access_control_policy",
-					"set_request_header_policy",
-					"ssl_negotiation_policy",
-					"trusted_certificate_policy",
+					applicationCookieStickinessPolicy,
+					cloudgatePolicy,
+					loadBalancerCookieStickinessPolicy,
+					rateLimitingRequestPolicy,
+					redirectPolicy,
+					resourceAccessControlPolicy,
+					setRequestHeaderPolicy,
+					sslNegotiationPolicy,
+					trustedCertificatePolicy,
 				},
 			},
-			"rate_limiting_request_policy": {
+			rateLimitingRequestPolicy: {
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
@@ -224,18 +238,18 @@ func resourceLBaaSPolicy() *schema.Resource {
 					},
 				},
 				ConflictsWith: []string{
-					"application_cookie_stickiness_policy",
-					"cloudgate_policy",
-					"load_balancer_cookie_stickiness_policy",
-					"load_balancing_mechanism_policy",
-					"redirect_policy",
-					"resource_access_control_policy",
-					"set_request_header_policy",
-					"ssl_negotiation_policy",
-					"trusted_certificate_policy",
+					applicationCookieStickinessPolicy,
+					cloudgatePolicy,
+					loadBalancerCookieStickinessPolicy,
+					loadBalancingMechanismPolicy,
+					redirectPolicy,
+					resourceAccessControlPolicy,
+					setRequestHeaderPolicy,
+					sslNegotiationPolicy,
+					trustedCertificatePolicy,
 				},
 			},
-			"redirect_policy": {
+			redirectPolicy: {
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
@@ -254,18 +268,18 @@ func resourceLBaaSPolicy() *schema.Resource {
 					},
 				},
 				ConflictsWith: []string{
-					"application_cookie_stickiness_policy",
-					"cloudgate_policy",
-					"load_balancer_cookie_stickiness_policy",
-					"load_balancing_mechanism_policy",
-					"rate_limiting_request_policy",
-					"resource_access_control_policy",
-					"set_request_header_policy",
-					"ssl_negotiation_policy",
-					"trusted_certificate_policy",
+					applicationCookieStickinessPolicy,
+					cloudgatePolicy,
+					loadBalancerCookieStickinessPolicy,
+					loadBalancingMechanismPolicy,
+					rateLimitingRequestPolicy,
+					resourceAccessControlPolicy,
+					setRequestHeaderPolicy,
+					sslNegotiationPolicy,
+					trustedCertificatePolicy,
 				},
 			},
-			"resource_access_control_policy": {
+			resourceAccessControlPolicy: {
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
@@ -293,18 +307,18 @@ func resourceLBaaSPolicy() *schema.Resource {
 					},
 				},
 				ConflictsWith: []string{
-					"application_cookie_stickiness_policy",
-					"cloudgate_policy",
-					"load_balancer_cookie_stickiness_policy",
-					"load_balancing_mechanism_policy",
-					"rate_limiting_request_policy",
-					"redirect_policy",
-					"set_request_header_policy",
-					"ssl_negotiation_policy",
-					"trusted_certificate_policy",
+					applicationCookieStickinessPolicy,
+					cloudgatePolicy,
+					loadBalancerCookieStickinessPolicy,
+					loadBalancingMechanismPolicy,
+					rateLimitingRequestPolicy,
+					redirectPolicy,
+					setRequestHeaderPolicy,
+					sslNegotiationPolicy,
+					trustedCertificatePolicy,
 				},
 			},
-			"set_request_header_policy": {
+			setRequestHeaderPolicy: {
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
@@ -343,18 +357,18 @@ func resourceLBaaSPolicy() *schema.Resource {
 					},
 				},
 				ConflictsWith: []string{
-					"application_cookie_stickiness_policy",
-					"cloudgate_policy",
-					"load_balancer_cookie_stickiness_policy",
-					"load_balancing_mechanism_policy",
-					"rate_limiting_request_policy",
-					"redirect_policy",
-					"resource_access_control_policy",
-					"ssl_negotiation_policy",
-					"trusted_certificate_policy",
+					applicationCookieStickinessPolicy,
+					cloudgatePolicy,
+					loadBalancerCookieStickinessPolicy,
+					loadBalancingMechanismPolicy,
+					rateLimitingRequestPolicy,
+					redirectPolicy,
+					resourceAccessControlPolicy,
+					sslNegotiationPolicy,
+					trustedCertificatePolicy,
 				},
 			},
-			"ssl_negotiation_policy": {
+			sslNegotiationPolicy: {
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
@@ -370,8 +384,8 @@ func resourceLBaaSPolicy() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 							ValidateFunc: validation.StringInSlice([]string{
-								"Enabled",
-								"Disabled",
+								"ENABLED",
+								"DISABLED",
 							}, true),
 						},
 						"ssl_protocol": {
@@ -387,18 +401,18 @@ func resourceLBaaSPolicy() *schema.Resource {
 					},
 				},
 				ConflictsWith: []string{
-					"application_cookie_stickiness_policy",
-					"cloudgate_policy",
-					"load_balancer_cookie_stickiness_policy",
-					"load_balancing_mechanism_policy",
-					"rate_limiting_request_policy",
-					"redirect_policy",
-					"resource_access_control_policy",
-					"set_request_header_policy",
-					"trusted_certificate_policy",
+					applicationCookieStickinessPolicy,
+					cloudgatePolicy,
+					loadBalancerCookieStickinessPolicy,
+					loadBalancingMechanismPolicy,
+					rateLimitingRequestPolicy,
+					redirectPolicy,
+					resourceAccessControlPolicy,
+					setRequestHeaderPolicy,
+					trustedCertificatePolicy,
 				},
 			},
-			"trusted_certificate_policy": {
+			trustedCertificatePolicy: {
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
@@ -412,15 +426,15 @@ func resourceLBaaSPolicy() *schema.Resource {
 					},
 				},
 				ConflictsWith: []string{
-					"application_cookie_stickiness_policy",
-					"cloudgate_policy",
-					"load_balancer_cookie_stickiness_policy",
-					"load_balancing_mechanism_policy",
-					"rate_limiting_request_policy",
-					"redirect_policy",
-					"resource_access_control_policy",
-					"set_request_header_policy",
-					"ssl_negotiation_policy",
+					applicationCookieStickinessPolicy,
+					cloudgatePolicy,
+					loadBalancerCookieStickinessPolicy,
+					loadBalancingMechanismPolicy,
+					rateLimitingRequestPolicy,
+					redirectPolicy,
+					resourceAccessControlPolicy,
+					setRequestHeaderPolicy,
+					sslNegotiationPolicy,
 				},
 			},
 
@@ -453,43 +467,43 @@ func resourcePolicyCreate(d *schema.ResourceData, meta interface{}) error {
 		Name: d.Get("name").(string),
 	}
 
-	if _, ok := d.GetOk("application_cookie_stickiness_policy"); ok {
+	if _, ok := d.GetOk(applicationCookieStickinessPolicy); ok {
 		input.Type = "AppCookieStickinessPolicy"
 		input.ApplicationCookieStickinessPolicyInfo = expandApplicationCookieStickinessPolicy(d)
 	}
-	if _, ok := d.GetOk("cloudgate_policy"); ok {
+	if _, ok := d.GetOk(cloudgatePolicy); ok {
 		input.Type = "CloudGatePolicy"
 		input.CloudGatePolicyInfo = expandCloudGatePolicy(d)
 	}
-	if _, ok := d.GetOk("load_balancer_cookie_stickiness_policy"); ok {
+	if _, ok := d.GetOk(loadBalancerCookieStickinessPolicy); ok {
 		input.Type = "LBCookieStickinessPolicy"
 		input.LoadBalancerCookieStickinessPolicyInfo = expandLoadBalancerCookieStickinessPolicy(d)
 	}
-	if _, ok := d.GetOk("load_balancing_mechanism_policy"); ok {
+	if _, ok := d.GetOk(loadBalancingMechanismPolicy); ok {
 		input.Type = "LoadBalancingMechanismPolicy"
 		input.LoadBalancingMechanismPolicyInfo = expandLoadBalancingMechanismPolicy(d)
 	}
-	if _, ok := d.GetOk("rate_limiting_request_policy"); ok {
+	if _, ok := d.GetOk(rateLimitingRequestPolicy); ok {
 		input.Type = "RateLimitingRequestPolicy"
 		input.RateLimitingRequestPolicyInfo = expandRateLimitingRequestPolicy(d)
 	}
-	if _, ok := d.GetOk("redirect_policy"); ok {
+	if _, ok := d.GetOk(redirectPolicy); ok {
 		input.Type = "RedirectPolicy"
 		input.RedirectPolicyInfo = expandRedirectPolicy(d)
 	}
-	if _, ok := d.GetOk("resource_access_control_policy"); ok {
+	if _, ok := d.GetOk(resourceAccessControlPolicy); ok {
 		input.Type = "ResourceAccessControlPolicy"
 		input.ResourceAccessControlPolicyInfo = expandResourceAccessControlPolicy(d)
 	}
-	if _, ok := d.GetOk("set_request_header_policy"); ok {
+	if _, ok := d.GetOk(setRequestHeaderPolicy); ok {
 		input.Type = "SetRequestHeaderPolicy"
 		input.SetRequestHeaderPolicyInfo = expandSetRequestHeaderPolicy(d)
 	}
-	if _, ok := d.GetOk("ssl_negotiation_policy"); ok {
+	if _, ok := d.GetOk(sslNegotiationPolicy); ok {
 		input.Type = "SSLNegotiationPolicy"
 		input.SSLNegotiationPolicyInfo = exapndSSLNegotiationPolicy(d)
 	}
-	if _, ok := d.GetOk("trusted_certificate_policy"); ok {
+	if _, ok := d.GetOk(trustedCertificatePolicy); ok {
 		input.Type = "TrustedCertPolicy"
 		input.TrustedCertificatePolicyInfo = expandTrustedCertificatePolicy(d)
 	}
@@ -534,34 +548,37 @@ func resourcePolicyRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("load_balancer", fmt.Sprintf("%s/%s", lb.Region, lb.Name))
 
 	if result.Type == "AppCookieStickinessPolicy" {
-		flattenApplicationCookieStickinessPolicy(d, result)
+		return flattenApplicationCookieStickinessPolicy(d, result)
 	}
 	if result.Type == "CloudGatePolicy" {
-		flattenCloudGatePolicy(d, result)
+		return flattenCloudGatePolicy(d, result)
 	}
 	if result.Type == "LBCookieStickinessPolicy" {
-		flattenLoadBalancerCookieStickinessPolicy(d, result)
+		return flattenLoadBalancerCookieStickinessPolicy(d, result)
 	}
 	if result.Type == "LoadBalancingMechanismPolicy" {
-		flattenLoadBalancingMechanismPolicy(d, result)
+		return flattenLoadBalancingMechanismPolicy(d, result)
 	}
 	if result.Type == "RateLimitingRequestPolicy" {
-		flattenRateLimitingRequestPolicy(d, result)
+		return flattenRateLimitingRequestPolicy(d, result)
+	}
+	if result.Type == "RedirectPolicy" {
+		return flattenRedirectPolicy(d, result)
 	}
 	if result.Type == "ResourceAccessControlPolicy" {
-		flattenResourceAccessControlPolicy(d, result)
+		return flattenResourceAccessControlPolicy(d, result)
 	}
 	if result.Type == "SetRequestHeaderPolicy" {
-		flattenSetRequestHeaderPolicy(d, result)
+		return flattenSetRequestHeaderPolicy(d, result)
 	}
 	if result.Type == "SSLNegotiationPolicy" {
-		flattenSSLNegotiationPolicy(d, result)
+		return flattenSSLNegotiationPolicy(d, result)
 	}
 	if result.Type == "TrustedCertPolicy" {
-		flattenTrustedCertificatePolicy(d, result)
+		return flattenTrustedCertificatePolicy(d, result)
 	}
 
-	return nil
+	return fmt.Errorf("Error reading Load Balancer Policy %s: Unsupported policy type %s", d.Id(), result.Type)
 }
 
 func resourcePolicyUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -577,43 +594,43 @@ func resourcePolicyUpdate(d *schema.ResourceData, meta interface{}) error {
 		Name: d.Get("name").(string),
 	}
 
-	if _, ok := d.GetOk("application_cookie_stickiness_policy"); ok {
+	if _, ok := d.GetOk(applicationCookieStickinessPolicy); ok {
 		input.Type = "AppCookieStickinessPolicy"
 		input.ApplicationCookieStickinessPolicyInfo = expandApplicationCookieStickinessPolicy(d)
 	}
-	if _, ok := d.GetOk("cloudgate_policy"); ok {
+	if _, ok := d.GetOk(cloudgatePolicy); ok {
 		input.Type = "CloudGatePolicy"
 		input.CloudGatePolicyInfo = expandCloudGatePolicy(d)
 	}
-	if _, ok := d.GetOk("load_balancer_cookie_stickiness_policy"); ok {
+	if _, ok := d.GetOk(loadBalancerCookieStickinessPolicy); ok {
 		input.Type = "LBCookieStickinessPolicy"
 		input.LoadBalancerCookieStickinessPolicyInfo = expandLoadBalancerCookieStickinessPolicy(d)
 	}
-	if _, ok := d.GetOk("load_balancing_mechanism_policy"); ok {
+	if _, ok := d.GetOk(loadBalancingMechanismPolicy); ok {
 		input.Type = "LoadBalancingMechanismPolicy"
 		input.LoadBalancingMechanismPolicyInfo = expandLoadBalancingMechanismPolicy(d)
 	}
-	if _, ok := d.GetOk("rate_limiting_request_policy"); ok {
+	if _, ok := d.GetOk(rateLimitingRequestPolicy); ok {
 		input.Type = "RateLimitingRequestPolicy"
 		input.RateLimitingRequestPolicyInfo = expandRateLimitingRequestPolicy(d)
 	}
-	if _, ok := d.GetOk("redirect_policy"); ok {
+	if _, ok := d.GetOk(redirectPolicy); ok {
 		input.Type = "RedirectPolicy"
 		input.RedirectPolicyInfo = expandRedirectPolicy(d)
 	}
-	if _, ok := d.GetOk("resource_access_control_policy"); ok {
+	if _, ok := d.GetOk(resourceAccessControlPolicy); ok {
 		input.Type = "ResourceAccessControlPolicy"
 		input.ResourceAccessControlPolicyInfo = expandResourceAccessControlPolicy(d)
 	}
-	if _, ok := d.GetOk("set_request_header_policy"); ok {
+	if _, ok := d.GetOk(setRequestHeaderPolicy); ok {
 		input.Type = "SetRequestHeaderPolicy"
 		input.SetRequestHeaderPolicyInfo = expandSetRequestHeaderPolicy(d)
 	}
-	if _, ok := d.GetOk("ssl_negotiation_policy"); ok {
+	if _, ok := d.GetOk(sslNegotiationPolicy); ok {
 		input.Type = "SSLNegotiationPolicy"
 		input.SSLNegotiationPolicyInfo = exapndSSLNegotiationPolicy(d)
 	}
-	if _, ok := d.GetOk("trusted_certificate_policy"); ok {
+	if _, ok := d.GetOk(trustedCertificatePolicy); ok {
 		input.Type = "TrustedCertPolicy"
 		input.TrustedCertificatePolicyInfo = expandTrustedCertificatePolicy(d)
 	}
@@ -629,6 +646,7 @@ func resourcePolicyUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourcePolicyDelete(d *schema.ResourceData, meta interface{}) error {
+
 	lbaasClient, err := meta.(*Client).getLBaaSClient()
 	if err != nil {
 		return err
@@ -647,7 +665,7 @@ func resourcePolicyDelete(d *schema.ResourceData, meta interface{}) error {
 
 func expandApplicationCookieStickinessPolicy(d *schema.ResourceData) lbaas.ApplicationCookieStickinessPolicyInfo {
 
-	policy := d.Get("application_cookie_stickiness_policy").([]interface{})[0].(map[string]interface{})
+	policy := d.Get(applicationCookieStickinessPolicy).([]interface{})[0].(map[string]interface{})
 
 	info := lbaas.ApplicationCookieStickinessPolicyInfo{
 		AppCookieName: policy["cookie_name"].(string),
@@ -659,7 +677,7 @@ func expandApplicationCookieStickinessPolicy(d *schema.ResourceData) lbaas.Appli
 func flattenApplicationCookieStickinessPolicy(d *schema.ResourceData, result *lbaas.PolicyInfo) error {
 	attrs := make(map[string]interface{})
 	p := make([]map[string]interface{}, 0)
-	val, ok := d.GetOk("application_cookie_stickiness_policy")
+	val, ok := d.GetOk(applicationCookieStickinessPolicy)
 	if ok {
 		policyConfiguration := val.([]interface{})
 		attrs = policyConfiguration[0].(map[string]interface{})
@@ -669,15 +687,14 @@ func flattenApplicationCookieStickinessPolicy(d *schema.ResourceData, result *lb
 
 	p = append(p, attrs)
 
-	d.Set("application_cookie_stickiness_policy", p)
-	return nil
+	return d.Set(applicationCookieStickinessPolicy, p)
 }
 
 // CloudGatePolicy
 
 func expandCloudGatePolicy(d *schema.ResourceData) lbaas.CloudGatePolicyInfo {
 
-	policy := d.Get("cloudgate_policy").([]interface{})[0].(map[string]interface{})
+	policy := d.Get(cloudgatePolicy).([]interface{})[0].(map[string]interface{})
 
 	info := lbaas.CloudGatePolicyInfo{
 		CloudGateApplication:                policy["cloudgate_application"].(string),
@@ -692,7 +709,7 @@ func expandCloudGatePolicy(d *schema.ResourceData) lbaas.CloudGatePolicyInfo {
 func flattenCloudGatePolicy(d *schema.ResourceData, result *lbaas.PolicyInfo) error {
 	attrs := make(map[string]interface{})
 	p := make([]map[string]interface{}, 0)
-	val, ok := d.GetOk("cloudgate_policy")
+	val, ok := d.GetOk(cloudgatePolicy)
 	if ok {
 		policyConfiguration := val.([]interface{})
 		attrs = policyConfiguration[0].(map[string]interface{})
@@ -705,15 +722,14 @@ func flattenCloudGatePolicy(d *schema.ResourceData, result *lbaas.PolicyInfo) er
 
 	p = append(p, attrs)
 
-	d.Set("cloudgate_policy", p)
-	return nil
+	return d.Set(cloudgatePolicy, p)
 }
 
 // LoadBalancerCookieStickinessPolicy
 
 func expandLoadBalancerCookieStickinessPolicy(d *schema.ResourceData) lbaas.LoadBalancerCookieStickinessPolicyInfo {
 
-	policy := d.Get("load_balancer_cookie_stickiness_policy").([]interface{})[0].(map[string]interface{})
+	policy := d.Get(loadBalancerCookieStickinessPolicy).([]interface{})[0].(map[string]interface{})
 
 	info := lbaas.LoadBalancerCookieStickinessPolicyInfo{
 		CookieExpirationPeriod: policy["cookie_expiration_period"].(int),
@@ -725,7 +741,7 @@ func expandLoadBalancerCookieStickinessPolicy(d *schema.ResourceData) lbaas.Load
 func flattenLoadBalancerCookieStickinessPolicy(d *schema.ResourceData, result *lbaas.PolicyInfo) error {
 	attrs := make(map[string]interface{})
 	p := make([]map[string]interface{}, 0)
-	val, ok := d.GetOk("load_balancer_cookie_stickiness_policy")
+	val, ok := d.GetOk(loadBalancerCookieStickinessPolicy)
 	if ok {
 		policyConfiguration := val.([]interface{})
 		attrs = policyConfiguration[0].(map[string]interface{})
@@ -735,15 +751,14 @@ func flattenLoadBalancerCookieStickinessPolicy(d *schema.ResourceData, result *l
 
 	p = append(p, attrs)
 
-	d.Set("load_balancer_cookie_stickiness_policy", p)
-	return nil
+	return d.Set(loadBalancerCookieStickinessPolicy, p)
 }
 
 // LoadBalancingMechanismPolicy
 
 func expandLoadBalancingMechanismPolicy(d *schema.ResourceData) lbaas.LoadBalancingMechanismPolicyInfo {
 
-	policy := d.Get("load_balancing_mechanism_policy").([]interface{})[0].(map[string]interface{})
+	policy := d.Get(loadBalancingMechanismPolicy).([]interface{})[0].(map[string]interface{})
 
 	info := lbaas.LoadBalancingMechanismPolicyInfo{
 		LoadBalancingMechanism: policy["load_balancing_mechanism"].(string),
@@ -755,7 +770,7 @@ func expandLoadBalancingMechanismPolicy(d *schema.ResourceData) lbaas.LoadBalanc
 func flattenLoadBalancingMechanismPolicy(d *schema.ResourceData, result *lbaas.PolicyInfo) error {
 	attrs := make(map[string]interface{})
 	p := make([]map[string]interface{}, 0)
-	val, ok := d.GetOk("load_balancing_mechanism_policy")
+	val, ok := d.GetOk(loadBalancingMechanismPolicy)
 	if ok {
 		policyConfiguration := val.([]interface{})
 		attrs = policyConfiguration[0].(map[string]interface{})
@@ -765,15 +780,14 @@ func flattenLoadBalancingMechanismPolicy(d *schema.ResourceData, result *lbaas.P
 
 	p = append(p, attrs)
 
-	d.Set("load_balancing_mechanism_policy", p)
-	return nil
+	return d.Set(loadBalancingMechanismPolicy, p)
 }
 
 // RateLimitingRequestPolicy
 
 func expandRateLimitingRequestPolicy(d *schema.ResourceData) lbaas.RateLimitingRequestPolicyInfo {
 
-	policy := d.Get("rate_limiting_request_policy").([]interface{})[0].(map[string]interface{})
+	policy := d.Get(rateLimitingRequestPolicy).([]interface{})[0].(map[string]interface{})
 
 	info := lbaas.RateLimitingRequestPolicyInfo{
 		BurstSize:                   policy["burst_size"].(int),
@@ -792,7 +806,7 @@ func expandRateLimitingRequestPolicy(d *schema.ResourceData) lbaas.RateLimitingR
 func flattenRateLimitingRequestPolicy(d *schema.ResourceData, result *lbaas.PolicyInfo) error {
 	attrs := make(map[string]interface{})
 	p := make([]map[string]interface{}, 0)
-	val, ok := d.GetOk("rate_limiting_request_policy")
+	val, ok := d.GetOk(rateLimitingRequestPolicy)
 	if ok {
 		policyConfiguration := val.([]interface{})
 		attrs = policyConfiguration[0].(map[string]interface{})
@@ -801,23 +815,21 @@ func flattenRateLimitingRequestPolicy(d *schema.ResourceData, result *lbaas.Poli
 	attrs["burst_size"] = result.BurstSize
 	attrs["delay_excessive_requests"] = !result.DoNotDelayExcessiveRequests
 	attrs["http_error_code"] = result.HttpStatusErrorCode
-	attrs["log_level"] = result.LogLevel
+	attrs["logging_level"] = result.LogLevel
 	attrs["rate_limiting_criteria"] = result.RateLimitingCriteria
 	attrs["requests_per_second"] = result.RequestsPerSecond
-	attrs["storage_size"] = result.StorageSize
+	attrs["zone_memory_size"] = result.StorageSize
 	attrs["zone"] = result.Zone
 
 	p = append(p, attrs)
 
-	d.Set("rate_limiting_request_policy", p)
-	return nil
+	return d.Set(rateLimitingRequestPolicy, p)
 }
 
 // RedirectPolicy
 
 func expandRedirectPolicy(d *schema.ResourceData) lbaas.RedirectPolicyInfo {
-
-	policy := d.Get("redirect_policy").([]interface{})[0].(map[string]interface{})
+	policy := d.Get(redirectPolicy).([]interface{})[0].(map[string]interface{})
 
 	info := lbaas.RedirectPolicyInfo{
 		RedirectURI:  policy["redirect_uri"].(string),
@@ -828,9 +840,10 @@ func expandRedirectPolicy(d *schema.ResourceData) lbaas.RedirectPolicyInfo {
 }
 
 func flattenRedirectPolicy(d *schema.ResourceData, result *lbaas.PolicyInfo) error {
+
 	attrs := make(map[string]interface{})
 	p := make([]map[string]interface{}, 0)
-	val, ok := d.GetOk("redirect_policy")
+	val, ok := d.GetOk(redirectPolicy)
 	if ok {
 		policyConfiguration := val.([]interface{})
 		attrs = policyConfiguration[0].(map[string]interface{})
@@ -841,15 +854,14 @@ func flattenRedirectPolicy(d *schema.ResourceData, result *lbaas.PolicyInfo) err
 
 	p = append(p, attrs)
 
-	d.Set("redirect_policy", p)
-	return nil
+	return d.Set(redirectPolicy, p)
 }
 
 // ResourceAccessControlPolicy
 
 func expandResourceAccessControlPolicy(d *schema.ResourceData) lbaas.ResourceAccessControlPolicyInfo {
 
-	policy := d.Get("resource_access_control_policy").([]interface{})[0].(map[string]interface{})
+	policy := d.Get(resourceAccessControlPolicy).([]interface{})[0].(map[string]interface{})
 
 	info := lbaas.ResourceAccessControlPolicyInfo{
 		Disposition: policy["disposition"].(string),
@@ -868,29 +880,37 @@ func expandResourceAccessControlPolicy(d *schema.ResourceData) lbaas.ResourceAcc
 }
 
 func flattenResourceAccessControlPolicy(d *schema.ResourceData, result *lbaas.PolicyInfo) error {
+
 	attrs := make(map[string]interface{})
 	p := make([]map[string]interface{}, 0)
-	val, ok := d.GetOk("resource_access_control_policy")
+	val, ok := d.GetOk(resourceAccessControlPolicy)
 	if ok {
 		policyConfiguration := val.([]interface{})
 		attrs = policyConfiguration[0].(map[string]interface{})
 	}
 
 	attrs["disposition"] = result.Disposition
-	attrs["denied_clients"] = result.DeniedClients
-	attrs["permitted_clients"] = result.PermittedClients
+	attrs["denied_clients"] = flattenStringSet(result.DeniedClients)
+	attrs["permitted_clients"] = flattenStringSet(result.PermittedClients)
 
 	p = append(p, attrs)
 
-	d.Set("resource_access_control_policy", p)
-	return nil
+	return d.Set(resourceAccessControlPolicy, p)
+}
+
+func flattenStringSet(list []string) *schema.Set {
+	s := make([]interface{}, len(list))
+	for i, v := range list {
+		s[i] = v
+	}
+	return schema.NewSet(schema.HashString, s)
 }
 
 // SetRequestHeaderPolicy
 
 func expandSetRequestHeaderPolicy(d *schema.ResourceData) lbaas.SetRequestHeaderPolicyInfo {
 
-	policy := d.Get("set_request_header_policy").([]interface{})[0].(map[string]interface{})
+	policy := d.Get(setRequestHeaderPolicy).([]interface{})[0].(map[string]interface{})
 
 	info := lbaas.SetRequestHeaderPolicyInfo{
 		HeaderName: policy["header_name"].(string),
@@ -910,9 +930,10 @@ func expandSetRequestHeaderPolicy(d *schema.ResourceData) lbaas.SetRequestHeader
 }
 
 func flattenSetRequestHeaderPolicy(d *schema.ResourceData, result *lbaas.PolicyInfo) error {
+
 	attrs := make(map[string]interface{})
 	p := make([]map[string]interface{}, 0)
-	val, ok := d.GetOk("set_request_header_policy")
+	val, ok := d.GetOk(setRequestHeaderPolicy)
 	if ok {
 		policyConfiguration := val.([]interface{})
 		attrs = policyConfiguration[0].(map[string]interface{})
@@ -921,19 +942,19 @@ func flattenSetRequestHeaderPolicy(d *schema.ResourceData, result *lbaas.PolicyI
 	attrs["header_name"] = result.HeaderName
 	attrs["value"] = result.Value
 	attrs["action_when_header_exists"] = result.ActionWhenHeaderExists
-	attrs["action_when_header_value_is"] = result.ActionWhenHeaderValueIs
-	attrs["action_when_header_value_is_not"] = result.ActionWhenHeaderValueIsNot
+	attrs["action_when_header_value_is"] = flattenStringSet(result.ActionWhenHeaderValueIs)
+	attrs["action_when_header_value_is_not"] = flattenStringSet(result.ActionWhenHeaderValueIsNot)
 
 	p = append(p, attrs)
 
-	return d.Set("set_request_header_policy", p)
+	return d.Set(setRequestHeaderPolicy, p)
 }
 
 // SSLNegotiationPolicy
 
 func exapndSSLNegotiationPolicy(d *schema.ResourceData) lbaas.SSLNegotiationPolicyInfo {
 
-	policy := d.Get("ssl_negotiation_policy").([]interface{})[0].(map[string]interface{})
+	policy := d.Get(sslNegotiationPolicy).([]interface{})[0].(map[string]interface{})
 
 	info := lbaas.SSLNegotiationPolicyInfo{
 		Port: policy["port"].(int),
@@ -958,29 +979,27 @@ func exapndSSLNegotiationPolicy(d *schema.ResourceData) lbaas.SSLNegotiationPoli
 func flattenSSLNegotiationPolicy(d *schema.ResourceData, result *lbaas.PolicyInfo) error {
 	attrs := make(map[string]interface{})
 	p := make([]map[string]interface{}, 0)
-	val, ok := d.GetOk("ssl_negotiation_policy")
+	val, ok := d.GetOk(sslNegotiationPolicy)
 	if ok {
 		policyConfiguration := val.([]interface{})
 		attrs = policyConfiguration[0].(map[string]interface{})
 	}
 
 	attrs["port"] = result.Port
-	attrs["server_order_preference"] = result.Value
-	attrs["action_when_header_exists"] = result.ActionWhenHeaderExists
-	attrs["ssl_protocol"] = result.SSLProtocol
-	attrs["ssl_ciphers"] = result.SSLCiphers
+	attrs["server_order_preference"] = result.ServerOrderPreference
+	attrs["ssl_protocol"] = flattenStringSet(result.SSLProtocol)
+	attrs["ssl_ciphers"] = flattenStringSet(result.SSLCiphers)
 
 	p = append(p, attrs)
 
-	d.Set("ssl_negotiation_policy", p)
-	return nil
+	return d.Set(sslNegotiationPolicy, p)
 }
 
 // TrustedCertificatePolicy
 
 func expandTrustedCertificatePolicy(d *schema.ResourceData) lbaas.TrustedCertificatePolicyInfo {
 
-	policy := d.Get("trusted_certificate_policy").([]interface{})[0].(map[string]interface{})
+	policy := d.Get(trustedCertificatePolicy).([]interface{})[0].(map[string]interface{})
 
 	info := lbaas.TrustedCertificatePolicyInfo{
 		TrustedCertificate: policy["trusted_certificate"].(string),
@@ -992,7 +1011,7 @@ func expandTrustedCertificatePolicy(d *schema.ResourceData) lbaas.TrustedCertifi
 func flattenTrustedCertificatePolicy(d *schema.ResourceData, result *lbaas.PolicyInfo) error {
 	attrs := make(map[string]interface{})
 	p := make([]map[string]interface{}, 0)
-	val, ok := d.GetOk("trusted_certificate_policy")
+	val, ok := d.GetOk(trustedCertificatePolicy)
 	if ok {
 		policyConfiguration := val.([]interface{})
 		attrs = policyConfiguration[0].(map[string]interface{})
@@ -1002,6 +1021,5 @@ func flattenTrustedCertificatePolicy(d *schema.ResourceData, result *lbaas.Polic
 
 	p = append(p, attrs)
 
-	d.Set("trusted_certificate_policy", p)
-	return nil
+	return d.Set(trustedCertificatePolicy, p)
 }

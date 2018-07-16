@@ -44,11 +44,3 @@ In addition to the above, the following values are exported:
 * `state` - The State of the Digital Certificate resource.
 
 * `uri` - The Uniform Resource Identifier for the Certificate resource.
-
-## Import
-
-Digital Certificates can be imported using the `name` of the resource.
-
-```shell
-$ terraform import opc_lbaas_ssl_certificate.cert1 example-cert1
-```

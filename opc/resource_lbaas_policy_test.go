@@ -141,7 +141,7 @@ func TestAccLBaaSPolicy_LoadBalancingMechanismPolicy(t *testing.T) {
 	})
 }
 
-func TestAccLBaaSPolicy_RateLimitingPolicy(t *testing.T) {
+func TestAccLBaaSPolicy_RateLimitingRequestPolicy(t *testing.T) {
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_policy.rate_limiting_request_policy"
 	testName := fmt.Sprintf("acctest-%d", rInt)
@@ -160,7 +160,7 @@ func TestAccLBaaSPolicy_RateLimitingPolicy(t *testing.T) {
 		CheckDestroy: opcResourceCheck(resName, testAccLBaaSCheckPolicyDestroyed),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccLBaaSPolicyConfig_RateLimitingPolicy(lbID, rInt, lbCount),
+				Config: testAccLBaaSPolicyConfig_RateRequestLimitingPolicy(lbID, rInt, lbCount),
 				Check: resource.ComposeTestCheckFunc(
 					opcResourceCheck(resName, testAccLBaaSCheckPolicyExists),
 					resource.TestCheckResourceAttr(resName, "name", testName),
@@ -309,7 +309,7 @@ func TestAccLBaaSPolicy_SSLNegotiationPolicy(t *testing.T) {
 					resource.TestMatchResourceAttr(resName, "uri", regexp.MustCompile(testName)),
 					resource.TestCheckResourceAttr(resName, "ssl_negotiation_policy.#", "1"),
 					resource.TestCheckResourceAttr(resName, "ssl_negotiation_policy.0.port", "8022"),
-					resource.TestCheckResourceAttr(resName, "ssl_negotiation_policy.0.server_order_preference", "Enabled"),
+					resource.TestCheckResourceAttr(resName, "ssl_negotiation_policy.0.server_order_preference", "ENABLED"),
 					resource.TestCheckResourceAttr(resName, "ssl_negotiation_policy.0.ssl_protocol.#", "3"),
 					resource.TestCheckResourceAttr(resName, "ssl_negotiation_policy.0.ssl_ciphers.#", "1"),
 				),
@@ -438,32 +438,6 @@ func TestAccLBaaSPolicy_Update_ChangePolicyType(t *testing.T) {
 	})
 }
 
-// Check for error if more that one policy type defined
-func TestAccLBaaSPolicy_InvalidPolicy(t *testing.T) {
-	rInt := acctest.RandInt()
-	// resName := "opc_lbaas_policy.invaild_policy"
-	// testName := fmt.Sprintf("acctest-%d", rInt)
-
-	// use existing LB instance from environment if set
-	lbCount := 0
-	lbID := os.Getenv("OPC_TEST_USE_EXISTING_LB")
-	if lbID == "" {
-		lbCount = 1
-		lbID = "${opc_lbaas_load_balancer.test.id}"
-	}
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccLBaaSPolicyConfig_Invalid(lbID, rInt, lbCount),
-				Check:  resource.ComposeTestCheckFunc(),
-			},
-		},
-	})
-}
-
 func testAccLBaaSPolicyConfig_ApplicationCookieStickinessPolicy(lbID string, rInt, lbCount int) string {
 	return fmt.Sprintf(`
 resource "opc_lbaas_policy" "application_cookie_stickiness_policy" {
@@ -536,7 +510,7 @@ resource "opc_lbaas_policy" "load_balancing_mechanism_policy" {
 `, lbID, rInt, testAccParentLoadBalancerConfig(lbCount, rInt))
 }
 
-func testAccLBaaSPolicyConfig_RateLimitingPolicy(lbID string, rInt, lbCount int) string {
+func testAccLBaaSPolicyConfig_RateRequestLimitingPolicy(lbID string, rInt, lbCount int) string {
 	return fmt.Sprintf(`
 resource "opc_lbaas_policy" "rate_limiting_request_policy" {
 	load_balancer = "%s"
@@ -614,7 +588,7 @@ resource "opc_lbaas_policy" "ssl_negotiation_policy" {
 
   ssl_negotiation_policy {
     port = 8022
-    server_order_preference = "Enabled"
+    server_order_preference = "ENABLED"
     ssl_protocol = ["SSLv3", "TLSv1.1", "TLSv1.2"]
     ssl_ciphers = ["AES256-SHA"]
   }
@@ -667,25 +641,6 @@ resource "opc_lbaas_policy" "update_policy_type" {
 	redirect_policy {
     redirect_uri = "https://redirect.example.com"
     response_code = 306
-  }
-}
-%s
-`, lbID, rInt, testAccParentLoadBalancerConfig(lbCount, rInt))
-}
-
-func testAccLBaaSPolicyConfig_Invalid(lbID string, rInt, lbCount int) string {
-	return fmt.Sprintf(`
-resource "opc_lbaas_policy" "invaild_policy" {
-  load_balancer = "%s"
-  name          = "acctest-%d"
-
-	redirect_policy {
-    redirect_uri = "https://redirect.example.com"
-    response_code = 306
-  }
-
-	application_cookie_stickiness_policy {
-    cookie_name = "MY_APP_COOKIE"
   }
 }
 %s
