@@ -57,12 +57,14 @@ type Snapshot struct {
 	Delay SnapshotDelay `json:"delay"`
 	// A description of the reason this request entered "error" state.
 	ErrorReason string `json:"error_reason"`
+	// Fully Qualified Domain Name
+	FQDN string `json:"name"`
 	// Name of the instance
 	Instance string `json:"instance"`
 	// Name of the machine image generated from the instance snapshot request.
 	MachineImage string `json:"machineimage"`
 	// Name of the instance snapshot request.
-	Name string `json:"name"`
+	Name string
 	// Not used
 	Quota string `json:"quota"`
 	// The state of the request.
@@ -258,6 +260,6 @@ func (c *SnapshotsClient) success(snapshotInfo *Snapshot) (*Snapshot, error) {
 	c.unqualify(&snapshotInfo.Account)
 	c.unqualify(&snapshotInfo.Instance)
 	c.unqualify(&snapshotInfo.MachineImage)
-	c.unqualify(&snapshotInfo.Name)
+	snapshotInfo.Name = c.getUnqualifiedName(snapshotInfo.FQDN)
 	return snapshotInfo, nil
 }

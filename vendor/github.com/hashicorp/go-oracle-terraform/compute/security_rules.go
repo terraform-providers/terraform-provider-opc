@@ -39,8 +39,10 @@ type SecurityRuleInfo struct {
 	Enabled bool `json:"enabledFlag"`
 	// Direction of the flow; Can be "egress" or "ingress".
 	FlowDirection string `json:"FlowDirection"`
+	// Fully Qualified Domain Name
+	FQDN string `json:"name"`
 	// The name of the Security Rule
-	Name string `json:"name"`
+	Name string
 	// List of security protocol names to match the packet's protocol and port.
 	SecProtocols []string `json:"secProtocols"`
 	// List of multipart names of IP address prefix set to match the packet's source IP address.
@@ -263,7 +265,8 @@ func (c *SecurityRuleClient) DeleteSecurityRule(input *DeleteSecurityRuleInput) 
 
 // Unqualifies any qualified fields in the IPNetworkExchangeInfo struct
 func (c *SecurityRuleClient) success(info *SecurityRuleInfo) (*SecurityRuleInfo, error) {
-	c.unqualify(&info.Name, &info.ACL, &info.SrcVnicSet, &info.DstVnicSet)
+	info.Name = c.getUnqualifiedName(info.FQDN)
+	c.unqualify(&info.ACL, &info.SrcVnicSet, &info.DstVnicSet)
 	info.SrcIPAddressPrefixSets = c.getUnqualifiedList(info.SrcIPAddressPrefixSets)
 	info.DstIPAddressPrefixSets = c.getUnqualifiedList(info.DstIPAddressPrefixSets)
 	info.SecProtocols = c.getUnqualifiedList(info.SecProtocols)

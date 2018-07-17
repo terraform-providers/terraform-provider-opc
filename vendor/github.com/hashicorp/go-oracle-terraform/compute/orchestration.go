@@ -95,8 +95,10 @@ type Orchestration struct {
 	DesiredState OrchestrationDesiredState `json:"desired_state"`
 	// Unique identifier of this orchestration
 	ID string `json:"id"`
-	// The three-part name of the Orchestration (/Compute-identity_domain/user/object).
-	Name string `json:"name"`
+	// Fully Qualified Domain Name
+	FQDN string `json:"name"`
+	// The three-part name of the Orchestration
+	Name string
 	// List of orchestration objects
 	Objects []Object `json:"objects"`
 	// Current status of this orchestration
@@ -296,7 +298,7 @@ func (c *OrchestrationsClient) CreateOrchestration(input *CreateOrchestrationInp
 		return nil, fmt.Errorf("Error creating orchestration %s: %s", getInput.Name, orchestrationError)
 	}
 
-	return &orchestrationInfo, nil
+	return orchestrationInfo, nil
 }
 
 // GetOrchestrationInput describes the Orchestration to get
@@ -383,7 +385,7 @@ func (c *OrchestrationsClient) UpdateOrchestration(input *UpdateOrchestrationInp
 		return nil, orchestrationError
 	}
 
-	return &orchestrationInfo, nil
+	return orchestrationInfo, nil
 }
 
 // DeleteOrchestrationInput describes the Orchestration to delete
@@ -414,7 +416,7 @@ func (c *OrchestrationsClient) DeleteOrchestration(input *DeleteOrchestrationInp
 }
 
 func (c *OrchestrationsClient) success(info *Orchestration) (*Orchestration, error) {
-	c.unqualify(&info.Name)
+	info.Name = c.getUnqualifiedName(info.FQDN)
 	for _, i := range info.Objects {
 		c.unqualify(&i.Orchestration)
 		if i.Type == OrchestrationTypeInstance {
@@ -427,7 +429,7 @@ func (c *OrchestrationsClient) success(info *Orchestration) (*Orchestration, err
 }
 
 // WaitForOrchestrationState waits for an orchestration to be in the specified state
-func (c *OrchestrationsClient) WaitForOrchestrationState(input *GetOrchestrationInput, pollInterval, timeout time.Duration) (Orchestration, error) {
+func (c *OrchestrationsClient) WaitForOrchestrationState(input *GetOrchestrationInput, pollInterval, timeout time.Duration) (*Orchestration, error) {
 	var info *Orchestration
 	var getErr error
 	err := c.client.WaitFor("orchestration to be ready", pollInterval, timeout, func() (bool, error) {
@@ -470,7 +472,7 @@ func (c *OrchestrationsClient) WaitForOrchestrationState(input *GetOrchestration
 			return false, fmt.Errorf("Unknown orchestration state: %s, erroring", s)
 		}
 	})
-	return *info, err
+	return info, err
 }
 
 // WaitForOrchestrationDeleted waits for an orchestration to be fully deleted.

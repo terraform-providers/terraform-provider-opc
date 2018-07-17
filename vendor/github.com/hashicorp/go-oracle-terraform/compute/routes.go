@@ -29,10 +29,12 @@ type RouteInfo struct {
 	AdminDistance int `json:"adminDistance"`
 	// Description of the route
 	Description string `json:"description"`
+	// Fully Qualified Domain Name
+	FQDN string `json:"name"`
 	// CIDR IPv4 Prefix associated with this route
 	IPAddressPrefix string `json:"ipAddressPrefix"`
 	// Name of the route
-	Name string `json:"name"`
+	Name string
 	// Name of the VNIC set associated with the route
 	NextHopVnicSet string `json:"nextHopVnicSet"`
 	// Slice of Tags associated with the route
@@ -158,7 +160,7 @@ func (c *RoutesClient) DeleteRoute(input *DeleteRouteInput) error {
 }
 
 func (c *RoutesClient) success(info *RouteInfo) (*RouteInfo, error) {
-	c.unqualify(&info.Name)
+	info.Name = c.getUnqualifiedName(info.FQDN)
 	c.unqualify(&info.NextHopVnicSet)
 	return info, nil
 }

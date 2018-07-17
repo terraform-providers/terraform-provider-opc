@@ -34,6 +34,9 @@ type MachineImage struct {
 	// Description of the state of the machine image if there is an error
 	ErrorReason string `json:"error_reason"`
 
+	// Fully Qualified Domain Name
+	FQDN string `json:"name"`
+
 	//  dictionary of hypervisor-specific attributes
 	Hypervisor map[string]interface{} `json:"hypervisor"`
 
@@ -44,7 +47,7 @@ type MachineImage struct {
 	File string `json:"file"`
 
 	// name of the machine image
-	Name string `json:"name"`
+	Name string
 
 	// Indicates that the image file is available in Object Storage Classic
 	NoUpload bool `json:"no_upload"`
@@ -138,6 +141,6 @@ func (c *MachineImagesClient) GetMachineImage(getInput *GetMachineImageInput) (*
 }
 
 func (c *MachineImagesClient) success(result *MachineImage) (*MachineImage, error) {
-	c.unqualify(&result.Name)
+	result.Name = c.getUnqualifiedName(result.FQDN)
 	return result, nil
 }

@@ -27,8 +27,10 @@ func (c *Client) IPNetworks() *IPNetworksClient {
 // IPNetworkInfo contains the exported fields necessary to hold all the information about an
 // IP Network
 type IPNetworkInfo struct {
+	// Fully Qualified Domain Name
+	FQDN string `json:"name"`
 	// The name of the IP Network
-	Name string `json:"name"`
+	Name string
 	// The CIDR IPv4 prefix associated with the IP Network
 	IPAddressPrefix string `json:"ipAddressPrefix"`
 	// Name of the IP Network Exchange associated with the IP Network
@@ -187,7 +189,7 @@ func (c *IPNetworksClient) DeleteIPNetwork(input *DeleteIPNetworkInput) error {
 
 // Unqualifies any qualified fields in the IPNetworkInfo struct
 func (c *IPNetworksClient) success(info *IPNetworkInfo) (*IPNetworkInfo, error) {
-	c.unqualify(&info.Name)
+	info.Name = c.getUnqualifiedName(info.FQDN)
 	c.unqualify(&info.IPNetworkExchange)
 	return info, nil
 }

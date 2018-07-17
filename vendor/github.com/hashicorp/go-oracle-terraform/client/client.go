@@ -5,11 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/url"
-	"os"
 	"runtime"
 	"strings"
 	"time"
@@ -144,8 +142,9 @@ func (c *Client) BuildNonJSONRequest(method, path string, body io.Reader) (*http
 	return req, nil
 }
 
-// BuildMultipartFormRequest builds a new HTTP Request for a multipart form request
-func (c *Client) BuildMultipartFormRequest(method, path string, files map[string]string, parameters map[string]interface{}) (*http.Request, error) {
+// BuildMultipartFormRequest builds a new HTTP Request for a multipart form request from specifies attributes
+func (c *Client) BuildMultipartFormRequest(method, path string, files map[string][]byte, parameters map[string]interface{}) (*http.Request, error) {
+
 	urlPath, err := url.Parse(path)
 	if err != nil {
 		return nil, err
@@ -155,39 +154,14 @@ func (c *Client) BuildMultipartFormRequest(method, path string, files map[string
 	writer := multipart.NewWriter(body)
 
 	var (
-		file         *os.File
-		fileContents []byte
-		fi           os.FileInfo
-		part         io.Writer
+		part io.Writer
 	)
-	for fileName, filePath := range files {
-		// Open the file
-		file, err = os.Open(filePath)
-		if err != nil {
-			return nil, err
-		}
-		defer func() {
-			fileErr := file.Close()
-			if fileErr != nil {
-				err = fileErr
-			}
-		}()
-
-		// Read the file contents
-		fileContents, err = ioutil.ReadAll(file)
+	for fileName, fileContents := range files {
+		part, err = writer.CreateFormFile(fileName, fmt.Sprintf("%s.json", fileName))
 		if err != nil {
 			return nil, err
 		}
 
-		// Write out the file information and contents
-		fi, err = file.Stat()
-		if err != nil {
-			return nil, err
-		}
-		part, err = writer.CreateFormFile(fileName, fi.Name())
-		if err != nil {
-			return nil, err
-		}
 		_, err = part.Write(fileContents)
 		if err != nil {
 			return nil, err
@@ -197,15 +171,16 @@ func (c *Client) BuildMultipartFormRequest(method, path string, files map[string
 	// Add additional parameters to the writer
 	for key, val := range parameters {
 		if val.(string) != "" {
-			_ = writer.WriteField(strings.ToLower(key), val.(string))
+			_ = writer.WriteField(key, val.(string))
 		}
 	}
+
 	err = writer.Close()
 	if err != nil {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", c.formatURL(urlPath), body)
+	req, err := http.NewRequest(method, c.formatURL(urlPath), body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 
 	return req, err
@@ -275,9 +250,11 @@ func (c *Client) retryRequest(req *http.Request) (*http.Response, error) {
 		if err != nil {
 			return resp, err
 		}
+		method := req.Method
+		url := req.URL
 		errMessage = buf.String()
 		statusCode = resp.StatusCode
-		c.DebugLogString(fmt.Sprintf("Encountered HTTP (%d) Error: %s", statusCode, errMessage))
+		c.DebugLogString(fmt.Sprintf("%s %s Encountered HTTP (%d) Error: %s", method, url, statusCode, errMessage))
 		c.DebugLogString(fmt.Sprintf("%d/%d retries left", i+1, retries))
 	}
 
@@ -296,19 +273,18 @@ func (c *Client) formatURL(path *url.URL) string {
 
 // WaitFor - Retry function
 func (c *Client) WaitFor(description string, pollInterval, timeout time.Duration, test func() (bool, error)) error {
-	tick := time.NewTicker(1 * time.Second)
 
 	timeoutSeconds := int(timeout.Seconds())
 	pollIntervalSeconds := int(pollInterval.Seconds())
 
+	c.DebugLogString(fmt.Sprintf("Starting Wait For %s, polling every %d for %d seconds ", description, pollIntervalSeconds, timeoutSeconds))
+
 	for i := 0; i < timeoutSeconds; i += pollIntervalSeconds {
-		for range tick.C {
-			completed, err := test()
-			if err != nil || completed {
-				return err
-			}
-			c.DebugLogString(fmt.Sprintf("Waiting %d seconds for %s (%d/%ds)", pollIntervalSeconds, description, i, timeoutSeconds))
-			time.Sleep(pollInterval)
+		c.DebugLogString(fmt.Sprintf("Waiting %d seconds for %s (%d/%ds)", pollIntervalSeconds, description, i, timeoutSeconds))
+		time.Sleep(pollInterval)
+		completed, err := test()
+		if err != nil || completed {
+			return err
 		}
 	}
 	return fmt.Errorf("Timeout after %d seconds waiting for %s", timeoutSeconds, description)

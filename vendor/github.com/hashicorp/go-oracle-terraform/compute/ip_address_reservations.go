@@ -35,6 +35,9 @@ type IPAddressReservation struct {
 	// Description of the IP Address Reservation
 	Description string `json:"description"`
 
+	// Fully Qualified Domain Name
+	FQDN string `json:"name"`
+
 	// Reserved NAT IPv4 address from the IP Address Pool
 	IPAddress string `json:"ipAddress"`
 
@@ -42,7 +45,7 @@ type IPAddressReservation struct {
 	IPAddressPool string `json:"ipAddressPool"`
 
 	// Name of the reservation
-	Name string `json:"name"`
+	Name string
 
 	// Tags associated with the object
 	Tags []string `json:"tags"`
@@ -175,7 +178,7 @@ func (c *IPAddressReservationsClient) DeleteIPAddressReservation(input *DeleteIP
 }
 
 func (c *IPAddressReservationsClient) success(result *IPAddressReservation) (*IPAddressReservation, error) {
-	c.unqualify(&result.Name)
+	result.Name = c.getUnqualifiedName(result.FQDN)
 	if result.IPAddressPool != "" {
 		result.IPAddressPool = c.unqualifyIPAddressPool(result.IPAddressPool)
 	}
