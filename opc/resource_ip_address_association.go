@@ -12,7 +12,6 @@ func resourceOPCIPAddressAssociation() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceOPCIPAddressAssociationCreate,
 		Read:   resourceOPCIPAddressAssociationRead,
-		Update: resourceOPCIPAddressAssociationUpdate,
 		Delete: resourceOPCIPAddressAssociationDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
@@ -27,16 +26,19 @@ func resourceOPCIPAddressAssociation() *schema.Resource {
 			"ip_address_reservation": {
 				Type:     schema.TypeString,
 				Optional: true,
+				ForceNew: true,
 			},
 			"vnic": {
 				Type:     schema.TypeString,
 				Optional: true,
+				ForceNew: true,
 			},
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
+				ForceNew: true,
 			},
-			"tags": tagsOptionalSchema(),
+			"tags": tagsForceNewSchema(),
 			"uri": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -116,43 +118,6 @@ func resourceOPCIPAddressAssociationRead(d *schema.ResourceData, meta interface{
 		return err
 	}
 	return nil
-}
-
-func resourceOPCIPAddressAssociationUpdate(d *schema.ResourceData, meta interface{}) error {
-	computeClient, err := meta.(*Client).getComputeClient()
-	if err != nil {
-		return err
-	}
-	resClient := computeClient.IPAddressAssociations()
-
-	input := compute.UpdateIPAddressAssociationInput{
-		Name: d.Get("name").(string),
-	}
-
-	if ipAddressReservation, ok := d.GetOk("ip_address_reservation"); ok {
-		input.IPAddressReservation = ipAddressReservation.(string)
-	}
-
-	if vnic, ok := d.GetOk("vnic"); ok {
-		input.Vnic = vnic.(string)
-	}
-
-	tags := getStringList(d, "tags")
-	if len(tags) != 0 {
-		input.Tags = tags
-	}
-
-	if description, ok := d.GetOk("description"); ok {
-		input.Description = description.(string)
-	}
-
-	info, err := resClient.UpdateIPAddressAssociation(&input)
-	if err != nil {
-		return fmt.Errorf("Error updating IP Address Association: %s", err)
-	}
-
-	d.SetId(info.Name)
-	return resourceOPCIPAddressAssociationRead(d, meta)
 }
 
 func resourceOPCIPAddressAssociationDelete(d *schema.ResourceData, meta interface{}) error {
