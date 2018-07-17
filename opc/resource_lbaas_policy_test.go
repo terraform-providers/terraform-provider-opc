@@ -479,7 +479,8 @@ resource "opc_lbaas_policy" "cloudgate_policy" {
     virtual_hostname_for_policy_attribution = "host1.example.com"
   }
 }
-`, lbID, rInt)
+%s
+`, lbID, rInt, testAccParentLoadBalancerConfig(lbCount, rInt))
 }
 
 func testAccLBaaSPolicyConfig_LoadBalancerCookieStickinessPolicy(lbID string, rInt, lbCount int) string {
