@@ -33,8 +33,10 @@ type SecurityProtocolInfo struct {
 	IPProtocol string `json:"ipProtocol"`
 	// List of port numbers or port range strings to match the packet's source port.
 	SrcPortSet []string `json:"srcPortSet"`
+	// Fully Qualified Domain Name
+	FQDN string `json:"name"`
 	// The name of the Security Protocol
-	Name string `json:"name"`
+	Name string
 	// Description of the Security Protocol
 	Description string `json:"description"`
 	// Slice of tags associated with the Security Protocol
@@ -187,6 +189,6 @@ func (c *SecurityProtocolsClient) DeleteSecurityProtocol(input *DeleteSecurityPr
 
 // Unqualifies any qualified fields in the SecurityProtocolInfo struct
 func (c *SecurityProtocolsClient) success(info *SecurityProtocolInfo) (*SecurityProtocolInfo, error) {
-	c.unqualify(&info.Name)
+	info.Name = c.getUnqualifiedName(info.FQDN)
 	return info, nil
 }

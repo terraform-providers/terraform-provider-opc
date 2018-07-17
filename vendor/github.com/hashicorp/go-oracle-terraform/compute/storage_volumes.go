@@ -52,6 +52,9 @@ type StorageVolumeInfo struct {
 	// The description of the storage volume.
 	Description string `json:"description,omitempty"`
 
+	// Fully Qualified Domain Name
+	FQDN string `json:"name"`
+
 	// The hypervisor that this volume is compatible with.
 	Hypervisor string `json:"hypervisor,omitempty"`
 
@@ -62,7 +65,7 @@ type StorageVolumeInfo struct {
 	MachineImage string `json:"machineimage_name,omitempty"`
 
 	// The three-part name of the object (/Compute-identity_domain/user/object).
-	Name string `json:"name"`
+	Name string
 
 	// The OS platform this volume is compatible with.
 	Platform string `json:"platform,omitempty"`
@@ -238,7 +241,7 @@ type GetStorageVolumeInput struct {
 
 func (c *StorageVolumeClient) success(result *StorageVolumeInfo) (*StorageVolumeInfo, error) {
 	c.unqualify(&result.ImageList)
-	c.unqualify(&result.Name)
+	result.Name = c.getUnqualifiedName(result.FQDN)
 	c.unqualify(&result.Snapshot)
 
 	sizeInMegaBytes, err := sizeInGigaBytes(result.Size)

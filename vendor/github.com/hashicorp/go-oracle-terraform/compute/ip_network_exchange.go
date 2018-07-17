@@ -27,8 +27,10 @@ func (c *Client) IPNetworkExchanges() *IPNetworkExchangesClient {
 // IPNetworkExchangeInfo contains the exported fields necessary to hold all the information about an
 // IP Network Exchange
 type IPNetworkExchangeInfo struct {
+	// Fully Qualified Domain Name
+	FQDN string `json:"name"`
 	// The name of the IP Network Exchange
-	Name string `json:"name"`
+	Name string
 	// Description of the IP Network Exchange
 	Description string `json:"description"`
 	// Slice of tags associated with the IP Network Exchange
@@ -99,6 +101,6 @@ func (c *IPNetworkExchangesClient) DeleteIPNetworkExchange(input *DeleteIPNetwor
 
 // Unqualifies any qualified fields in the IPNetworkExchangeInfo struct
 func (c *IPNetworkExchangesClient) success(info *IPNetworkExchangeInfo) (*IPNetworkExchangeInfo, error) {
-	c.unqualify(&info.Name)
+	info.Name = c.getUnqualifiedName(info.FQDN)
 	return info, nil
 }
