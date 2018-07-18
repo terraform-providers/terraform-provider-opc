@@ -1,18 +1,18 @@
-## 1.2.0 (Unreleased)
+## 1.2.0 (July 18, 2018)
 
 FEATURES:
 
-* **New Resource:** `r/opc_lbaas_certificate` [GH-132]    
-* **New Resource:** `r/opc_lbaas_listener` [GH-132]          
-* **New Resource:** `r/opc_lbaas_load_balancer` [GH-132]            
-* **New Resource:** `r/opc_lbaas_policy` [GH-132]                 
-* **New Resource:** `r/opc_lbaas_server_pool` [GH-132]
+* **New Resource:** `r/opc_lbaas_certificate` [[#132](https://github.com/terraform-providers/terraform-provider-opc/issues/132)]    
+* **New Resource:** `r/opc_lbaas_listener` [[#132](https://github.com/terraform-providers/terraform-provider-opc/issues/132)]          
+* **New Resource:** `r/opc_lbaas_load_balancer` [[#132](https://github.com/terraform-providers/terraform-provider-opc/issues/132)]            
+* **New Resource:** `r/opc_lbaas_policy` [[#132](https://github.com/terraform-providers/terraform-provider-opc/issues/132)]                 
+* **New Resource:** `r/opc_lbaas_server_pool` ([#132](https://github.com/terraform-providers/terraform-provider-opc/issues/132))
 
 BUG FIXES: 
 
-* All resources confirm that the client has been properly initialized [GH-136]
+* All resources confirm that the client has been properly initialized ([#136](https://github.com/terraform-providers/terraform-provider-opc/issues/136))
 
-* Don't unqualify security lists in orchestrated instances [GH-140]
+* Don't unqualify security lists in orchestrated instances ([#140](https://github.com/terraform-providers/terraform-provider-opc/issues/140))
 
 ## 1.1.2 (June 20, 2018)
 
