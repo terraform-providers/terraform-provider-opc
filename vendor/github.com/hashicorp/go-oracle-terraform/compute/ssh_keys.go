@@ -21,10 +21,12 @@ func (c *Client) SSHKeys() *SSHKeysClient {
 type SSHKey struct {
 	// Indicates whether the key is enabled (true) or disabled.
 	Enabled bool `json:"enabled"`
+	// Fully Qualified Domain Name
+	FQDN string `json:"name"`
 	// The SSH public key value.
 	Key string `json:"key"`
 	// The three-part name of the SSH Key (/Compute-identity_domain/user/object).
-	Name string `json:"name"`
+	Name string
 	// Unique Resource Identifier
 	URI string `json:"uri"`
 }
@@ -119,6 +121,6 @@ func (c *SSHKeysClient) DeleteSSHKey(deleteInput *DeleteSSHKeyInput) error {
 }
 
 func (c *SSHKeysClient) success(keyInfo *SSHKey) (*SSHKey, error) {
-	c.unqualify(&keyInfo.Name)
+	keyInfo.Name = c.getUnqualifiedName(keyInfo.FQDN)
 	return keyInfo, nil
 }

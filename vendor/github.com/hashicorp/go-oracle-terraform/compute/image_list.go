@@ -52,8 +52,11 @@ type ImageList struct {
 	// Each machine image in an image list is identified by an image list entry.
 	Entries []ImageListEntry `json:"entries"`
 
+	// Fully Qualified Domain Name
+	FQDN string `json:"name"`
+
 	// The name of the Image List
-	Name string `json:"name"`
+	Name string
 
 	// Uniform Resource Identifier
 	URI string `json:"uri"`
@@ -145,7 +148,7 @@ func (c *ImageListClient) UpdateImageList(updateInput *UpdateImageListInput) (*I
 }
 
 func (c *ImageListClient) success(imageList *ImageList) (*ImageList, error) {
-	c.unqualify(&imageList.Name)
+	imageList.Name = c.getUnqualifiedName(imageList.FQDN)
 
 	for _, v := range imageList.Entries {
 		v.MachineImages = c.getUnqualifiedList(v.MachineImages)

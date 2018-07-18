@@ -23,8 +23,10 @@ type VirtualNICSet struct {
 	AppliedACLs []string `json:"appliedAcls"`
 	// Description of the VNIC Set.
 	Description string `json:"description"`
+	// Fully Qualified Domain Name
+	FQDN string `json:"name"`
 	// Name of the VNIC set.
-	Name string `json:"name"`
+	Name string
 	// The three-part name (/Compute-identity_domain/user/object) of the virtual NIC set.
 	Tags []string `json:"tags"`
 	// Uniform Resource Identifier
@@ -157,7 +159,7 @@ func (c *VirtNICSetsClient) unqualifyAcls(acls []string) []string {
 }
 
 func (c *VirtNICSetsClient) success(info *VirtualNICSet) (*VirtualNICSet, error) {
-	c.unqualify(&info.Name)
+	info.Name = c.getUnqualifiedName(info.FQDN)
 	info.AppliedACLs = c.unqualifyAcls(info.AppliedACLs)
 	info.VirtualNICs = c.getUnqualifiedList(info.VirtualNICs)
 	return info, nil

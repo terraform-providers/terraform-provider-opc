@@ -23,12 +23,14 @@ type SecurityApplicationInfo struct {
 	Description string `json:"description"`
 	// The TCP or UDP destination port number. This can be a port range, such as 5900-5999 for TCP.
 	DPort string `json:"dport"`
+	// Fully Qualified Domain Name
+	FQDN string `json:"name"`
 	// The ICMP code.
 	ICMPCode SecurityApplicationICMPCode `json:"icmpcode"`
 	// The ICMP type.
 	ICMPType SecurityApplicationICMPType `json:"icmptype"`
 	// The three-part name of the Security Application (/Compute-identity_domain/user/object).
-	Name string `json:"name"`
+	Name string
 	// The protocol to use.
 	Protocol SecurityApplicationProtocol `json:"protocol"`
 	// The Uniform Resource Identifier
@@ -106,7 +108,7 @@ const (
 )
 
 func (c *SecurityApplicationsClient) success(result *SecurityApplicationInfo) (*SecurityApplicationInfo, error) {
-	c.unqualify(&result.Name)
+	result.Name = c.getUnqualifiedName(result.FQDN)
 	return result, nil
 }
 

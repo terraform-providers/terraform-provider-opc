@@ -47,11 +47,14 @@ type StorageVolumeSnapshotInfo struct {
 	// Description of the snapshot
 	Description string `json:"description"`
 
+	// Fully Qualified Domain Name
+	FQDN string `json:"name"`
+
 	// The name of the machine image that's used in the boot volume from which this snapshot is taken
 	MachineImageName string `json:"machineimage_name"`
 
 	// Name of the snapshot
-	Name string `json:"name"`
+	Name string
 
 	// String indicating whether the parent volume is bootable or not
 	ParentVolumeBootable string `json:"parent_volume_bootable"`
@@ -200,7 +203,7 @@ func (c *StorageVolumeSnapshotClient) DeleteStorageVolumeSnapshot(input *DeleteS
 }
 
 func (c *StorageVolumeSnapshotClient) success(result *StorageVolumeSnapshotInfo) (*StorageVolumeSnapshotInfo, error) {
-	c.unqualify(&result.Name)
+	result.Name = c.getUnqualifiedName(result.FQDN)
 	c.unqualify(&result.Volume)
 
 	sizeInGigaBytes, err := sizeInGigaBytes(result.Size)

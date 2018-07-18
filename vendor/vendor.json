@@ -320,20 +320,20 @@
 			"revision": "d30f09973e19c1dfcd120b2d9c4f168e68d6b5d5"
 		},
 		{
-			"checksumSHA1": "kFv0/5eXRLfsUrEhgPW65YxvWec=",
+			"checksumSHA1": "3iLFdjGP7gJ/MYI1NzphMmDNYJY=",
 			"path": "github.com/hashicorp/go-oracle-terraform/client",
-			"revision": "acdb9ba7464481c8e3a80a44f214038866ce0515",
-			"revisionTime": "2018-07-08T18:30:42Z",
-			"version": "v0.11.0",
-			"versionExact": "v0.11.0"
+			"revision": "267cd1957aac3990025de350264b26d7d6c736dc",
+			"revisionTime": "2018-07-17T19:37:11Z",
+			"version": "v0.12.0",
+			"versionExact": "v0.12.0"
 		},
 		{
-			"checksumSHA1": "uH4oOQQCaQVfc4QZg8hZkaHSbtU=",
+			"checksumSHA1": "FZ3wHovGPPY6H8toOUnm3hQJXNI=",
 			"path": "github.com/hashicorp/go-oracle-terraform/compute",
-			"revision": "4bce5c92459e62a1247656f35f7a7e2882c9afaa",
-			"revisionTime": "2018-06-19T16:04:14Z",
-			"version": "v0.9.6",
-			"versionExact": "v0.9.6"
+			"revision": "267cd1957aac3990025de350264b26d7d6c736dc",
+			"revisionTime": "2018-07-17T19:37:11Z",
+			"version": "v0.12.0",
+			"versionExact": "v0.12.0"
 		},
 		{
 			"checksumSHA1": "dgwlXIqeWN5S/8ugHSGmoPHVMYk=",
@@ -346,18 +346,18 @@
 		{
 			"checksumSHA1": "aeXObRk6gAfuvnT+puKaEib7dm0=",
 			"path": "github.com/hashicorp/go-oracle-terraform/opc",
-			"revision": "acdb9ba7464481c8e3a80a44f214038866ce0515",
-			"revisionTime": "2018-07-08T18:30:42Z",
-			"version": "v0.11.0",
-			"versionExact": "v0.11.0"
+			"revision": "267cd1957aac3990025de350264b26d7d6c736dc",
+			"revisionTime": "2018-07-17T19:37:11Z",
+			"version": "v0.12.0",
+			"versionExact": "v0.12.0"
 		},
 		{
-			"checksumSHA1": "zpXLKPHSuhmIItE8OkK6sxUQHPU=",
+			"checksumSHA1": "SAIFJOjbTaNkCKVvndgVjJzuo7c=",
 			"path": "github.com/hashicorp/go-oracle-terraform/storage",
-			"revision": "acdb9ba7464481c8e3a80a44f214038866ce0515",
-			"revisionTime": "2018-07-08T18:30:42Z",
-			"version": "v0.11.0",
-			"versionExact": "v0.11.0"
+			"revision": "267cd1957aac3990025de350264b26d7d6c736dc",
+			"revisionTime": "2018-07-17T19:37:11Z",
+			"version": "v0.12.0",
+			"versionExact": "v0.12.0"
 		},
 		{
 			"checksumSHA1": "lbG9uwM7qJlTIBg+8mjCC88sCPc=",

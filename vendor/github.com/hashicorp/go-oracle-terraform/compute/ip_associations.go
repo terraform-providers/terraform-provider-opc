@@ -26,8 +26,11 @@ func (c *Client) IPAssociations() *IPAssociationsClient {
 type IPAssociationInfo struct {
 	// TODO: it'd probably make sense to expose the `ip` field here too?
 
+	// Fully Qualified Domain Name
+	FQDN string `json:"name"`
+
 	// The three-part name of the object (/Compute-identity_domain/user/object).
-	Name string `json:"name"`
+	Name string
 
 	// The three-part name of the IP reservation object in the format (/Compute-identity_domain/user/object).
 	// An IP reservation is a public IP address which is attached to an Oracle Compute Cloud Service instance that requires access to or from the Internet.
@@ -115,7 +118,8 @@ func (c *IPAssociationsClient) unqualifyParentPoolName(parentpool *string) {
 
 // Unqualifies identifiers
 func (c *IPAssociationsClient) success(assocInfo *IPAssociationInfo) (*IPAssociationInfo, error) {
-	c.unqualify(&assocInfo.Name, &assocInfo.VCable)
+	assocInfo.Name = c.getUnqualifiedName(assocInfo.FQDN)
+	c.unqualify(&assocInfo.VCable)
 	c.unqualifyParentPoolName(&assocInfo.ParentPool)
 	return assocInfo, nil
 }

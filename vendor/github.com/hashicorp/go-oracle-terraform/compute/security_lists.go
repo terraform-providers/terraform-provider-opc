@@ -35,8 +35,10 @@ type SecurityListInfo struct {
 	Account string `json:"account"`
 	// A description of the security list.
 	Description string `json:"description"`
-	// The three-part name of the security list (/Compute-identity_domain/user/object).
-	Name string `json:"name"`
+	// Fully Qualified Domain Name
+	FQDN string `json:"name"`
+	// The name of the security list
+	Name string
 	// The policy for outbound traffic from the security list.
 	OutboundCIDRPolicy SecurityListPolicy `json:"outbound_cidr_policy"`
 	// The policy for inbound traffic to the security list
@@ -130,6 +132,6 @@ func (c *SecurityListsClient) DeleteSecurityList(deleteInput *DeleteSecurityList
 }
 
 func (c *SecurityListsClient) success(listInfo *SecurityListInfo) (*SecurityListInfo, error) {
-	c.unqualify(&listInfo.Name)
+	listInfo.Name = c.getUnqualifiedName(listInfo.FQDN)
 	return listInfo, nil
 }

@@ -355,9 +355,5 @@ func (c *Client) success(rsp *http.Response, container *Container) (*Container, 
 		}
 	}
 
-	if err != nil {
-		return nil, err
-	}
-
 	return container, nil
 }

@@ -27,8 +27,10 @@ func (c *Client) IPAddressPrefixSets() *IPAddressPrefixSetsClient {
 // IPAddressPrefixSetInfo contains the exported fields necessary to hold all the information about an
 // IP Address Prefix Set
 type IPAddressPrefixSetInfo struct {
+	// Fully Qualified Domain Name
+	FQDN string `json:"name"`
 	// The name of the IP Address Prefix Set
-	Name string `json:"name"`
+	Name string
 	// Description of the IP Address Prefix Set
 	Description string `json:"description"`
 	// List of CIDR IPv4 prefixes assigned in the virtual network.
@@ -135,6 +137,6 @@ func (c *IPAddressPrefixSetsClient) DeleteIPAddressPrefixSet(input *DeleteIPAddr
 
 // Unqualifies any qualified fields in the IPAddressPrefixSetInfo struct
 func (c *IPAddressPrefixSetsClient) success(info *IPAddressPrefixSetInfo) (*IPAddressPrefixSetInfo, error) {
-	c.unqualify(&info.Name)
+	info.Name = c.getUnqualifiedName(info.FQDN)
 	return info, nil
 }

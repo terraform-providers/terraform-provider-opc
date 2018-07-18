@@ -35,10 +35,12 @@ const (
 type IPReservation struct {
 	// Shows the default account for your identity domain.
 	Account string `json:"account"`
+	// Fully Qualified Domain Name
+	FQDN string `json:"name"`
 	// Public IP address.
 	IP string `json:"ip"`
 	// The three-part name of the IP Reservation (/Compute-identity_domain/user/object).
-	Name string `json:"name"`
+	Name string
 	// Pool of public IP addresses
 	ParentPool IPReservationPool `json:"parentpool"`
 	// A comma-separated list of strings which helps you to identify IP reservation.
@@ -144,6 +146,6 @@ func (c *IPReservationsClient) DeleteIPReservation(input *DeleteIPReservationInp
 }
 
 func (c *IPReservationsClient) success(result *IPReservation) (*IPReservation, error) {
-	c.unqualify(&result.Name)
+	result.Name = c.getUnqualifiedName(result.FQDN)
 	return result, nil
 }

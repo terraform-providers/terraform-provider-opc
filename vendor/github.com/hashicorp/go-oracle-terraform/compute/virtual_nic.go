@@ -21,10 +21,12 @@ func (c *Client) VirtNICs() *VirtNICsClient {
 type VirtualNIC struct {
 	// Description of the object.
 	Description string `json:"description"`
+	// Fully Qualified Domain Name
+	FQDN string `json:"name"`
 	// MAC address of this VNIC.
 	MACAddress string `json:"macAddress"`
 	// The three-part name (/Compute-identity_domain/user/object) of the Virtual NIC.
-	Name string `json:"name"`
+	Name string
 	// Tags associated with the object.
 	Tags []string `json:"tags"`
 	// True if the VNIC is of type "transit".
@@ -51,6 +53,6 @@ func (c *VirtNICsClient) GetVirtualNIC(input *GetVirtualNICInput) (*VirtualNIC, 
 }
 
 func (c *VirtNICsClient) success(info *VirtualNIC) (*VirtualNIC, error) {
-	c.unqualify(&info.Name)
+	info.Name = c.getUnqualifiedName(info.FQDN)
 	return info, nil
 }

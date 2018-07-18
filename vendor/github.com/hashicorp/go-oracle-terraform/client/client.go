@@ -171,9 +171,10 @@ func (c *Client) BuildMultipartFormRequest(method, path string, files map[string
 	// Add additional parameters to the writer
 	for key, val := range parameters {
 		if val.(string) != "" {
-			_ = writer.WriteField(strings.ToLower(key), val.(string))
+			_ = writer.WriteField(key, val.(string))
 		}
 	}
+
 	err = writer.Close()
 	if err != nil {
 		return nil, err
