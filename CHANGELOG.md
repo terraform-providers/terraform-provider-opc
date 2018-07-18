@@ -1,8 +1,18 @@
-## 1.1.3 (Unreleased)
+## 1.2.0 (Unreleased)
+
+FEATURES:
+
+* **New Resource:** `r/opc_lbaas_certificate` [GH-132]    
+* **New Resource:** `r/opc_lbaas_listener` [GH-132]          
+* **New Resource:** `r/opc_lbaas_load_balancer` [GH-132]            
+* **New Resource:** `r/opc_lbaas_policy` [GH-132]                 
+* **New Resource:** `r/opc_lbaas_server_pool` [GH-132]
 
 BUG FIXES: 
 
 * All resources confirm that the client has been properly initialized [GH-136]
+
+* Don't unqualify security lists in orchestrated instances [GH-140]
 
 ## 1.1.2 (June 20, 2018)
 
