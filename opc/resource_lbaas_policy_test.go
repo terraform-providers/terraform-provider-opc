@@ -318,38 +318,37 @@ func TestAccLBaaSPolicy_SSLNegotiationPolicy(t *testing.T) {
 	})
 }
 
-// TODO TrustedCertificatePolicy Test disabled due to issue deleting Trusted certificates.
-// func TestAccLBaaSPolicy_TrustedCertificatePolicy(t *testing.T) {
-// 	rInt := acctest.RandInt()
-// 	resName := "opc_lbaas_policy.trusted_certificate_policy"
-// 	testName := fmt.Sprintf("acctest-%d", rInt)
-//
-// 	// use existing LB instance from environment if set
-// 	lbCount := 0
-// 	lbID := os.Getenv("OPC_TEST_USE_EXISTING_LB")
-// 	if lbID == "" {
-// 		lbCount = 1
-// 		lbID = "${opc_lbaas_load_balancer.test.id}"
-// 	}
-//
-// 	resource.Test(t, resource.TestCase{
-// 		PreCheck:     func() { testAccPreCheck(t) },
-// 		Providers:    testAccProviders,
-// 		CheckDestroy: opcResourceCheck(resName, testAccLBaaSCheckPolicyDestroyed),
-// 		Steps: []resource.TestStep{
-// 			{
-// 				Config: testAccLBaaSPolicyConfig_TrustedCertificatePolicy(lbID, rInt, lbCount),
-// 				Check: resource.ComposeTestCheckFunc(
-// 					opcResourceCheck(resName, testAccLBaaSCheckPolicyExists),
-// 					resource.TestCheckResourceAttr(resName, "name", testName),
-// 					resource.TestMatchResourceAttr(resName, "uri", regexp.MustCompile(testName)),
-// 					resource.TestCheckResourceAttr(resName, "trusted_certificate_policy.#", "1"),
-// 					resource.TestCheckResourceAttrSet(resName, "trusted_certificate_policy.0.trusted_certificate"),
-// 				),
-// 			},
-// 		},
-// 	})
-// }
+func TestAccLBaaSPolicy_TrustedCertificatePolicy(t *testing.T) {
+	rInt := acctest.RandInt()
+	resName := "opc_lbaas_policy.trusted_certificate_policy"
+	testName := fmt.Sprintf("acctest-%d", rInt)
+
+	// use existing LB instance from environment if set
+	lbCount := 0
+	lbID := os.Getenv("OPC_TEST_USE_EXISTING_LB")
+	if lbID == "" {
+		lbCount = 1
+		lbID = "${opc_lbaas_load_balancer.test.id}"
+	}
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: opcResourceCheck(resName, testAccLBaaSCheckPolicyDestroyed),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccLBaaSPolicyConfig_TrustedCertificatePolicy(lbID, rInt, lbCount),
+				Check: resource.ComposeTestCheckFunc(
+					opcResourceCheck(resName, testAccLBaaSCheckPolicyExists),
+					resource.TestCheckResourceAttr(resName, "name", testName),
+					resource.TestMatchResourceAttr(resName, "uri", regexp.MustCompile(testName)),
+					resource.TestCheckResourceAttr(resName, "trusted_certificate_policy.#", "1"),
+					resource.TestCheckResourceAttrSet(resName, "trusted_certificate_policy.0.trusted_certificate"),
+				),
+			},
+		},
+	})
+}
 
 func TestAccLBaaSPolicy_ApplicationCookieStickinessPolicy_Update(t *testing.T) {
 	rInt := acctest.RandInt()
