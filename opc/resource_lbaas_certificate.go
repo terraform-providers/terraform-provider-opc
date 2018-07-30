@@ -31,7 +31,7 @@ func resourceLBaaSSSLCertificate() *schema.Resource {
 			},
 			"certificate_chain": {
 				Type:         schema.TypeString,
-				Required:     true,
+				Optional:     true,
 				ForceNew:     true,
 				ValidateFunc: validateIsPEMFormat,
 			},
