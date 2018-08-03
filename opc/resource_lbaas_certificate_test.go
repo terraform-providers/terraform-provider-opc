@@ -34,31 +34,30 @@ func TestAccLBaaSServerCertificate_ServerCertificate(t *testing.T) {
 	})
 }
 
-// TODO TrustedCertificate Test disabled due to issue deleting certificates
-// func TestAccLBaaSServerCertificate_TrustedCertificate(t *testing.T) {
-// 	rInt := acctest.RandInt()
-// 	resName := "opc_lbaas_certificate.trusted-cert"
-// 	testName := fmt.Sprintf("acctest-%d", rInt)
-//
-// 	resource.Test(t, resource.TestCase{
-// 		PreCheck:     func() { testAccPreCheck(t) },
-// 		Providers:    testAccProviders,
-// 		CheckDestroy: opcResourceCheck(resName, testAccLBaaSCheckCertificateDestroyed),
-// 		Steps: []resource.TestStep{
-// 			{
-// 				Config: testAccLBaaSCertificateConfig_TrustedCertificate(rInt),
-// 				Check: resource.ComposeTestCheckFunc(
-// 					opcResourceCheck(resName, testAccLBaaSCheckCertificateExists),
-// 					resource.TestCheckResourceAttr(resName, "name", testName),
-// 					resource.TestCheckResourceAttr(resName, "type", "TRUSTED"),
-// 					resource.TestMatchResourceAttr(resName, "uri", regexp.MustCompile(testName)),
-// 					resource.TestCheckResourceAttrSet(resName, "certificate_body"),
-// 					resource.TestCheckResourceAttrSet(resName, "certificate_chain"),
-// 				),
-// 			},
-// 		},
-// 	})
-// }
+func TestAccLBaaSServerCertificate_TrustedCertificate(t *testing.T) {
+	rInt := acctest.RandInt()
+	resName := "opc_lbaas_certificate.trusted-cert"
+	testName := fmt.Sprintf("acctest-%d", rInt)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: opcResourceCheck(resName, testAccLBaaSCheckCertificateDestroyed),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccLBaaSCertificateConfig_TrustedCertificate(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					opcResourceCheck(resName, testAccLBaaSCheckCertificateExists),
+					resource.TestCheckResourceAttr(resName, "name", testName),
+					resource.TestCheckResourceAttr(resName, "type", "TRUSTED"),
+					resource.TestMatchResourceAttr(resName, "uri", regexp.MustCompile(testName)),
+					resource.TestCheckResourceAttrSet(resName, "certificate_body"),
+					resource.TestCheckResourceAttrSet(resName, "certificate_chain"),
+				),
+			},
+		},
+	})
+}
 
 func testAccLBaaSCertificateConfig_ServerCertificate(rInt int) string {
 	return fmt.Sprintf(`

@@ -31,7 +31,7 @@ func resourceLBaaSSSLCertificate() *schema.Resource {
 			},
 			"certificate_chain": {
 				Type:         schema.TypeString,
-				Required:     true,
+				Optional:     true,
 				ForceNew:     true,
 				ValidateFunc: validateIsPEMFormat,
 			},
@@ -48,7 +48,7 @@ func resourceLBaaSSSLCertificate() *schema.Resource {
 				ForceNew: true,
 				ValidateFunc: validation.StringInSlice([]string{
 					"SERVER",
-					// "TRUSTED", TODO disable TRUSTED certs due to deletion issue
+					"TRUSTED",
 				}, true),
 			},
 
