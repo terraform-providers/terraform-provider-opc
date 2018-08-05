@@ -1,4 +1,15 @@
 ## 1.2.1 (Unreleased)
+
+IMPROVEMENTS:
+
+* r/opc_lbaas_certificate: Now supports `TRUSTED` type [GH-147]
+
+BUG FIXES: 
+
+* r/opc_lbaas_server_pool: additional validation around origin servers [GH-143]
+
+* r/opc_lbaas_certificate: required attribute `certificate_chain` -> to optional [GH-143]
+
 ## 1.2.0 (July 18, 2018)
 
 FEATURES:
