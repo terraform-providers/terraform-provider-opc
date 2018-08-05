@@ -327,9 +327,12 @@ func expandOriginServerConfig(servers []string) ([]lbaas.CreateOriginServerInput
 	config := []lbaas.CreateOriginServerInput{}
 	for _, element := range servers {
 		s := strings.Split(element, ":")
+		if len(s) != 2 {
+			return nil, fmt.Errorf("Invalid server definition. Server Pool servers must be in the format \"host:port\"")
+		}
 		port, err := strconv.Atoi(s[1])
 		if err != nil {
-			return nil, fmt.Errorf("Server Pool servers must be in the format \"host:port\"")
+			return nil, fmt.Errorf("Invalid port number. Server Pool servers must be in the format \"host:port\"")
 		}
 		server := lbaas.CreateOriginServerInput{
 			Hostname: s[0],
