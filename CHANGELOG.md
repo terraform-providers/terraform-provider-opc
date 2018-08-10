@@ -1,16 +1,16 @@
-## 1.2.1 (Unreleased)
+## 1.2.1 (August 10, 2018)
 
 IMPROVEMENTS:
 
-* r/opc_lbaas_certificate: Now supports `TRUSTED` type [GH-147]
+* r/opc_lbaas_certificate: Now supports `TRUSTED` type ([#147](https://github.com/terraform-providers/terraform-provider-opc/issues/147))
 
-* r/opc_ip_address_reservation: Adding support for custom `ip_address_pools` [GH-152]
+* r/opc_ip_address_reservation: Adding support for custom `ip_address_pools` ([#152](https://github.com/terraform-providers/terraform-provider-opc/issues/152))
 
 BUG FIXES: 
 
-* r/opc_lbaas_server_pool: additional validation around origin servers [GH-143]
+* r/opc_lbaas_server_pool: additional validation around origin servers ([#143](https://github.com/terraform-providers/terraform-provider-opc/issues/143))
 
-* r/opc_lbaas_certificate: required attribute `certificate_chain` -> to optional [GH-143]
+* r/opc_lbaas_certificate: required attribute `certificate_chain` -> to optional ([#143](https://github.com/terraform-providers/terraform-provider-opc/issues/143))
 
 ## 1.2.0 (July 18, 2018)
 
