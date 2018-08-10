@@ -4,6 +4,8 @@ IMPROVEMENTS:
 
 * r/opc_lbaas_certificate: Now supports `TRUSTED` type [GH-147]
 
+* r/opc_ip_address_reservation: Adding support for custom `ip_address_pools` [GH-152]
+
 BUG FIXES: 
 
 * r/opc_lbaas_server_pool: additional validation around origin servers [GH-143]
