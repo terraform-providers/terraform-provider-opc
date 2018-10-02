@@ -12,7 +12,7 @@ import (
 )
 
 const strAccount = "/Storage-%s"
-const strUsername = "/Storage-%s:%s"
+const strUsername = "Storage-%s:%s"
 const authHeader = "X-Auth-Token"
 const strQualifiedName = "%s%s/%s"
 const apiVersion = "v1"

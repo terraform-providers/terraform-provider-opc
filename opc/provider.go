@@ -112,6 +112,7 @@ func Provider() terraform.ResourceProvider {
 			"opc_compute_ip_address_association":  resourceOPCIPAddressAssociation(),
 			"opc_compute_snapshot":                resourceOPCSnapshot(),
 			"opc_compute_orchestrated_instance":   resourceOPCOrchestratedInstance(),
+			"opc_compute_vpn_endpoint_v2":         resourceOPCVPNEndpointV2(),
 			"opc_lbaas_certificate":               resourceLBaaSSSLCertificate(),
 			"opc_lbaas_listener":                  resourceLBaaSListener(),
 			"opc_lbaas_load_balancer":             resourceLBaaSLoadBalancer(),
