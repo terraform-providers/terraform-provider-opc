@@ -110,7 +110,7 @@ func testAccVPNEndpointV2Basic(rInt int) string {
 	  name        = "test_vpn_endpoint_v2-%d"
 	  customer_vpn_gateway = "127.0.0.1"
 	  ip_network = "${opc_compute_ip_network.test.name}"
-	  psk = "asdfasdf"
+	  pre_shared_key = "asdfasdf"
 	  reachable_routes = ["127.0.0.1/24"]
 	  vnic_sets = ["default"]
 	}
@@ -128,7 +128,7 @@ func testAccVPNEndpointV2Update(rInt int) string {
 	  name        = "test_vpn_endpoint_v2-%d"
 	  customer_vpn_gateway = "127.0.0.1"
 	  ip_network = "${opc_compute_ip_network.test.name}"
-	  psk = "fdsafdsa"
+	  pre_shared_key = "fdsafdsa"
 	  reachable_routes = ["127.0.0.1/24"]
 	  vnic_sets = ["default"]
 	}

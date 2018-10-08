@@ -21,9 +21,9 @@ func resourceOPCVPNEndpointV2() *schema.Resource {
 		},
 
 		Timeouts: &schema.ResourceTimeout{
-			Create: schema.DefaultTimeout(20 * time.Minute),
-			Update: schema.DefaultTimeout(20 * time.Minute),
-			Delete: schema.DefaultTimeout(20 * time.Minute),
+			Create: schema.DefaultTimeout(60 * time.Minute),
+			Update: schema.DefaultTimeout(60 * time.Minute),
+			Delete: schema.DefaultTimeout(60 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -58,7 +58,7 @@ func resourceOPCVPNEndpointV2() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
-			"pfs_flag": {
+			"require_perfect_forward_secrecy": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
@@ -109,7 +109,7 @@ func resourceOPCVPNEndpointV2() *schema.Resource {
 					},
 				},
 			},
-			"psk": {
+			"pre_shared_key": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
@@ -157,7 +157,7 @@ func resourceOPCVPNEndpointV2Create(d *schema.ResourceData, meta interface{}) er
 		Enabled:            d.Get("enabled").(bool),
 		CustomerVPNGateway: d.Get("customer_vpn_gateway").(string),
 		IPNetwork:          d.Get("ip_network").(string),
-		PSK:                d.Get("psk").(string),
+		PSK:                d.Get("pre_shared_key").(string),
 		VNICSets:           getStringList(d, "vnic_sets"),
 	}
 
@@ -174,7 +174,7 @@ func resourceOPCVPNEndpointV2Create(d *schema.ResourceData, meta interface{}) er
 		input.IKEIdentifier = ikeIdentifier.(string)
 	}
 
-	if pfsFlag, ok := d.GetOk("pfs_flag"); ok {
+	if pfsFlag, ok := d.GetOk("require_perfect_forward_secrecy"); ok {
 		input.PFSFlag = pfsFlag.(bool)
 	}
 
@@ -229,8 +229,8 @@ func resourceOPCVPNEndpointV2Read(d *schema.ResourceData, meta interface{}) erro
 	d.Set("enabled", result.Enabled)
 	d.Set("ike_identifier", result.IKEIdentifier)
 	d.Set("ip_network", result.IPNetwork)
-	d.Set("pfs_flag", result.PFSFlag)
-	d.Set("psk", result.PSK)
+	d.Set("require_perfect_forward_secrecy", result.PFSFlag)
+	d.Set("pre_shared_key", result.PSK)
 	d.Set("uri", result.URI)
 	d.Set("tunnel_status", string(result.TunnelStatus))
 
@@ -271,7 +271,7 @@ func resourceOPCVPNEndpointV2Update(d *schema.ResourceData, meta interface{}) er
 		Enabled:            d.Get("enabled").(bool),
 		CustomerVPNGateway: d.Get("customer_vpn_gateway").(string),
 		IPNetwork:          d.Get("ip_network").(string),
-		PSK:                d.Get("psk").(string),
+		PSK:                d.Get("pre_shared_key").(string),
 		VNICSets:           getStringList(d, "vnic_sets"),
 	}
 
@@ -288,7 +288,7 @@ func resourceOPCVPNEndpointV2Update(d *schema.ResourceData, meta interface{}) er
 		input.IKEIdentifier = ikeIdentifier.(string)
 	}
 
-	if pfsFlag, ok := d.GetOk("pfs_flag"); ok {
+	if pfsFlag, ok := d.GetOk("require_perfect_forward_secrecy"); ok {
 		input.PFSFlag = pfsFlag.(bool)
 	}
 

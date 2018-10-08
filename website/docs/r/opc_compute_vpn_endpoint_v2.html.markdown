@@ -22,7 +22,7 @@ resource "opc_compute_vpn_endpoint_v2" "default" {
     name = "default_vpn_endpoint_v2
     customer_vpn_gateway = "127.0.0.1"
     ip_network = "${opc_compute_ip_network.default.name}"
-    psk = "defaultpsk"
+    pre_shared_key = "defaultpsk"
     reachable_routes = ["127.0.0.1/24"]
     vnic_sets = ["default"]
 }
@@ -38,7 +38,7 @@ The following arguments are supported:
 
 * `ip_network` - (Required) The name of the IP network on which the cloud gateway is created by VPNaaS.
 
-* `psk` - (Required) The pre-shared VPN key
+* `pre_shared_key` - (Required) The pre-shared VPN key
 
 * `reachable_routes` - (Required) A list of routes (CIDR prefixes) that are reachable through this VPN tunnel.
 
@@ -50,7 +50,7 @@ The following arguments are supported:
 
 * `ike_identifier` - (Optional) The Internet Key Exchange (IKE) ID. If you don't specify a value, the default value is the public IP address of the cloud gateway.
 
-* `pfs_flag` - (Optional) Boolean specificying whether Perfect Forward Secrecy is enabled. Set to true by default.
+* `require_perfect_forward_secrecy` - (Optional) Boolean specificying whether Perfect Forward Secrecy is enabled. Set to true by default.
 
 * `phase_one_settings` - (Optional) Settings for the phase one protocol (IKE). Phase One Settings are detailed below.
 
