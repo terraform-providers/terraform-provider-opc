@@ -1,8 +1,8 @@
-## 1.3.0 (Unreleased)
+## 1.3.0 (October 11, 2018)
 
 FEATURES:
 
-* **New Resource:** `r/opc_compute_vpn_endpoint_v2` [GH-157]
+* **New Resource:** `r/opc_compute_vpn_endpoint_v2` ([#157](https://github.com/terraform-providers/terraform-provider-opc/issues/157))
 
 ## 1.2.1 (August 10, 2018)
 
