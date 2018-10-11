@@ -320,44 +320,44 @@
 			"revision": "d30f09973e19c1dfcd120b2d9c4f168e68d6b5d5"
 		},
 		{
-			"checksumSHA1": "3iLFdjGP7gJ/MYI1NzphMmDNYJY=",
+			"checksumSHA1": "2HXZQWsVNPQme21DBmz9P3n9NNc=",
 			"path": "github.com/hashicorp/go-oracle-terraform/client",
-			"revision": "267cd1957aac3990025de350264b26d7d6c736dc",
-			"revisionTime": "2018-07-17T19:37:11Z",
-			"version": "v0.12.0",
-			"versionExact": "v0.12.0"
+			"revision": "38658ee17daf51e5afcdcd3f402251b0f67ba3fd",
+			"revisionTime": "2018-10-01T21:00:33Z",
+			"version": "v0.14.0",
+			"versionExact": "v0.14.0"
 		},
 		{
-			"checksumSHA1": "FZ3wHovGPPY6H8toOUnm3hQJXNI=",
+			"checksumSHA1": "qilmIuLIvkbd4mDSc1T3aVKBJzg=",
 			"path": "github.com/hashicorp/go-oracle-terraform/compute",
-			"revision": "267cd1957aac3990025de350264b26d7d6c736dc",
-			"revisionTime": "2018-07-17T19:37:11Z",
-			"version": "v0.12.0",
-			"versionExact": "v0.12.0"
+			"revision": "38658ee17daf51e5afcdcd3f402251b0f67ba3fd",
+			"revisionTime": "2018-10-01T21:00:33Z",
+			"version": "v0.14.0",
+			"versionExact": "v0.14.0"
 		},
 		{
 			"checksumSHA1": "dgwlXIqeWN5S/8ugHSGmoPHVMYk=",
 			"path": "github.com/hashicorp/go-oracle-terraform/lbaas",
-			"revision": "acdb9ba7464481c8e3a80a44f214038866ce0515",
-			"revisionTime": "2018-07-08T18:30:42Z",
-			"version": "v0.11.0",
-			"versionExact": "v0.11.0"
+			"revision": "38658ee17daf51e5afcdcd3f402251b0f67ba3fd",
+			"revisionTime": "2018-10-01T21:00:33Z",
+			"version": "v0.14.0",
+			"versionExact": "v0.14.0"
 		},
 		{
 			"checksumSHA1": "aeXObRk6gAfuvnT+puKaEib7dm0=",
 			"path": "github.com/hashicorp/go-oracle-terraform/opc",
-			"revision": "267cd1957aac3990025de350264b26d7d6c736dc",
-			"revisionTime": "2018-07-17T19:37:11Z",
-			"version": "v0.12.0",
-			"versionExact": "v0.12.0"
+			"revision": "38658ee17daf51e5afcdcd3f402251b0f67ba3fd",
+			"revisionTime": "2018-10-01T21:00:33Z",
+			"version": "v0.14.0",
+			"versionExact": "v0.14.0"
 		},
 		{
-			"checksumSHA1": "SAIFJOjbTaNkCKVvndgVjJzuo7c=",
+			"checksumSHA1": "LWC5EL8usE+EESGtLByWjHkZVg8=",
 			"path": "github.com/hashicorp/go-oracle-terraform/storage",
-			"revision": "267cd1957aac3990025de350264b26d7d6c736dc",
-			"revisionTime": "2018-07-17T19:37:11Z",
-			"version": "v0.12.0",
-			"versionExact": "v0.12.0"
+			"revision": "38658ee17daf51e5afcdcd3f402251b0f67ba3fd",
+			"revisionTime": "2018-10-01T21:00:33Z",
+			"version": "v0.14.0",
+			"versionExact": "v0.14.0"
 		},
 		{
 			"checksumSHA1": "lbG9uwM7qJlTIBg+8mjCC88sCPc=",

@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"math/rand"
 	"mime/multipart"
 	"net/http"
 	"net/url"
@@ -235,7 +237,28 @@ func (c *Client) retryRequest(req *http.Request) (*http.Response, error) {
 	var statusCode int
 	var errMessage string
 
-	for i := 0; i < retries; i++ {
+	// Cache the body content for retries.
+	// This is to allow reuse of the original request for the retries attempts
+	// as the act of reading the body (when doing the httpClient.Do()) closes the
+	// Reader.
+	var body []byte
+	if req.Body != nil {
+		var err error
+		body, err = ioutil.ReadAll(req.Body)
+		if err != nil {
+			return nil, err
+		}
+	}
+	// Initial sleep time between retries
+	sleep := 1 * time.Second
+
+	for i := retries; i > 0; i-- {
+
+		// replace body with new unread Reader before each request
+		if len(body) > 0 {
+			req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+		}
+
 		resp, err := c.httpClient.Do(req)
 		if err != nil {
 			return resp, err
@@ -250,12 +273,19 @@ func (c *Client) retryRequest(req *http.Request) (*http.Response, error) {
 		if err != nil {
 			return resp, err
 		}
-		method := req.Method
-		url := req.URL
 		errMessage = buf.String()
 		statusCode = resp.StatusCode
-		c.DebugLogString(fmt.Sprintf("%s %s Encountered HTTP (%d) Error: %s", method, url, statusCode, errMessage))
-		c.DebugLogString(fmt.Sprintf("%d/%d retries left", i+1, retries))
+		c.DebugLogString(fmt.Sprintf("%s %s Encountered HTTP (%d) Error: %s", req.Method, req.URL, statusCode, errMessage))
+		if i != 1 {
+			c.DebugLogString(fmt.Sprintf("%d of %d retries remaining. Next retry in %ds", i-1, retries, sleep/time.Second))
+			time.Sleep(sleep)
+			// increase sleep time for next retry (exponential backoff with jitter)
+			// up to a maximum of ~60 seconds
+			if sleep <= 30*time.Second {
+				jitter := time.Duration(rand.Int63n(int64(sleep))) / 2
+				sleep = (sleep * 2) + jitter
+			}
+		}
 	}
 
 	oracleErr := &opc.OracleError{
