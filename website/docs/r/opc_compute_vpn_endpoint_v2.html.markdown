@@ -13,18 +13,22 @@ The ``opc_compute_vpn_endpoint_v2`` resource creates and manages an VPN Endpoint
 ## Example Usage
 
 ```hcl
-resource "opc_compute_ip_network" "default" {
-	name = "default_ip_network"
+resource "opc_compute_vnic_set" "vnicset1" {
+  name = "vpnaas-vnicset1"
+}
+
+resource "opc_compute_ip_network" "ipnetwork1" {
+	name              = "ipnetwork1"
 	ip_address_prefix = "10.0.12.0/24"
 }
 
-resource "opc_compute_vpn_endpoint_v2" "default" {
-    name = "default_vpn_endpoint_v2
-    customer_vpn_gateway = "127.0.0.1"
-    ip_network = "${opc_compute_ip_network.default.name}"
-    pre_shared_key = "defaultpsk"
-    reachable_routes = ["127.0.0.1/24"]
-    vnic_sets = ["default"]
+resource "opc_compute_vpn_endpoint_v2" "vpnaas1" {
+  name                 = "vpnaas1"
+  customer_vpn_gateway = "${var.vpn_endpoint_public_ip}"
+  ip_network           = "${opc_compute_ip_network.ipnetwork1.name}"
+  pre_shared_key       = "${var.pre_shared_key}"
+  reachable_routes     = ["172.16.4.0/24"]
+  vnic_sets            = ["${opc_compute_vnic_set.vnicset1.name}"]
 }
 ```
 
@@ -42,7 +46,7 @@ The following arguments are supported:
 
 * `reachable_routes` - (Required) A list of routes (CIDR prefixes) that are reachable through this VPN tunnel.
 
-* `vnic_sets` - (Required) A list of vnic sets that traffics is allowed to and from. 
+* `vnic_sets` - (Required) A list of vnic sets that traffics is allowed to and from.
 
 * `description` - (Optional) A description of the VPN Endpoint V2.
 
@@ -50,7 +54,7 @@ The following arguments are supported:
 
 * `ike_identifier` - (Optional) The Internet Key Exchange (IKE) ID. If you don't specify a value, the default value is the public IP address of the cloud gateway.
 
-* `require_perfect_forward_secrecy` - (Optional) Boolean specificying whether Perfect Forward Secrecy is enabled. Set to true by default.
+* `require_perfect_forward_secrecy` - (Optional) Boolean specifying whether Perfect Forward Secrecy is enabled. Set to true by default.
 
 * `phase_one_settings` - (Optional) Settings for the phase one protocol (IKE). Phase One Settings are detailed below.
 
@@ -60,19 +64,27 @@ The following arguments are supported:
 
 Phase One Settings support the following:
 
-* `encryption` - (Required) Encryption options for IKE.
+* `encryption` - (Required) IKE Encryption. `aes128`, `aes192` or `aes256`  
 
-* `hash` - (Required) Authentication options for IKE. 
+* `hash` - (Required) IKE Hash. `sha1`, `sha2_256` or `md5`
 
-* `dh_group` - (Required) Diffie-Hellman group for both IKE and ESP. 
+* `dh_group` - (Required) Diffie-Hellman group for both IKE and ESP. `group2`, `group5`, `group14`, `group22`, `group23`, or `group24`
 
-Phase Two Settings support the following: 
+* `lifetime` - (Optional) IKE Lifetime in seconds.
 
-* `encryption` - (Required) Encryption options for IKE.
+Phase Two Settings support the following:
 
-* `hash` - (Required) Authentication options for IKE. 
+* `encryption` - (Required) ESP Encryption.  `aes128`, `aes192` or `aes256`  
+
+* `hash` - (Required) ESP Hash. `sha1`, `sha2_256` or `md5`
+
+* `lifetime` - (Optional) IPSEC Lifetime in seconds.
 
 In addition to the above, the following values are exported:
+
+* `local_gateway_ip_address` - Public IP Address of the Local Gateway.
+
+* `local_gateway_private_ip_address` - Private IP Address of the Local Gateway.
 
 * `uri` - The Uniform Resource Identifier for the VPN Endpoint V2.
 
@@ -81,5 +93,5 @@ In addition to the above, the following values are exported:
 VPN Endpoint V2's can be imported using the `resource name`, e.g.
 
 ```shell
-$ terraform import opc_compute_vpn_endpoint_v2.default example
+$ terraform import opc_compute_vpn_endpoint_v2.vpnaas1 /Compute-mydomain/user/example
 ```
