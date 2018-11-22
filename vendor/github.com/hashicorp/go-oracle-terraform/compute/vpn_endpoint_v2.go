@@ -83,6 +83,10 @@ type VPNEndpointV2Info struct {
 	Name string `json:"name"`
 	// The lifecycle state the VPNEndpointV2 is in
 	LifeCycleState VPNEndpointLifeCycleState `json:"lifecycleState"`
+	// Local Gateway IP Address
+	LocalGatewayIPAddress string `json:"localGatewayAddress"`
+	// Local Gateway Private IP Address
+	LocalGatewayPrivateIPAddress string `json:"localGatewayPrivateIpAddress"`
 	// Indicates whether Perfect Forward Secrecy (PFS) is required and your third-party device supports PFS.
 	PFSFlag bool `json:"pfsFlag"`
 	// Settings for Phase 1 of protocol (IKE).
@@ -109,20 +113,24 @@ type VPNEndpointV2Info struct {
 // Phase1Settings define the attributes related to Phase 1 Protocol (IKE)
 type Phase1Settings struct {
 	// Encryption options for IKE. Permissible values are aes128, aes192, aes256.
-	Encryption string `json:"encryption"`
+	Encryption string `json:"encryption,omitempty"`
 	// Authentication options for IKE. Permissible values are sha1, sha2_256, and md5.
-	Hash string `json:"hash"`
+	Hash string `json:"hash,omitempty"`
 	// Diffie-Hellman group for both IKE and ESP. It is applicable for ESP only if PFS is enabled.
 	// Permissible values are group5, group14, group22, group23, and group24.
-	DHGroup string `json:"dhGroup"`
+	DHGroup string `json:"dhGroup,omitempty"`
+	// IKE Lifetime
+	Lifetime int `json:"lifetime,omitempty"`
 }
 
 // Phase2Settings define the attributes related to Phase 2 Protocol (IPSEC)
 type Phase2Settings struct {
 	// Encryption options for IKE. Permissible values are aes128, aes192, aes256.
-	Encryption string `json:"encryption"`
+	Encryption string `json:"encryption,omitempty"`
 	// Authentication options for IKE. Permissible values are sha1, sha2_256, and md5.
-	Hash string `json:"hash"`
+	Hash string `json:"hash,omitempty"`
+	// IPSEC Lifetime
+	Lifetime int `json:"lifetime,omitempty"`
 }
 
 // CreateVPNEndpointV2Input define the attributes related to creating a vpn endpoint v2
@@ -257,10 +265,10 @@ type UpdateVPNEndpointV2Input struct {
 	// Required
 	CustomerVPNGateway string `json:"customer_vpn_gateway"`
 	// Description of the VPNGatewayV2
-	Description string `json:"description,omitempty"`
+	Description string `json:"description"`
 	// Enable/Disable the tunnel
 	// Optional
-	Enabled bool `json:"enabled,omitempty"`
+	Enabled bool `json:"enabled"`
 	// The Internet Key Exchange (IKE) ID. If you don't specify a value, the default value is
 	// the public IP address of the cloud gateway. You can specify either an alternative IP address,
 	// or any text string that you want to use as the IKE ID. If you specify a text string, you must
@@ -273,7 +281,7 @@ type UpdateVPNEndpointV2Input struct {
 	// third-party device in your data center. Other Peer ID types, such as email address, firewall
 	// identifier or key identifier, aren't supported.
 	// Optional
-	IKEIdentifier string `json:"ikeIdentifier,omitempty"`
+	IKEIdentifier string `json:"ikeIdentifier"`
 	// Specify the name of the IP network
 	// which you want to create the cloud gateway. When you send a request to create a VPN connection,
 	// a cloud gateway is created and this is assigned an available IP address from the IP network that
@@ -290,13 +298,13 @@ type UpdateVPNEndpointV2Input struct {
 	// This is enabled (set to true) by default. If your third-party device supports Perfect Forward
 	// Secrecy (PFS), set this parameter to true to require PFS.
 	// Optional. Default true
-	PFSFlag bool `json:"pfsFlag,omitempty"`
+	PFSFlag bool `json:"pfsFlag"`
 	// Settings for Phase 1 of protocol (IKE).
 	// Optional
-	Phase1Settings *Phase1Settings `json:"phase1Settings,omitempty"`
+	Phase1Settings *Phase1Settings `json:"phase1Settings"`
 	// Settings for Phase 2 of protocol (IPSEC).
 	// Optional
-	Phase2Settings *Phase2Settings `json:"phase2Settings,omitempty"`
+	Phase2Settings *Phase2Settings `json:"phase2Settings"`
 	// Pre-shared VPN key. This secret key is shared between your network gateway and
 	// the Oracle Cloud network for authentication. Specify the full path and name of
 	// the text file that contains the pre-shared key. Ensure that the permission level
@@ -309,7 +317,7 @@ type UpdateVPNEndpointV2Input struct {
 	// Required
 	ReachableRoutes []string `json:"reachable_routes"`
 	// Array of tags
-	Tags []string `json:"tags,omitempty"`
+	Tags []string `json:"tags"`
 	// Comma-separated list of vNIC sets. Traffic is allowed to and from these vNIC sets to the
 	// cloud gateway's vNIC set.
 	// Required
