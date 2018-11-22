@@ -19,7 +19,7 @@ resource "opc_lbaas_server_pool" "serverpool1" {
 
   servers = ["129.150.169.179:8080", "129.150.170.162:8080"]
 
-  health_checks {
+  health_check {
     type = "http"
     path = "/healthcheck"
   }

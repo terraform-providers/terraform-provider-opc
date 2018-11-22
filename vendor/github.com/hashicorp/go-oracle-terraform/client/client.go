@@ -241,18 +241,23 @@ func (c *Client) retryRequest(req *http.Request) (*http.Response, error) {
 	// This is to allow reuse of the original request for the retries attempts
 	// as the act of reading the body (when doing the httpClient.Do()) closes the
 	// Reader.
-	body, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		return nil, err
+	var body []byte
+	if req.Body != nil {
+		var err error
+		body, err = ioutil.ReadAll(req.Body)
+		if err != nil {
+			return nil, err
+		}
 	}
-
 	// Initial sleep time between retries
 	sleep := 1 * time.Second
 
 	for i := retries; i > 0; i-- {
 
 		// replace body with new unread Reader before each request
-		req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+		if len(body) > 0 {
+			req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+		}
 
 		resp, err := c.httpClient.Do(req)
 		if err != nil {

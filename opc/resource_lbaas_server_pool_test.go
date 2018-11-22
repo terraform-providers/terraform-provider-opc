@@ -8,7 +8,37 @@ import (
 
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/stretchr/testify/assert"
 )
+
+func TestExpandOriginServers(t *testing.T) {
+
+	validServers := []string{
+		"192.168.1.100:8080",
+		"www.example.com:80",
+	}
+
+	serverInput, err := expandOriginServerConfig(validServers)
+	assert.NoError(t, err)
+
+	assert.Len(t, serverInput, 2, "Origin Servers should contain two servers")
+	assert.Equal(t, "192.168.1.100", serverInput[0].Hostname, "OriginServer Hostname should match IP Address")
+	assert.Equal(t, 8080, serverInput[0].Port, "OriginServer Port should match Port")
+	assert.Equal(t, "www.example.com", serverInput[1].Hostname, "OriginServer Hostname should match IP Address")
+	assert.Equal(t, 80, serverInput[1].Port, "OriginServer Port should match Port")
+
+	invalidServers := []string{
+		"missingport.com",
+	}
+	_, err = expandOriginServerConfig(invalidServers)
+	assert.Error(t, err)
+
+	invalidServers = []string{
+		"invalidport.com:bogus",
+	}
+	_, err = expandOriginServerConfig(invalidServers)
+	assert.Error(t, err)
+}
 
 func TestAccLBaaSServerPool_Basic(t *testing.T) {
 	rInt := acctest.RandInt()

@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
 )
 
 func resourceOPCIPAddressReservation() *schema.Resource {
@@ -29,10 +28,6 @@ func resourceOPCIPAddressReservation() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
-				ValidateFunc: validation.StringInSlice([]string{
-					string(compute.PublicIPAddressPool),
-					string(compute.PrivateIPAddressPool),
-				}, true),
 			},
 			"description": {
 				Type:     schema.TypeString,
