@@ -328,12 +328,12 @@
 			"versionExact": "v0.14.0"
 		},
 		{
-			"checksumSHA1": "qilmIuLIvkbd4mDSc1T3aVKBJzg=",
+			"checksumSHA1": "4CJ1P6jlMUMsBItGtsmL4+m71hw=",
 			"path": "github.com/hashicorp/go-oracle-terraform/compute",
-			"revision": "38658ee17daf51e5afcdcd3f402251b0f67ba3fd",
-			"revisionTime": "2018-10-01T21:00:33Z",
-			"version": "v0.14.0",
-			"versionExact": "v0.14.0"
+			"revision": "94de9668d10fd3ab6f93fb6e0ae1b626a5680ba7",
+			"revisionTime": "2018-12-03T18:15:43Z",
+			"version": "v0.15.0",
+			"versionExact": "v0.15.0"
 		},
 		{
 			"checksumSHA1": "dgwlXIqeWN5S/8ugHSGmoPHVMYk=",
