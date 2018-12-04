@@ -265,9 +265,6 @@ func resourceOPCVPNEndpointV2Read(d *schema.ResourceData, meta interface{}) erro
 		d.Set("phase_two_settings", nil)
 	}
 
-	// pre_shared_key always returned as ***** by the API
-	d.Set("pre_shared_key", d.Get("pre_shared_key").(string))
-
 	return nil
 }
 

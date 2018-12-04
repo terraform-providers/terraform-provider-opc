@@ -26,9 +26,10 @@ func TestAccOPCVPNEndpointV2_Basic(t *testing.T) {
 				),
 			},
 			{
-				ResourceName:      resourceName,
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"pre_shared_key", "customer_vpn_gateway"},
 			},
 		},
 	})
