@@ -1,4 +1,9 @@
 ## 1.3.1 (Unreleased)
+
+IMPROVEMENTS:
+
+* r/opc_vpn_endpoint_v2: Many attributes are now updatable/more robust [GH-158]
+
 ## 1.3.0 (October 11, 2018)
 
 FEATURES:
