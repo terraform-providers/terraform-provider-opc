@@ -336,12 +336,6 @@
 			"versionExact": "v0.15.2"
 		},
 		{
-			"path": "github.com/hashicorp/go-oracle-terraform/config",
-			"revision": "v0.15.2",
-			"version": "v0.15.2",
-			"versionExact": "v0.15.2"
-		},
-		{
 			"checksumSHA1": "dgwlXIqeWN5S/8ugHSGmoPHVMYk=",
 			"path": "github.com/hashicorp/go-oracle-terraform/lbaas",
 			"revision": "b5d4fa5c826def844b2420bec79ecb64ea624912",
