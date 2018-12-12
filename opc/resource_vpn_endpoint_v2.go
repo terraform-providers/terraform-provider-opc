@@ -35,12 +35,10 @@ func resourceOPCVPNEndpointV2() *schema.Resource {
 			"customer_vpn_gateway": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: true,
 			},
 			"enabled": {
 				Type:     schema.TypeBool,
@@ -50,7 +48,6 @@ func resourceOPCVPNEndpointV2() *schema.Resource {
 			"ike_identifier": {
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: true,
 				Computed: true,
 			},
 			"ip_network": {
@@ -61,30 +58,30 @@ func resourceOPCVPNEndpointV2() *schema.Resource {
 			"require_perfect_forward_secrecy": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				ForceNew: true,
 				Default:  true,
 			},
 			"phase_one_settings": {
 				Type:     schema.TypeList,
 				MaxItems: 1,
 				Optional: true,
-				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"encryption": {
 							Type:     schema.TypeString,
 							Required: true,
-							ForceNew: true,
 						},
 						"hash": {
 							Type:     schema.TypeString,
 							Required: true,
-							ForceNew: true,
 						},
 						"dh_group": {
 							Type:     schema.TypeString,
 							Required: true,
-							ForceNew: true,
+						},
+						"lifetime": {
+							Type:     schema.TypeInt,
+							Default:  0,
+							Optional: true,
 						},
 					},
 				},
@@ -93,18 +90,20 @@ func resourceOPCVPNEndpointV2() *schema.Resource {
 				Type:     schema.TypeList,
 				MaxItems: 1,
 				Optional: true,
-				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"encryption": {
 							Type:     schema.TypeString,
 							Required: true,
-							ForceNew: true,
 						},
 						"hash": {
 							Type:     schema.TypeString,
 							Required: true,
-							ForceNew: true,
+						},
+						"lifetime": {
+							Type:     schema.TypeInt,
+							Default:  0,
+							Optional: true,
 						},
 					},
 				},
@@ -115,20 +114,27 @@ func resourceOPCVPNEndpointV2() *schema.Resource {
 			},
 			"reachable_routes": {
 				Type:     schema.TypeList,
+				MinItems: 1,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
-				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"vnic_sets": {
 				Type:     schema.TypeList,
 				Required: true,
-				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"local_gateway_ip_address": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"local_gateway_private_ip_address": {
+				Type:     schema.TypeString,
+				Computed: true,
 			},
 			"tunnel_status": {
 				Type:     schema.TypeString,
@@ -158,6 +164,7 @@ func resourceOPCVPNEndpointV2Create(d *schema.ResourceData, meta interface{}) er
 		CustomerVPNGateway: d.Get("customer_vpn_gateway").(string),
 		IPNetwork:          d.Get("ip_network").(string),
 		PSK:                d.Get("pre_shared_key").(string),
+		ReachableRoutes:    getStringList(d, "reachable_routes"),
 		VNICSets:           getStringList(d, "vnic_sets"),
 	}
 
@@ -230,8 +237,9 @@ func resourceOPCVPNEndpointV2Read(d *schema.ResourceData, meta interface{}) erro
 	d.Set("ike_identifier", result.IKEIdentifier)
 	d.Set("ip_network", result.IPNetwork)
 	d.Set("require_perfect_forward_secrecy", result.PFSFlag)
-	d.Set("pre_shared_key", result.PSK)
 	d.Set("uri", result.URI)
+	d.Set("local_gateway_ip_address", string(result.LocalGatewayIPAddress))
+	d.Set("local_gateway_private_ip_address", string(result.LocalGatewayPrivateIPAddress))
 	d.Set("tunnel_status", string(result.TunnelStatus))
 
 	if err := setStringList(d, "reachable_routes", result.ReachableRoutes); err != nil {
@@ -241,16 +249,20 @@ func resourceOPCVPNEndpointV2Read(d *schema.ResourceData, meta interface{}) erro
 		return err
 	}
 
-	if p1Settings := result.Phase1Settings; &p1Settings != nil {
-		if err := d.Set("phase_one_settings", flattenVPNEndpointV2PhaseOneSettings(p1Settings)); err != nil {
+	if result.Phase1Settings.Encryption != "" {
+		if err := d.Set("phase_one_settings", flattenVPNEndpointV2PhaseOneSettings(result.Phase1Settings)); err != nil {
 			return err
 		}
+	} else {
+		d.Set("phase_one_settings", nil)
 	}
 
-	if p2Settings := result.Phase2Settings; &p2Settings != nil {
-		if err := d.Set("phase_two_settings", flattenVPNEndpointV2PhaseTwoSettings(p2Settings)); err != nil {
+	if result.Phase2Settings.Encryption != "" {
+		if err := d.Set("phase_two_settings", flattenVPNEndpointV2PhaseTwoSettings(result.Phase2Settings)); err != nil {
 			return err
 		}
+	} else {
+		d.Set("phase_two_settings", nil)
 	}
 
 	return nil
@@ -294,15 +306,19 @@ func resourceOPCVPNEndpointV2Update(d *schema.ResourceData, meta interface{}) er
 
 	if _, ok := d.GetOk("phase_one_settings"); ok {
 		input.Phase1Settings = expandVPNEndpoingV2PhaseOneSettings(d)
+	} else {
+		input.Phase1Settings = nil
 	}
 
 	if _, ok := d.GetOk("phase_two_settings"); ok {
 		input.Phase2Settings = expandVPNEndpoingV2PhaseTwoSettings(d)
+	} else {
+		input.Phase2Settings = nil
 	}
 
 	info, err := resClient.UpdateVPNEndpointV2(&input)
 	if err != nil {
-		return fmt.Errorf("Error creating VPNEndpointV2: %s", err)
+		return fmt.Errorf("Error updating VPNEndpointV2: %s", err)
 	}
 
 	d.SetId(info.Name)
@@ -336,6 +352,7 @@ func flattenVPNEndpointV2PhaseOneSettings(input compute.Phase1Settings) []interf
 	settings["encryption"] = input.Encryption
 	settings["hash"] = input.Hash
 	settings["dh_group"] = input.DHGroup
+	settings["lifetime"] = input.Lifetime
 
 	return []interface{}{settings}
 }
@@ -346,6 +363,7 @@ func flattenVPNEndpointV2PhaseTwoSettings(input compute.Phase2Settings) []interf
 
 	settings["encryption"] = input.Encryption
 	settings["hash"] = input.Hash
+	settings["lifetime"] = input.Lifetime
 
 	return []interface{}{settings}
 }
@@ -359,19 +377,21 @@ func expandVPNEndpoingV2PhaseOneSettings(d *schema.ResourceData) *compute.Phase1
 		Encryption: attrs["encryption"].(string),
 		Hash:       attrs["hash"].(string),
 		DHGroup:    attrs["dh_group"].(string),
+		Lifetime:   attrs["lifetime"].(int),
 	}
 
 	return result
 }
 
 func expandVPNEndpoingV2PhaseTwoSettings(d *schema.ResourceData) *compute.Phase2Settings {
-	phase1Settings := d.Get("phase_one_settings").([]interface{})
+	phase2Settings := d.Get("phase_two_settings").([]interface{})
 
-	attrs := phase1Settings[0].(map[string]interface{})
+	attrs := phase2Settings[0].(map[string]interface{})
 
 	result := &compute.Phase2Settings{
 		Encryption: attrs["encryption"].(string),
 		Hash:       attrs["hash"].(string),
+		Lifetime:   attrs["lifetime"].(int),
 	}
 
 	return result

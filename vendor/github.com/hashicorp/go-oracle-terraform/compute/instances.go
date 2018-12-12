@@ -198,6 +198,9 @@ type CreateInstanceInput struct {
 	// Omits if empty.
 	// Optional
 	DesiredState InstanceDesiredState `json:"desired_state,omitempty"`
+	// ImageListEntry number. Default will be used if not specified
+	// Optional
+	Entry int `json:"entry,omitempty"`
 	// The host name assigned to the instance. On an Oracle Linux instance,
 	// this host name is displayed in response to the hostname command.
 	// Only relative DNS is supported. The domain name is suffixed to the host name

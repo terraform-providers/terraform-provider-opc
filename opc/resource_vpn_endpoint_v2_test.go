@@ -26,9 +26,10 @@ func TestAccOPCVPNEndpointV2_Basic(t *testing.T) {
 				),
 			},
 			{
-				ResourceName:      resourceName,
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"pre_shared_key", "customer_vpn_gateway"},
 			},
 		},
 	})
@@ -54,7 +55,7 @@ func TestAccOPCVPNEndpointV2_Update(t *testing.T) {
 				Config: config2,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVPNEndpointV2Exists,
-					resource.TestCheckResourceAttr(resourceName, "psk", "fdsafdsa"),
+					resource.TestCheckResourceAttr(resourceName, "pre_shared_key", "fdsafdsa"),
 				),
 			},
 		},

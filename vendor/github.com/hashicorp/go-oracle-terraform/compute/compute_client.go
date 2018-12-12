@@ -54,7 +54,7 @@ func (c *Client) executeRequest(method, path string, body interface{}) (*http.Re
 		req.Header.Set("Content-Type", "application/oracle-compute-v3+json")
 		// Don't leak credentials in STDERR
 		if path != "/authenticate/" {
-			debugReqString = fmt.Sprintf("%s:\n %+v", debugReqString, string(reqBody))
+			debugReqString = fmt.Sprintf("%s:\nBody: %+v", debugReqString, string(reqBody))
 		}
 	}
 	// Log the request before the authentication cookie, so as not to leak credentials
