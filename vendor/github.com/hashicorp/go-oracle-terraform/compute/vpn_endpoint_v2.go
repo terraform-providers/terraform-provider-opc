@@ -265,7 +265,7 @@ type UpdateVPNEndpointV2Input struct {
 	// Required
 	CustomerVPNGateway string `json:"customer_vpn_gateway"`
 	// Description of the VPNGatewayV2
-	Description string `json:"description"`
+	Description string `json:"description,omitempty"`
 	// Enable/Disable the tunnel
 	// Optional
 	Enabled bool `json:"enabled"`

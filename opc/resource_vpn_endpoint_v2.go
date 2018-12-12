@@ -318,7 +318,7 @@ func resourceOPCVPNEndpointV2Update(d *schema.ResourceData, meta interface{}) er
 
 	info, err := resClient.UpdateVPNEndpointV2(&input)
 	if err != nil {
-		return fmt.Errorf("Error creating VPNEndpointV2: %s", err)
+		return fmt.Errorf("Error updating VPNEndpointV2: %s", err)
 	}
 
 	d.SetId(info.Name)
