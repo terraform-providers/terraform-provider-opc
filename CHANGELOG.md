@@ -1,8 +1,8 @@
-## 1.3.1 (Unreleased)
+## 1.3.1 (December 12, 2018)
 
 IMPROVEMENTS:
 
-* r/opc_vpn_endpoint_v2: Many attributes are now updatable/more robust [GH-158]
+* r/opc_vpn_endpoint_v2: Many attributes are now updatable/more robust ([#158](https://github.com/terraform-providers/terraform-provider-opc/issues/158))
 
 ## 1.3.0 (October 11, 2018)
 
