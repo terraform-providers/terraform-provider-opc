@@ -65,7 +65,7 @@ func setIntList(d *schema.ResourceData, key string, value []int) error {
 
 // Return the last element in a Path string
 func getLastNameInPath(uri string) string {
-	return uri[strings.LastIndex(uri, "/")+1 : len(uri)]
+	return uri[strings.LastIndex(uri, "/")+1:]
 }
 
 // Return just the path component of a URI
