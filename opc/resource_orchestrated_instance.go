@@ -183,7 +183,7 @@ func resourceOPCOrchestratedInstanceUpdate(d *schema.ResourceData, meta interfac
 	input := compute.UpdateOrchestrationInput{
 		Name:         d.Get("name").(string),
 		DesiredState: compute.OrchestrationDesiredState(d.Get("desired_state").(string)),
-		Timeout:      d.Timeout(schema.TimeoutCreate),
+		Timeout:      d.Timeout(schema.TimeoutUpdate),
 		Version:      d.Get("version").(int),
 	}
 

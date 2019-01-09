@@ -2,6 +2,7 @@ package opc
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
@@ -15,6 +16,11 @@ func resourceOPCSnapshot() *schema.Resource {
 		Delete: resourceOPCSnapshotDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
+		},
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(20 * time.Minute),
+			Delete: schema.DefaultTimeout(20 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -60,6 +66,7 @@ func resourceOPCSnapshotCreate(d *schema.ResourceData, meta interface{}) error {
 
 	input := compute.CreateSnapshotInput{
 		Instance: instance,
+		Timeout:  d.Timeout(schema.TimeoutCreate),
 	}
 
 	if account, ok := d.GetOk("description"); ok {
@@ -137,6 +144,7 @@ func resourceOPCSnapshotDelete(d *schema.ResourceData, meta interface{}) error {
 	input := compute.DeleteSnapshotInput{
 		Snapshot:     name,
 		MachineImage: result.MachineImage,
+		Timeout:      d.Timeout(schema.TimeoutDelete),
 	}
 	if err := snapshotClient.DeleteSnapshot(machineImageClient, &input); err != nil {
 		return fmt.Errorf("Error deleting snapshot %s: %s", name, err)
