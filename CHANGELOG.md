@@ -1,4 +1,9 @@
 ## 1.3.2 (Unreleased)
+
+IMPROVEMENTS:
+
+* Add timeout support to snapshot [GH-160]
+
 ## 1.3.1 (December 12, 2018)
 
 IMPROVEMENTS:
