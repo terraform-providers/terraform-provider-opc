@@ -1,8 +1,8 @@
-## 1.3.2 (Unreleased)
+## 1.3.2 (January 16, 2019)
 
 IMPROVEMENTS:
 
-* Add timeout support to snapshot [GH-160]
+* Add timeout support to snapshot ([#160](https://github.com/terraform-providers/terraform-provider-opc/issues/160))
 
 ## 1.3.1 (December 12, 2018)
 
