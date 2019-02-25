@@ -1,6 +1,7 @@
 package opc
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -9,6 +10,9 @@ import (
 )
 
 func TestAccLBaaSServerPool_importBasic(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_server_pool.test"
 

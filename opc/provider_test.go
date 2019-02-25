@@ -34,8 +34,7 @@ func TestProvider_impl(t *testing.T) {
 func testAccPreCheck(t *testing.T) {
 	required := []string{"OPC_USERNAME", "OPC_PASSWORD",
 		"OPC_IDENTITY_DOMAIN", "OPC_ENDPOINT",
-		"OPC_STORAGE_ENDPOINT", "OPC_STORAGE_SERVICE_ID",
-		"OPC_LBAAS_ENDPOINT"}
+	}
 
 	for _, prop := range required {
 		if os.Getenv(prop) == "" {
@@ -44,25 +43,40 @@ func testAccPreCheck(t *testing.T) {
 	}
 
 	config := Config{
-		User:             os.Getenv("OPC_USERNAME"),
-		Password:         os.Getenv("OPC_PASSWORD"),
-		IdentityDomain:   os.Getenv("OPC_IDENTITY_DOMAIN"),
-		Endpoint:         os.Getenv("OPC_ENDPOINT"),
-		MaxRetries:       1,
-		Insecure:         false,
-		StorageEndpoint:  os.Getenv("OPC_STORAGE_ENDPOINT"),
-		StorageServiceID: os.Getenv("OPC_STORAGE_SERVICE_ID"),
-		LBaaSEndpoint:    os.Getenv("OPC_LBAAS_ENDPOINT"),
+		User:           os.Getenv("OPC_USERNAME"),
+		Password:       os.Getenv("OPC_PASSWORD"),
+		IdentityDomain: os.Getenv("OPC_IDENTITY_DOMAIN"),
+		Endpoint:       os.Getenv("OPC_ENDPOINT"),
+		MaxRetries:     1,
+		Insecure:       false,
+	}
+
+	if v := os.Getenv("OPC_STORAGE_ENDPOINT"); v != "" {
+		config.StorageEndpoint = v
+	}
+
+	if v := os.Getenv("OPC_STORAGE_SERVICE_ID"); v != "" {
+		config.StorageServiceID = v
+	}
+
+	if config.StorageEndpoint == "" && config.StorageServiceID == "" {
+		t.Fatalf("One of `OPC_STORAGE_ENDPOINT` OR `OPC_STROAGE_SERVICE_ID` must be set to run tests")
+	}
+
+	if v := os.Getenv("OPC_LBAAS_ENDPOINT"); v != "" {
+		config.LBaaSEndpoint = v
 	}
 
 	client, err := config.Client()
 	if err != nil {
 		t.Fatal(fmt.Sprintf("%+v", err))
 	}
-	if client.storageClient == nil {
+
+	if config.StorageServiceID != "" && client.storageClient == nil {
 		t.Fatalf("Storage Client is nil. Make sure your Oracle Cloud Account has access to the Object Storage Classic service")
 	}
-	if client.lbaasClient == nil {
+
+	if config.LBaaSEndpoint != "" && client.lbaasClient == nil {
 		t.Fatalf("Load Balancer Client is nil. Make sure your Oracle Cloud Account has access to the Load Balancer Classic service")
 	}
 }

@@ -9,6 +9,10 @@ import (
 )
 
 func TestAccOPCLoadBalancer_importBasic(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
+
 	resourceName := "opc_lbaas_load_balancer.test"
 
 	ri := acctest.RandInt()

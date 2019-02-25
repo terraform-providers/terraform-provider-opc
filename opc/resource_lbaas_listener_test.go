@@ -11,6 +11,10 @@ import (
 )
 
 func TestAccLBaaSListener_Basic(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
+
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_listener.test"
 	testName := fmt.Sprintf("acctest-%d", rInt)
@@ -47,6 +51,10 @@ func TestAccLBaaSListener_Basic(t *testing.T) {
 }
 
 func TestAccLBaaSListener_BasicUpdate(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
+
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_listener.test"
 	testName := fmt.Sprintf("acctest-%d", rInt)

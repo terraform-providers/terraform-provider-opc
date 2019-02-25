@@ -3,6 +3,7 @@ package opc
 import (
 	"log"
 	"net/url"
+	"os"
 	"sort"
 	"strings"
 
@@ -86,4 +87,12 @@ func getLoadBalancerContextFromID(id string) lbaas.LoadBalancerContext {
 		Name:   ids[1],
 	}
 	return lb
+}
+
+// Skip LB tests if environment variable isn't set.
+func checkSkipLBTests() bool {
+	if os.Getenv("OPC_LBAAS_ENDPOINT") == "" {
+		return true
+	}
+	return false
 }
