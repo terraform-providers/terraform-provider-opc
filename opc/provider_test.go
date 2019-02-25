@@ -60,7 +60,7 @@ func testAccPreCheck(t *testing.T) {
 	}
 
 	if config.StorageEndpoint == "" && config.StorageServiceID == "" {
-		t.Fatalf("One of `OPC_STORAGE_ENDPOINT` OR `OPC_STROAGE_SERVICE_ID` must be set to run tests")
+		t.Fatalf("One of `OPC_STORAGE_ENDPOINT` OR `OPC_STORAGE_SERVICE_ID` must be set to run tests")
 	}
 
 	if v := os.Getenv("OPC_LBAAS_ENDPOINT"); v != "" {
