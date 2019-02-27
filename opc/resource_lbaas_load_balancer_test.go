@@ -11,6 +11,9 @@ import (
 )
 
 func TestAccLBaaSLoadBalancer_Basic(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
 
 	rInt := acctest.RandInt()
 	config := fmt.Sprintf(testAccLoadBalancerBasic, rInt)
@@ -35,6 +38,9 @@ func TestAccLBaaSLoadBalancer_Basic(t *testing.T) {
 }
 
 func TestAccLBaaSLoadBalancer_BasicUpdate(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
 
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_load_balancer.test"

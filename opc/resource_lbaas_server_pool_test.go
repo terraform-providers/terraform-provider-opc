@@ -12,6 +12,9 @@ import (
 )
 
 func TestExpandOriginServers(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
 
 	validServers := []string{
 		"192.168.1.100:8080",
@@ -41,6 +44,10 @@ func TestExpandOriginServers(t *testing.T) {
 }
 
 func TestAccLBaaSServerPool_Basic(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
+
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_server_pool.test"
 	testName := fmt.Sprintf("acctest-%d", rInt)

@@ -10,6 +10,10 @@ import (
 )
 
 func TestAccLBaaSServerCertificate_ServerCertificate(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
+
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_certificate.server-cert"
 	testName := fmt.Sprintf("acctest-%d", rInt)
@@ -35,6 +39,10 @@ func TestAccLBaaSServerCertificate_ServerCertificate(t *testing.T) {
 }
 
 func TestAccLBaaSServerCertificate_TrustedCertificate(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
+
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_certificate.trusted-cert"
 	testName := fmt.Sprintf("acctest-%d", rInt)

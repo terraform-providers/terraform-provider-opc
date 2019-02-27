@@ -11,6 +11,10 @@ import (
 )
 
 func TestAccLBaaSPolicy_ApplicationCookieStickinessPolicy(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
+
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_policy.application_cookie_stickiness_policy"
 	testName := fmt.Sprintf("acctest-%d", rInt)
@@ -43,6 +47,10 @@ func TestAccLBaaSPolicy_ApplicationCookieStickinessPolicy(t *testing.T) {
 }
 
 func TestAccLBaaSPolicy_CloudGatePolicy(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
+
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_policy.cloudgate_policy"
 	testName := fmt.Sprintf("acctest-%d", rInt)
@@ -78,6 +86,10 @@ func TestAccLBaaSPolicy_CloudGatePolicy(t *testing.T) {
 }
 
 func TestAccLBaaSPolicy_LoadBalancerCookieStickinessPolicy(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
+
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_policy.load_balancer_cookie_stickiness_policy"
 	testName := fmt.Sprintf("acctest-%d", rInt)
@@ -110,6 +122,10 @@ func TestAccLBaaSPolicy_LoadBalancerCookieStickinessPolicy(t *testing.T) {
 }
 
 func TestAccLBaaSPolicy_LoadBalancingMechanismPolicy(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
+
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_policy.load_balancing_mechanism_policy"
 	testName := fmt.Sprintf("acctest-%d", rInt)
@@ -142,6 +158,10 @@ func TestAccLBaaSPolicy_LoadBalancingMechanismPolicy(t *testing.T) {
 }
 
 func TestAccLBaaSPolicy_RateLimitingRequestPolicy(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
+
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_policy.rate_limiting_request_policy"
 	testName := fmt.Sprintf("acctest-%d", rInt)
@@ -181,6 +201,10 @@ func TestAccLBaaSPolicy_RateLimitingRequestPolicy(t *testing.T) {
 }
 
 func TestAccLBaaSPolicy_RedirectPolicy(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
+
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_policy.redirect_policy"
 	testName := fmt.Sprintf("acctest-%d", rInt)
@@ -214,6 +238,10 @@ func TestAccLBaaSPolicy_RedirectPolicy(t *testing.T) {
 }
 
 func TestAccLBaaSPolicy_ResourceAccessControlPolicy(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
+
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_policy.resource_access_control_policy"
 	testName := fmt.Sprintf("acctest-%d", rInt)
@@ -248,6 +276,10 @@ func TestAccLBaaSPolicy_ResourceAccessControlPolicy(t *testing.T) {
 }
 
 func TestAccLBaaSPolicy_SetRequestHeaderPolicy(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
+
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_policy.set_request_header_policy"
 	testName := fmt.Sprintf("acctest-%d", rInt)
@@ -284,6 +316,10 @@ func TestAccLBaaSPolicy_SetRequestHeaderPolicy(t *testing.T) {
 }
 
 func TestAccLBaaSPolicy_SSLNegotiationPolicy(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
+
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_policy.ssl_negotiation_policy"
 	testName := fmt.Sprintf("acctest-%d", rInt)
@@ -319,6 +355,10 @@ func TestAccLBaaSPolicy_SSLNegotiationPolicy(t *testing.T) {
 }
 
 func TestAccLBaaSPolicy_TrustedCertificatePolicy(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
+
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_policy.trusted_certificate_policy"
 	testName := fmt.Sprintf("acctest-%d", rInt)
@@ -351,6 +391,10 @@ func TestAccLBaaSPolicy_TrustedCertificatePolicy(t *testing.T) {
 }
 
 func TestAccLBaaSPolicy_ApplicationCookieStickinessPolicy_Update(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
+
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_policy.application_cookie_stickiness_policy"
 	testName := fmt.Sprintf("acctest-%d", rInt)
@@ -394,6 +438,10 @@ func TestAccLBaaSPolicy_ApplicationCookieStickinessPolicy_Update(t *testing.T) {
 
 // Test to check that policy type can be completely changed successfully
 func TestAccLBaaSPolicy_Update_ChangePolicyType(t *testing.T) {
+	if checkSkipLBTests() {
+		t.Skip(fmt.Printf("`OPC_LBAAS_ENDPOINT` not set, skipping test"))
+	}
+
 	rInt := acctest.RandInt()
 	resName := "opc_lbaas_policy.update_policy_type"
 	testName := fmt.Sprintf("acctest-%d", rInt)
