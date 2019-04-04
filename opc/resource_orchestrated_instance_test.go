@@ -343,6 +343,27 @@ func TestAccOPCOrchestratedInstance_105(t *testing.T) {
 	})
 }
 
+func TestAccOPCOrchestratedInstance_UserData(t *testing.T) {
+	resName := "opc_compute_orchestrated_instance.test"
+	ri := acctest.RandInt()
+	config := testAccOrchestrationUserData(ri)
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckOrchestrationDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckOrchestrationExists,
+					resource.TestCheckResourceAttrSet(resName, "instance.0.id"),
+					resource.TestCheckResourceAttrSet(resName, "instance.0.instance_attributes"),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckOrchestrationExists(s *terraform.State) error {
 	client := testAccProvider.Meta().(*Client).computeClient.Orchestrations()
 
@@ -629,4 +650,30 @@ resource "opc_compute_orchestrated_instance" "test" {
 		}
 	}
 }`, rInt, rInt, rInt, rInt)
+}
+
+func testAccOrchestrationUserData(rInt int) string {
+	return fmt.Sprintf(`
+resource "opc_compute_orchestrated_instance" "test" {
+  name        = "test_orchestration-%d"
+  desired_state = "active"
+  instance {
+	name = "acc-test-instance-%d"
+	label = "TestAccOPCInstance_basic"
+	shape = "oc3"
+	image_list = "/oracle/public/OL_7.2_UEKR4_x86_64"
+	instance_attributes = <<JSON
+{
+  "userdata": {
+    "pre-bootstrap": {
+      "script": [
+        "echo 'This instance was provisioned by Terraform.' >> /etc/motd"
+      ]
+    }
+  }
+}
+JSON
+  }
+}
+  `, rInt, rInt)
 }

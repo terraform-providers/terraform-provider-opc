@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/go-oracle-terraform/compute"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/structure"
 	"github.com/hashicorp/terraform/helper/validation"
 )
 
@@ -45,8 +46,11 @@ func orchestrationInstanceSchema() *schema.Schema {
 				},
 
 				"instance_attributes": {
-					Type:     schema.TypeString,
-					Computed: true,
+					Type:             schema.TypeString,
+					Optional:         true,
+					Computed:         true,
+					ValidateFunc:     validation.ValidateJsonString,
+					DiffSuppressFunc: structure.SuppressJsonDiff,
 				},
 
 				"boot_order": {
@@ -394,6 +398,16 @@ func expandCreateInstanceInput(prefix string, d *schema.ResourceData) (*compute.
 		input.Tags = tags
 	}
 
+	if attributes, ok := d.GetOk(fmt.Sprintf("%s.instance_attributes", prefix)); ok {
+		attrs, err := structure.ExpandJsonFromString(attributes.(string))
+		if err != nil {
+			return nil, fmt.Errorf("Cannot parse attributes as json: %s", err)
+		}
+		if attrs != nil {
+			input.Attributes = attrs
+		}
+	}
+
 	return input, nil
 }
 
@@ -475,20 +489,24 @@ func flattenOrchestratedInstances(d *schema.ResourceData, meta interface{}, obje
 		v["shape"] = instance.Shape
 		v["id"] = instance.ID
 
-		instanceAttributes, err := flattenInstanceAttributes(instance.Attributes)
-		if err != nil {
-			return nil, err
+		if attrs, ok := d.GetOk(fmt.Sprintf("instance.%d.instance_attributes", i)); ok && attrs != nil {
+			v["instance_attributes"] = attrs.(string)
+		} else {
+			instanceAttributes, err := flattenInstanceAttributes(instance.Attributes)
+			if err != nil {
+				return nil, err
+			}
+			v["instance_attributes"] = instanceAttributes
 		}
-		v["instance_attributes"] = instanceAttributes
 
 		sort.Ints(instance.BootOrder)
 		v["boot_order"] = instance.BootOrder
 
-		split_hostname := strings.Split(instance.Hostname, ".")
-		if len(split_hostname) == 0 {
+		splitHostname := strings.Split(instance.Hostname, ".")
+		if len(splitHostname) == 0 {
 			return nil, fmt.Errorf("Unable to parse hostname: %s", instance.Hostname)
 		}
-		v["hostname"] = split_hostname[0]
+		v["hostname"] = splitHostname[0]
 		v["fqdn"] = instance.Hostname
 
 		v["image_list"] = instance.ImageList
