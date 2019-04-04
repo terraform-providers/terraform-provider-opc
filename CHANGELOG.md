@@ -1,4 +1,9 @@
 ## 1.3.3 (Unreleased)
+
+IMPROVEMENTS:
+
+* Add ability to set `instance_attributes` for orchestrated instances [GH-165]
+
 ## 1.3.2 (January 16, 2019)
 
 IMPROVEMENTS:
