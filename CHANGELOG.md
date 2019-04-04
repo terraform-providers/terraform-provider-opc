@@ -1,8 +1,8 @@
-## 1.3.3 (Unreleased)
+## 1.3.3 (April 04, 2019)
 
 IMPROVEMENTS:
 
-* Add ability to set `instance_attributes` for orchestrated instances [GH-165]
+* Add ability to set `instance_attributes` for orchestrated instances ([#165](https://github.com/terraform-providers/terraform-provider-opc/issues/165))
 
 ## 1.3.2 (January 16, 2019)
 
