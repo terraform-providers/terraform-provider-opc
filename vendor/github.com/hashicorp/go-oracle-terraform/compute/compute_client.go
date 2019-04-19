@@ -124,6 +124,18 @@ func (c *Client) getUnqualifiedName(name string) string {
 	}
 
 	nameParts := strings.Split(name, "/")
+
+	if len(nameParts) < 4 {
+		return name
+	}
+
+	// OCI-Classic allows users to specify resources from across different users. We'll check to see if
+	// a user uses a different username and return the orginal if it's different.
+	userName := fmt.Sprintf("/%s/%s", nameParts[1], nameParts[2])
+	if userName != c.getUserName() {
+		return name
+	}
+
 	return strings.Join(nameParts[3:], "/")
 }
 
