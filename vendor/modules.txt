@@ -67,7 +67,7 @@ github.com/hashicorp/go-getter/helper/url
 github.com/hashicorp/go-hclog
 # github.com/hashicorp/go-multierror v0.0.0-20150916205742-d30f09973e19
 github.com/hashicorp/go-multierror
-# github.com/hashicorp/go-oracle-terraform v0.15.2
+# github.com/hashicorp/go-oracle-terraform v0.16.2
 github.com/hashicorp/go-oracle-terraform/client
 github.com/hashicorp/go-oracle-terraform/compute
 github.com/hashicorp/go-oracle-terraform/lbaas

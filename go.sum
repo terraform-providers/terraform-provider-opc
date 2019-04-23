@@ -112,8 +112,8 @@ github.com/hashicorp/go-immutable-radix v1.0.0/go.mod h1:0y9vanUI8NX6FsYoO3zeMjh
 github.com/hashicorp/go-msgpack v0.5.3/go.mod h1:ahLV/dePpqEmjfWmKiqvPkv/twdG7iPBM1vqhUKIvfM=
 github.com/hashicorp/go-multierror v0.0.0-20150916205742-d30f09973e19 h1:gb61U/o4ZJ6TRYvZqJUKYidIhJOEAvNyVMesryROxAY=
 github.com/hashicorp/go-multierror v0.0.0-20150916205742-d30f09973e19/go.mod h1:JMRHfdO9jKNzS/+BTlxCjKNQHg/jZAft8U7LloJvN7I=
-github.com/hashicorp/go-oracle-terraform v0.15.2 h1:Cg0pP/IPbuaPG+2NBJkZtu3XLCyOamCdrVFv34XrsHo=
-github.com/hashicorp/go-oracle-terraform v0.15.2/go.mod h1:09jT3Y/OIsjTjQ2+3bkVNPDKqWcGIYYvjB2BEKVUdvc=
+github.com/hashicorp/go-oracle-terraform v0.16.2 h1:rAY3cFVkT1b8eVwYhy2+hx1aDSgR3BrZ7vqE5P9bbWo=
+github.com/hashicorp/go-oracle-terraform v0.16.2/go.mod h1:09jT3Y/OIsjTjQ2+3bkVNPDKqWcGIYYvjB2BEKVUdvc=
 github.com/hashicorp/go-plugin v0.0.0-20180125190438-e53f54cbf51e/go.mod h1:JSqWYsict+jzcj0+xElxyrBQRPNoiWQuddnxArJ7XHQ=
 github.com/hashicorp/go-plugin v0.0.0-20180331002553-e8d22c780116 h1:Y4V/yReWjQo/Ngyc0w6C3EKXKincp4YgvXeo8lI4LrI=
 github.com/hashicorp/go-plugin v0.0.0-20180331002553-e8d22c780116/go.mod h1:JSqWYsict+jzcj0+xElxyrBQRPNoiWQuddnxArJ7XHQ=
