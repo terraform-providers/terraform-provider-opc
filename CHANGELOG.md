@@ -1,3 +1,9 @@
+## 1.3.4 (Unreleased)
+
+IMPROVEMENTS:
+
+* Add ability to use different username/identity domains without forcing a recreate of the resource [GH-167]
+
 ## 1.3.3 (April 04, 2019)
 
 IMPROVEMENTS:
