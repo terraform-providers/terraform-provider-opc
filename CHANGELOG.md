@@ -1,8 +1,8 @@
-## 1.3.4 (Unreleased)
+## 1.3.4 (April 23, 2019)
 
 IMPROVEMENTS:
 
-* Add ability to use different username/identity domains without forcing a recreate of the resource [GH-167]
+* Add ability to use different username/identity domains without forcing a recreate of the resource ([#167](https://github.com/terraform-providers/terraform-provider-opc/issues/167))
 
 ## 1.3.3 (April 04, 2019)
 
