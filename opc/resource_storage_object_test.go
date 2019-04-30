@@ -179,9 +179,9 @@ func testAccOPCStorageObject_objectMetadata(rInt int, body string) string {
 resource "opc_storage_object" "test" {
   name = "test-acc-%d"
   container = "${opc_storage_container.foo.name}"
-	metadata {
-		"Foo" = "bar",
-		"Abc-Def" = "xyz"
+	metadata = {
+		Foo = "bar",
+		Abc-Def = "xyz"
 	}
   content_type = "text/plain;charset=UTF-8"
   content = <<EOF

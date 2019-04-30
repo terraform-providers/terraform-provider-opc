@@ -70,6 +70,7 @@ func resourceOPCStorageContainer() *schema.Resource {
 			"metadata": {
 				Type:     schema.TypeMap,
 				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			// "georeplication_policy": {
 			// 	Type:     schema.TypeList,
