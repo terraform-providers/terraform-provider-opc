@@ -32,6 +32,7 @@ func resourceOPCSnapshot() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
+				Computed: true,
 			},
 			"creation_time": {
 				Type:     schema.TypeString,
@@ -69,7 +70,7 @@ func resourceOPCSnapshotCreate(d *schema.ResourceData, meta interface{}) error {
 		Timeout:  d.Timeout(schema.TimeoutCreate),
 	}
 
-	if account, ok := d.GetOk("description"); ok {
+	if account, ok := d.GetOk("account"); ok {
 		input.Account = account.(string)
 	}
 

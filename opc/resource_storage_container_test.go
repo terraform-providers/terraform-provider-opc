@@ -125,15 +125,15 @@ func testAccOPCStorageContainerBasic(rInt int) string {
 resource "opc_storage_container" "test" {
   name = "acc-storage-container-%d"
   max_age = 50
-	quota_bytes = 1000000000
-	quota_count = 1000
+  quota_bytes = 1000000000
+  quota_count = 1000
   primary_key = "test-key"
   allowed_origins = ["origin-1"]
-	exposed_headers = ["exposed-header-1"]
-	metadata {
-		"Foo" = "bar",
-		"Abc-Def" = "xyz"
-	}
+  exposed_headers = ["exposed-header-1"]
+  metadata = {
+	Foo = "bar"
+	Abc-Def = "xyz"
+  }
 }
 `, rInt)
 }
@@ -149,9 +149,9 @@ resource "opc_storage_container" "test" {
   secondary_key = "test-key"
   allowed_origins = ["origin-1", "origin-2"]
 	exposed_headers = ["exposed-header-1", "exposed-header-2"]
-	metadata {
-		"Bar" = "foo",
-		"Abc-Def" = "xyz"
+	metadata = {
+		Bar = "foo"
+		Abc-Def = "xyz"
 	}
 }
 `, rInt)
