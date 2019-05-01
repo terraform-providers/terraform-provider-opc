@@ -1,4 +1,9 @@
 ## 1.3.6 (Unreleased)
+
+NOTES:
+
+Adding the additonal protocol version (5) for Terraform 0.12 to this release.
+
 ## 1.3.5 (April 30, 2019)
 
 NOTES:
