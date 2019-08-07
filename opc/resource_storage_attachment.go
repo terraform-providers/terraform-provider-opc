@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/hashicorp/go-oracle-terraform/client"
 	"github.com/hashicorp/go-oracle-terraform/compute"
@@ -18,6 +19,11 @@ func resourceOPCStorageAttachment() *schema.Resource {
 		Delete: resourceOPCStorageAttachmentDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
+		},
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -90,6 +96,7 @@ func resourceOPCStorageAttachmentCreate(d *schema.ResourceData, meta interface{}
 		StorageVolumeName: storageVolume.Name,
 		InstanceName:      fmt.Sprintf("%s/%s", instance.Name, instance.ID),
 		Index:             volumeIndex,
+		Timeout:           d.Timeout(schema.TimeoutCreate),
 	}
 
 	info, err := storageAttachmentClient.CreateStorageAttachment(&input)
@@ -159,7 +166,8 @@ func resourceOPCStorageAttachmentDelete(d *schema.ResourceData, meta interface{}
 	log.Printf("[DEBUG] Deleting StorageAttachment: %v", name)
 
 	input := compute.DeleteStorageAttachmentInput{
-		Name: name,
+		Name:    name,
+		Timeout: d.Timeout(schema.TimeoutDelete),
 	}
 	if err := resClient.DeleteStorageAttachment(&input); err != nil {
 		return fmt.Errorf("Error deleting StorageAttachment")
