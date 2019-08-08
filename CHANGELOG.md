@@ -1,8 +1,8 @@
-## 1.3.7 (Unreleased)
+## 1.3.7 (August 08, 2019)
 
 IMPROVEMENTS:
 
-`opc_storage_attachment` - Support for timeouts [GH-171]
+`opc_storage_attachment` - Support for timeouts ([#171](https://github.com/terraform-providers/terraform-provider-opc/issues/171))
 
 ## 1.3.6 (May 01, 2019)
 
