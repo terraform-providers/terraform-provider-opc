@@ -1,4 +1,9 @@
 ## 1.3.7 (Unreleased)
+
+IMPROVEMENTS:
+
+`opc_storage_attachment` - Support for timeouts [GH-171]
+
 ## 1.3.6 (May 01, 2019)
 
 NOTES:
