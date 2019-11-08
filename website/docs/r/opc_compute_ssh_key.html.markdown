@@ -1,4 +1,5 @@
 ---
+subcategory: "Compute Classic"
 layout: "opc"
 page_title: "Oracle: opc_compute_ssh_key"
 sidebar_current: "docs-opc-resource-ssh-key"

@@ -57,5 +57,8 @@ ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
 endif
 	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider-test PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
 
-.PHONY: build test testacc vet fmt fmtcheck errcheck test-compile website website-test
+test-docscheck:
+	@sh -c "'$(CURDIR)/scripts/docscheck.sh'"
+
+.PHONY: build test testacc vet fmt fmtcheck errcheck test-compile website website-test docscheck
 

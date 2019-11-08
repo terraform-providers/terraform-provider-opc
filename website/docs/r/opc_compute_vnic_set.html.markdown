@@ -1,4 +1,5 @@
 ---
+subcategory: "Compute Classic"
 layout: "opc"
 page_title: "Oracle: opc_compute_vnic_set"
 sidebar_current: "docs-opc-resource-vnic-set"

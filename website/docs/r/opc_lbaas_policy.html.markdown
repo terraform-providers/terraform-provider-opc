@@ -1,4 +1,5 @@
 ---
+subcategory: "Load Balancer Classic"
 layout: "opc"
 page_title: "Oracle: opc_lbaas_policy"
 sidebar_current: "docs-opc-resource-lbaas-policy"

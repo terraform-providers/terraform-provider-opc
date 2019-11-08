@@ -1,4 +1,5 @@
 ---
+subcategory: "Compute Classic"
 layout: "opc"
 page_title: "Oracle: opc_compute_image_list_entry"
 sidebar_current: "docs-opc-resource-image-list-entry"

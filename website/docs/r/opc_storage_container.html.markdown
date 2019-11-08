@@ -1,4 +1,5 @@
 ---
+subcategory: "Object Storage Classic"
 layout: "opc"
 page_title: "Oracle: opc_storage_container"
 sidebar_current: "docs-opc-resource-storage-container"

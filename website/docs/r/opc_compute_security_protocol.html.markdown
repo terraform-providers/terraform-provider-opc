@@ -1,4 +1,5 @@
 ---
+subcategory: "Compute Classic"
 layout: "opc"
 page_title: "Oracle: opc_compute_security_protocol"
 sidebar_current: "docs-opc-resource-security-protocol"
