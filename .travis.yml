@@ -17,6 +17,7 @@ script:
 - make test
 - make vet
 - make website-test
+- make test-docscheck
 
 branches:
   only:

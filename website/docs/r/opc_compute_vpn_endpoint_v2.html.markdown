@@ -1,4 +1,5 @@
 ---
+subcategory: "Compute Classic"
 layout: "opc"
 page_title: "Oracle: opc_compute_vpn_endpoint_v2"
 sidebar_current: "docs-opc-resource-vpn-endpoint-v2"

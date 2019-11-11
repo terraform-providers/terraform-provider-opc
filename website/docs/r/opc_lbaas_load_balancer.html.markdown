@@ -1,4 +1,5 @@
 ---
+subcategory: "Load Balancer Classic"
 layout: "opc"
 page_title: "Oracle: opc_lbaas_load_balancer"
 sidebar_current: "docs-opc-resource-lbaas-load-balancer"
