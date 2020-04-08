@@ -25,11 +25,11 @@ func resourceInstance() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: func(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 				combined := strings.Split(d.Id(), "/")
-				if len(combined) != 2 {
+				if len(combined) < 2 {
 					return nil, fmt.Errorf("Invalid ID specified. Must be in the form of instance_name/instance_id. Got: %s", d.Id())
 				}
-				d.Set("name", combined[0])
-				d.SetId(combined[1])
+				d.Set("name", strings.Join(combined[0:len(combined)-1], "/"))
+				d.SetId(combined[len(combined)-1])
 				return []*schema.ResourceData{d}, nil
 			},
 		},
