@@ -1,4 +1,11 @@
-## 1.3.8 (Unreleased)
+## 1.4.0 (Unreleased)
+
+IMPROVEMENTS: 
+
+* Add support for multiname resources
+
+* Upgrade to 0.17.0 of the go-oracle-sdk
+
 ## 1.3.7 (August 08, 2019)
 
 IMPROVEMENTS:
