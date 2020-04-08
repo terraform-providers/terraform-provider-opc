@@ -452,8 +452,8 @@ func (c *InstancesClient) GetInstance(input *GetInstanceInput) (*InstanceInfo, e
 	// The returned 'Name' attribute is the fully qualified instance name + "/" + ID
 	// Split these out to accurately populate the fields
 	nID := strings.Split(c.getUnqualifiedName(responseBody.FQDN), "/")
-	responseBody.Name = nID[0]
-	responseBody.ID = nID[1]
+	responseBody.Name = strings.Join(nID[0:len(nID)-1], "/")
+	responseBody.ID = nID[len(nID)-1]
 
 	c.unqualify(&responseBody.VCableID)
 
@@ -504,8 +504,8 @@ func (c *InstancesClient) GetInstanceFromName(input *GetInstanceIDInput) (*Insta
 			// The returned 'Name' attribute is the fully qualified instance name + "/" + ID
 			// Split these out to accurately populate the fields
 			nID := strings.Split(c.getUnqualifiedName(i.FQDN), "/")
-			i.Name = nID[0]
-			i.ID = nID[1]
+			i.Name = strings.Join(nID[0:len(nID)-1], "/")
+			i.ID = nID[len(nID)-1]
 
 			c.unqualify(&i.VCableID)
 
@@ -765,7 +765,7 @@ func (c *InstancesClient) unqualifyNetworking(info map[string]NetworkingInfo) (m
 		if v.Vnic != "" {
 			unq.Vnic = c.getUnqualifiedName(v.Vnic)
 		}
-		if v.Nat != nil {
+		if v.Nat != nil && len(v.Nat) > 0 && v.Nat[0] != "null" {
 			unq.Nat, err = c.unqualifyNat(v.Nat)
 			if err != nil {
 				return nil, err
@@ -806,7 +806,7 @@ func (c *InstancesClient) unqualifyNat(nat []string) ([]string, error) {
 			continue
 		}
 		n := strings.Split(v, ":")
-		if len(n) < 1 {
+		if len(n) < 2 {
 			return nil, fmt.Errorf("Error unqualifying NAT: %s", v)
 		}
 		u := n[1]
