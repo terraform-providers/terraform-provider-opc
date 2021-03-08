@@ -1,4 +1,9 @@
 ## 1.5.0 (Unreleased)
+
+IMPROVEMENTS:
+
+* Enable timeouts for vpn_endpoint_v2 [GH-177]
+
 ## 1.4.0 (April 08, 2020)
 
 IMPROVEMENTS: 
