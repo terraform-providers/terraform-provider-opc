@@ -1,8 +1,8 @@
-## 1.4.1 (Unreleased)
+## 1.4.1 (March 08, 2021)
 
 IMPROVEMENTS:
 
-* Enable timeouts for vpn_endpoint_v2 [GH-177]
+* Enable timeouts for vpn_endpoint_v2 ([#177](https://github.com/terraform-providers/terraform-provider-opc/issues/177))
 
 ## 1.4.0 (April 08, 2020)
 
