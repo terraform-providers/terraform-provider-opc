@@ -166,6 +166,7 @@ func resourceOPCVPNEndpointV2Create(d *schema.ResourceData, meta interface{}) er
 		PSK:                d.Get("pre_shared_key").(string),
 		ReachableRoutes:    getStringList(d, "reachable_routes"),
 		VNICSets:           getStringList(d, "vnic_sets"),
+		Timeout:            d.Timeout(schema.TimeoutCreate),
 	}
 
 	tags := getStringList(d, "tags")
@@ -285,6 +286,7 @@ func resourceOPCVPNEndpointV2Update(d *schema.ResourceData, meta interface{}) er
 		IPNetwork:          d.Get("ip_network").(string),
 		PSK:                d.Get("pre_shared_key").(string),
 		VNICSets:           getStringList(d, "vnic_sets"),
+		Timeout:            d.Timeout(schema.TimeoutUpdate),
 	}
 
 	tags := getStringList(d, "tags")
@@ -337,7 +339,8 @@ func resourceOPCVPNEndpointV2Delete(d *schema.ResourceData, meta interface{}) er
 	log.Printf("[DEBUG] Deleting VPNEndpointV2: %v", name)
 
 	input := compute.DeleteVPNEndpointV2Input{
-		Name: name,
+		Name:    name,
+		Timeout: d.Timeout(schema.TimeoutDelete),
 	}
 	if err := resClient.DeleteVPNEndpointV2(&input); err != nil {
 		return fmt.Errorf("Error deleting VPNEndpointV2")
