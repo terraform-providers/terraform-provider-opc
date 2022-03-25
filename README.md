@@ -1,3 +1,6 @@
+| :memo:        | This provider is no longer maintained by HashiCorp.       |
+|---------------|:------------------------|
+
 Terraform Provider
 ==================
 
