@@ -1,0 +1,27 @@
+on:
+  push:
+    branches:
+      - master
+jobs:
+  test:
+    env:
+      GO111MODULE: on
+    strategy:
+      fail-fast: true
+      matrix:
+        go-version: [1.11]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      # Install the action at version 2.1.4: https://github.com/actions/setup-go/releases/tag/v2.1.4
+      - name: Install Go
+        uses: actions/setup-go@331ce1d993939866bb63c32c6cbbfd48fa76fc57
+        with:
+          go-version: ${{ matrix.go-version }}
+      # Install the action at version 2.3.4: https://github.com/actions/checkout/releases/tag/v2.3.4
+      - name: Checkout code
+        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
+      - run: make test
+      - run: make vet
+      - run: make website-test
+      - run: make test-docscheck
