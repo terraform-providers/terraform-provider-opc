@@ -62,7 +62,7 @@ func resourceInstance() *schema.Resource {
 			"instance_attributes": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				ForceNew:     true,
+				ForceNew:     false,
 				ValidateFunc: validation.ValidateJsonString,
 			},
 
