@@ -86,7 +86,7 @@ func resourceSSLCertificateCreate(d *schema.ResourceData, meta interface{}) erro
 
 	info, err := sslCertClient.CreateSSLCertificate(&input)
 	if err != nil {
-		return fmt.Errorf("Error creating Load Balancer Server Pool: %s", err)
+		return fmt.Errorf("Error creating Load Balancer Certificate: %s", err)
 	}
 
 	d.SetId(info.Name)

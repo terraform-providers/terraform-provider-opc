@@ -268,6 +268,9 @@ func (c *Client) retryRequest(req *http.Request) (*http.Response, error) {
 			return resp, nil
 		}
 
+		// replace body with unread Reader
+		req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+
 		buf := new(bytes.Buffer)
 		_, err = buf.ReadFrom(resp.Body)
 		if err != nil {
